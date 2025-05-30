@@ -1,50 +1,154 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# ---------------------------------------------
+# 🔧 编译输出 / 构建目录
+# ---------------------------------------------
+dist/
+build/
+out/
+out-tsc/
+.next/
+.temp/
+tmp/
+temp/
+test-output/
+storybook-static/
 
-# compiled output
-dist
-tmp
-out-tsc
+# ---------------------------------------------
+# 📦 依赖
+# ---------------------------------------------
+node_modules/
 
-# dependencies
-node_modules
+# ---------------------------------------------
+# 🧠 IDE 和编辑器配置
+# ---------------------------------------------
+# JetBrains 系列
+.idea/
+*.iml
 
-# IDEs and editors
-/.idea
+# Eclipse
 .project
 .classpath
-.c9/
-*.launch
 .settings/
+*.launch
+
+# Cloud9
+.c9/
+
+# Sublime
 *.sublime-workspace
 
-# IDE - VSCode
+# VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
+# ---------------------------------------------
+# 🧪 测试 & 覆盖率
+# ---------------------------------------------
+coverage/
+*.lcov
 testem.log
-/typings
+/libpeerconnection.log
+/test-results/
 
-# System Files
+# Jest
+/jest-test-results.json
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+# Playwright
+/playwright-report/
+
+# ---------------------------------------------
+# 🐞 日志文件
+# ---------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ---------------------------------------------
+# 💻 系统文件
+# ---------------------------------------------
 .DS_Store
 Thumbs.db
 
-.nx/cache
-.nx/workspace-data
+# ---------------------------------------------
+# 🔐 环境变量文件
+.env
+.env.*
+!.env.example
+*.local.*
+
+# ---------------------------------------------
+# 🧹 Lint / Prettier 缓存及临时配置
+.eslintcache
+.prettiercache
+lint-staged.config.js
+
+# ---------------------------------------------
+# 🐎 Husky 自动生成的 Hook 缓存
+.husky/_
+
+# ---------------------------------------------
+# 🧠 TypeScript / tsx 工具缓存
+.cache/
+/typings
+
+# ---------------------------------------------
+# 📦 Nx / TurboRepo / Monorepo 支持
+.nx/cache/
+.nx/workspace-data/
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
+.turbo/
+turbo.json
+turbo.lock.json
 
-# Next.js
-.next
-out
+# ---------------------------------------------
+# ☁️ 部署平台配置
+.vercel/
+.netlify/
+netlify.toml
+firebase-debug.log
+.firebaserc
+.firebase/
+.firebase.json
 
-test-output
+# AWS SAM / Serverless Framework
+.aws-sam/
+.serverless/
+
+# ---------------------------------------------
+# 🐳 Docker / PM2 支持
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+*.pid
+.pm2/
+
+# ---------------------------------------------
+# ⛔ 其他忽略项
+*.swp
+*.bak
+*.tmp
+*.log.*
+
+# ---------------------------------------------
+# 🧪 临时测试脚本和工具生成项（建议）
+/scripts/tmp/
+/tools/tmp/
+/examples/
+
+# ---------------------------------------------
+# 🚫 禁止上传的个人文件（手动创建的配置）
+*.secret.*
+*.private.*
+*.key
+*.pem
+*.crt

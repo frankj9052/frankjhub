@@ -2,7 +2,10 @@
   "name": "@frankjhub/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky",
+    "preinstall": "only-allow npm"
+  },
   "private": true,
   "dependencies": {
     "express": "^4.21.2",
@@ -49,10 +52,13 @@
     "eslint-plugin-jsx-a11y": "6.10.1",
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
+    "husky": "^9.1.7",
     "jest": "^29.7.0",
     "jest-environment-node": "^29.7.0",
     "jsonc-eslint-parser": "^2.1.0",
+    "lint-staged": "^16.1.0",
     "nx": "21.1.2",
+    "only-allow": "1.2.1",
     "postcss": "8.4.38",
     "prettier": "^2.6.2",
     "rollup": "^4.14.0",
@@ -67,5 +73,11 @@
   "workspaces": [
     "apps/*",
     "libs/*"
-  ]
+  ],
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
 }

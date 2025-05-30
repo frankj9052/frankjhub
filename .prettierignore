@@ -1,5 +1,81 @@
-# Add files here to ignore them from prettier formatting
-/dist
-/coverage
-/.nx/cache
-/.nx/workspace-data
+# 👉 不需要 Prettier 格式化的编译产物、构建目录
+dist/
+build/
+out/
+out-tsc/
+.next/
+storybook-static/
+test-output/
+.temp/
+tmp/
+temp/
+
+# 👉 不格式化依赖
+node_modules/
+
+# 👉 缓存目录
+.cache/
+coverage/
+.nx/cache/
+.nx/workspace-data/
+.turbo/
+
+# 👉 编辑器和 IDE 设置文件（由工具生成，不需要格式化）
+.vscode/
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+*.launch
+
+# 👉 日志和测试结果文件
+logs/
+*.log
+testem.log
+/libpeerconnection.log
+jest-test-results.json
+/playwright-report/
+/cypress/videos/
+/cypress/screenshots/
+/test-results/
+
+# 👉 环境变量文件
+.env*
+!.env.example
+*.local.*
+
+# 👉 Husky 自动生成
+.husky/_
+
+# 👉 Docker、PM2、部署配置等非代码文件
+Dockerfile
+docker-compose.yml
+docker-compose.*.yml
+.pm2/
+.vercel/
+.netlify/
+firebase.json
+.firebaserc
+.aws-sam/
+.serverless/
+
+# 👉 锁文件通常不需要格式化
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 👉 日常脚本或测试目录（可选）
+scripts/tmp/
+tools/tmp/
+examples/
+
+# 👉 其他应排除的文件
+*.bak
+*.tmp
+*.swp
+*.secret.*
+*.private.*
+*.key
+*.crt
+*.pem
