@@ -3,6 +3,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { corsOptions } from './config/corsOptions';
 import { registerRoutes } from './loaders/registerRoutes';
+import { requestId } from './middlewares/requestId';
+import { errorHandler } from './middlewares/errorHandler';
 
 export async function createApp() {
   const app = express();
@@ -16,10 +18,15 @@ export async function createApp() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // 其它中间件
+  app.use(requestId);
+
   // ---- 动态注册业务路由（异步操作）----
   const apiRouter = Router();
   await registerRoutes(apiRouter);
   app.use('/api', apiRouter);
 
+  // ---- 全局错误处理器 ----
+  app.use(errorHandler);
   return app;
 }
