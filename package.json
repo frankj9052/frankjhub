@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky",
-    "preinstall": "only-allow npm"
+    "preinstall": "only-allow npm",
+    "generate:tree": "tsx ./scripts/generateTree.ts"
   },
   "private": true,
   "dependencies": {
@@ -79,6 +80,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
+    "tsx": "4.19.4",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.19.0",
     "uuid": "11.1.0",
