@@ -1,15 +1,20 @@
-import express from 'express';
+import { createApp } from './createApp';
+import { createLoggerWithContext } from './modules/common/libs/logger';
 import { env } from './config/env';
 
-const host = process.env.HOST ?? 'localhost';
-// const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const serverLogger = createLoggerWithContext('Server');
+async function startServer() {
+  try {
+    serverLogger.info('🚀 Starting server...');
+    const app = await createApp();
 
-const app = express();
+    app.listen(Number(env.PORT), () => {
+      serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
+    });
+  } catch (error) {
+    serverLogger.error('❌ Server failed to start', error);
+    process.exit(1);
+  }
+}
 
-app.get('/', (req, res) => {
-  res.send({ message: 'Hello API' });
-});
-
-app.listen(Number(env.PORT), host, () => {
-  console.log(`[ ready ] http://${host}:${env.PORT}`);
-});
+startServer();
