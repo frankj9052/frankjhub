@@ -42,20 +42,6 @@
           }
         }
       },
-      "serve:dev": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "cross-env NODE_ENV=development tsx watch apps/main-server/src/main.ts --ignore node_modules --ignore dist",
-          "cwd": "."
-        }
-      },
-      "serve:prod": {
-        "executor": "nx:run-commands",
-        "options": {
-          "command": "nx build main-server --configuration=production && cross-env NODE_ENV=production node apps/main-server/dist/main.js",
-          "cwd": "."
-        }
-      },
       "serve": {
         "continuous": true,
         "executor": "@nx/js:node",
