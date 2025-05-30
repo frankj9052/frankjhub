@@ -7,6 +7,7 @@ import { requestId } from './middlewares/requestId';
 import { errorHandler } from './middlewares/errorHandler';
 import { generateSwaggerDocs } from './swagger/swagger';
 import { sessionMiddleware } from './middlewares/sessionMiddleware';
+import { securityHeaders } from './middlewares/securityHeaders';
 
 export async function createApp() {
   const app = express();
@@ -17,6 +18,7 @@ export async function createApp() {
   // ---- 全局中间件 ----
   app.use(cookieParser());
   app.use(cors(corsOptions));
+  app.use(securityHeaders);
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
