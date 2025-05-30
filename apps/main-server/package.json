@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "nx": {
+    "projectType": "application",
     "targets": {
       "build": {
         "executor": "@nx/esbuild:esbuild",
@@ -39,6 +40,20 @@
               }
             }
           }
+        }
+      },
+      "serve:dev": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "cross-env NODE_ENV=development tsx watch apps/main-server/src/main.ts --ignore node_modules --ignore dist",
+          "cwd": "."
+        }
+      },
+      "serve:prod": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "nx build main-server --configuration=production && cross-env NODE_ENV=production node apps/main-server/dist/main.js",
+          "cwd": "."
         }
       },
       "serve": {
