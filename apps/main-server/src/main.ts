@@ -10,6 +10,7 @@ async function startServer() {
 
     app.listen(Number(env.PORT), () => {
       serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
+      serverLogger.info(`📚 Swagger docs available at http://${env.HOST}:${env.PORT}/api-docs`);
     });
   } catch (error) {
     serverLogger.error('❌ Server failed to start', error);

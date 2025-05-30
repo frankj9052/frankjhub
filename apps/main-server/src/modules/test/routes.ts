@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { connectionTest } from './test.controller';
+import './docs/openapi';
 
 const router = Router();
 

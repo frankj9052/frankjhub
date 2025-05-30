@@ -5,6 +5,7 @@ import { corsOptions } from './config/corsOptions';
 import { registerRoutes } from './loaders/registerRoutes';
 import { requestId } from './middlewares/requestId';
 import { errorHandler } from './middlewares/errorHandler';
+import { generateSwaggerDocs } from './swagger/swagger';
 
 export async function createApp() {
   const app = express();
@@ -25,6 +26,9 @@ export async function createApp() {
   const apiRouter = Router();
   await registerRoutes(apiRouter);
   app.use('/api', apiRouter);
+
+  // ---- Swagger ----
+  generateSwaggerDocs(app);
 
   // ---- 全局错误处理器 ----
   app.use(errorHandler);
