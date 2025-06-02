@@ -1,7 +1,7 @@
 export function SharedUi() {
   return (
-    <div className={styles['container']}>
-      <h1>Welcome to SharedUi!</h1>
+    <div>
+      <h1 className="bg-red-400">Welcome to SharedUi!333</h1>
     </div>
   );
 }
