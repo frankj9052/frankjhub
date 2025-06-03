@@ -1,3 +1,4 @@
+const { heroui } = require('@heroui/react');
 const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
 
 // The above utility import will not work if you are using Next.js' --turbo.
@@ -15,11 +16,10 @@ module.exports = {
     './{src,pages,components,app}/**/*.{ts,tsx,js,jsx,html}',
     '!./{src,pages,components,app}/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
     ...createGlobPatternsForDependencies(__dirname),
-    '../../libs/storybook-host/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
-    '../../libs/shared-ui/src/**/*.{stories,spec}.{ts,tsx,js,jsx,html}',
+    '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [heroui()],
 };

@@ -1,8 +1,15 @@
 import '@styles/global';
 import type { Preview } from '@storybook/react';
+import { HeroUIProvider } from '@heroui/react';
 
 const preview: Preview = {
-  decorators: [Story => <Story />],
+  decorators: [
+    Story => (
+      <HeroUIProvider>
+        <Story />
+      </HeroUIProvider>
+    ),
+  ],
 
   parameters: {
     controls: {
