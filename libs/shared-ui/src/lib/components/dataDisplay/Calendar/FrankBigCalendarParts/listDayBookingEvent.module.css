@@ -1,0 +1,7 @@
+.bgGrid {
+    background-image: repeating-linear-gradient(
+      135deg,
+      #EBEBEB 0 1px,
+      transparent 2px 8px
+    );
+  }

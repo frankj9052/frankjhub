@@ -6,7 +6,12 @@ module.exports = withNx(
     outputPath: './dist',
     tsConfig: './tsconfig.lib.json',
     compiler: 'swc',
-    format: ['esm'],
+    format: ['esm', 'cjs'],
+    assets: [
+      { input: 'libs/shared-utils', output: '.', glob: '*.md' },
+      { input: 'libs/shared-utils', output: '.', glob: 'package.json'}
+    ],
+    external: ['@internationalized/date', 'date-fns', 'react'],
   },
   {
     // Provide additional rollup configuration here. See: https://rollupjs.org/configuration-options

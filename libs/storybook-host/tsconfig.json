@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../apps/admin-portal"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {
