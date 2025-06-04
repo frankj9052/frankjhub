@@ -1,4 +1,4 @@
-import { FrankButtonBase, FrankCard } from '@frankjia9052/shared-ui';
+import { FrankCard } from '@frankjhub/shared-ui';
 import { Divider } from '@heroui/react';
 export type WorkCardProps = {
   companyName: string;

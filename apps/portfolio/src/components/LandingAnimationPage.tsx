@@ -1,6 +1,6 @@
 'use client';
 
-import { FrankLoadingSignature } from '@frankjia9052/shared-ui';
+import { FrankLoadingSignature } from '@frankjhub/shared-ui';
 import { useEffect, useState } from 'react';
 
 export const LandingAnimationPage = () => {

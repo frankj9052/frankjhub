@@ -1,5 +1,5 @@
 'use client';
-import { FrankTabs, HeroTitle } from '@frankjia9052/shared-ui';
+import { FrankTabs, HeroTitle } from '@frankjhub/shared-ui';
 import { EducationCard } from '../../components/home/SkillSectionLayout/EducationCard';
 import { WorkCard } from './SkillSectionLayout/WorkCard';
 import { Spacer } from '@heroui/react';

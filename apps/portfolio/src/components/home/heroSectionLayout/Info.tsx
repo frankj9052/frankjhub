@@ -1,5 +1,5 @@
 'use client';
-import { FrankButtonBase } from '@frankjia9052/shared-ui';
+import { FrankButtonBase } from '@frankjhub/shared-ui';
 import { Spacer } from '@heroui/react';
 import { FaArrowAltCircleRight } from 'react-icons/fa';
 

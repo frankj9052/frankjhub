@@ -1,4 +1,4 @@
-import { FrankCard } from '@frankjia9052/shared-ui';
+import { FrankCard } from '@frankjhub/shared-ui';
 
 export type EducationCardProps = {
   year: string;

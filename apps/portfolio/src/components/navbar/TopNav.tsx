@@ -1,6 +1,6 @@
 'use client';
-import { NavLinkType } from '@frankjia9052/shared-utils';
-import { FrankTopNav } from '@frankjia9052/shared-ui';
+import { NavLinkType } from '@frankjhub/shared-utils';
+import { FrankTopNav } from '@frankjhub/shared-ui';
 import { TextBrand } from './TextBrand';
 
 const publicLinks: NavLinkType[] = [

@@ -1,4 +1,4 @@
-import { NumberRiser } from '@frankjia9052/shared-ui';
+import { NumberRiser } from '@frankjhub/shared-ui';
 
 type NumberRiserComponentProps = {
   number: number;
