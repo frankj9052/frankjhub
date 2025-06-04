@@ -1,9 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "outDir": ""
+    "emitDecoratorMetadata": true
+    // "outDir": ""
   },
   "exclude": [
     "src/**/*.spec.ts",
@@ -24,9 +25,11 @@
     ".storybook/*.js",
     ".storybook/*.ts",
     ".storybook/*.jsx",
-    ".storybook/*.tsx"
+    ".storybook/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx"
   ],
-    "files": [
+  "files": [
     "../../node_modules/@nx/react/typings/styled-jsx.d.ts",
     "../../node_modules/@nx/react/typings/cssmodule.d.ts",
     "../../node_modules/@nx/react/typings/image.d.ts"

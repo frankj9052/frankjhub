@@ -1,4 +1,15 @@
 const { withNx } = require('@nx/rollup/with-nx');
+const pkg = require('./package.json');
+const { builtinModules } = require('module');
+
+const manuallyExternal = [];
+
+const externalDeps = [
+  ...Object.keys(pkg.dependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {}),
+  ...builtinModules,
+  ...manuallyExternal,
+];
 
 module.exports = withNx(
   {
@@ -11,7 +22,7 @@ module.exports = withNx(
       { input: 'libs/shared-utils', output: '.', glob: '*.md' },
       { input: 'libs/shared-utils', output: '.', glob: 'package.json'}
     ],
-    external: ['@internationalized/date', 'date-fns', 'react'],
+    external: externalDeps,
   },
   {
     // Provide additional rollup configuration here. See: https://rollupjs.org/configuration-options

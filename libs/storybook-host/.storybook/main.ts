@@ -17,10 +17,11 @@ const config: StorybookConfig = {
       plugins: [react(), nxViteTsPaths()],
       resolve: {
         alias: {
-          '@styles/global': join(__dirname, '../../../apps/admin-portal/src/app/global.css'),
+          '@styles/global': join(__dirname, '../src/global.css'),
           '@api': path.resolve(__dirname, './mocks/mock-api.ts'),
           'next/navigation': path.resolve(__dirname, './mocks/mock-next-navigation.ts'),
           'next/link': path.resolve(__dirname, './mocks/mock-next-link.tsx'),
+          'next/image': path.resolve(__dirname, './mocks/mock-next-image.tsx'),
         },
       },
     }),

@@ -22,6 +22,15 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "**/*.spec.ts",
+    "**/*.test.tsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    {
+      "path": "../shared-utils/tsconfig.lib.json"
+    }
+  ]
 }

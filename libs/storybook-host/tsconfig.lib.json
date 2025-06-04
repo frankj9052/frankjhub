@@ -28,9 +28,5 @@
     "**/*.stories.tsx"
   ],
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
-  "references": [
-    {
-      "path": "../../apps/admin-portal"
-    }
-  ]
+  "references": []
 }

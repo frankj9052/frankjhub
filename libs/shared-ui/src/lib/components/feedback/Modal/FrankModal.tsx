@@ -7,7 +7,7 @@ import {
   useDraggable,
 } from '@heroui/react';
 import { ReactNode, RefObject, useRef } from 'react';
-import { FrankButtonBase, FrankButtonBaseProps } from '../../general';
+import { FrankButtonBase, FrankButtonBaseProps } from '../../general/Button/FrankButtonBase';
 
 export type FrankModalProps = {
   isOpen: boolean;
