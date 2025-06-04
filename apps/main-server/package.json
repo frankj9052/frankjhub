@@ -2,6 +2,15 @@
   "name": "@frankjhub/main-server",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "typeorm:dev": "tsx -r reflect-metadata -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/config/data-source.ts",
+    "typeorm:prod": "tsx -r reflect-metadata -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d dist/config/data-source.js",
+    "migration:generate": "cross-env NODE_ENV=development npm run typeorm:dev migration:generate src/migrations/AutoMigration",
+    "migration:run": "cross-env NODE_ENV=development npm run typeorm:dev migration:run",
+    "migration:run:prod": "cross-env NODE_ENV=production npm run typeorm:prod migration:run",
+    "migration:revert": "cross-env NODE_ENV=development npm run typeorm migration:revert",
+    "migration:revert:prod": "cross-env NODE_ENV=production npm run typeorm migration:revert"
+  },
   "nx": {
     "projectType": "application",
     "targets": {
@@ -65,6 +74,48 @@
       "test": {
         "options": {
           "passWithNoTests": true
+        }
+      },
+      "typeorm": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/typeorm-command.ts",
+          "cwd": "."
+        }
+      },
+      "migration:generate": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/typeorm-command.ts migration:generate apps/main-server/src/migrations/AutoMigration",
+          "cwd": "."
+        }
+      },
+      "migration:run": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/typeorm-command.ts migration:run",
+          "cwd": "."
+        }
+      },
+      "migration:run:prod": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "NODE_ENV=production tsx scripts/typeorm-command.ts migration:run",
+          "cwd": "."
+        }
+      },
+      "migration-revert": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/typeorm-command.ts migration:revert",
+          "cwd": "."
+        }
+      },
+      "migration-revert-prod": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "NODE_ENV=production tsx scripts/typeorm-command.ts migration:revert",
+          "cwd": "."
         }
       }
     }
