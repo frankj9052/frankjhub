@@ -1,6 +1,6 @@
-import { Entity, Column, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, Column, Index, BeforeInsert, BeforeUpdate, BaseEntity } from 'typeorm';
+import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
-import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Gender } from '../../common/enums/gender.enum';
 import { Honorific } from '../../common/enums/honorific.enum';
 
@@ -24,7 +24,12 @@ export class User extends BaseEntity {
     // 避免重复 hash（已加密的 password 通常以 "$argon2" 开头）
     if (this.password.startsWith('$argon2')) return;
 
-    // hash this.password
+    this.password = await argon2.hash(this.password, {
+      type: argon2.argon2id, // 更强的算法
+      memoryCost: 2 ** 16, // 使用更多内存
+      timeCost: 5, // 更多计算迭代
+      parallelism: 1, // 单线程，防止资源争用
+    });
   }
 
   @Column({ type: 'varchar', length: 100 })

@@ -5,7 +5,8 @@
   "scripts": {
     "prepare": "husky",
     "preinstall": "only-allow npm",
-    "generate:tree": "tsx ./scripts/generateTree.ts"
+    "generate:tree": "tsx ./scripts/generateTree.ts",
+    "argon2-env-test": "tsx ./scripts/argon2Test.ts"
   },
   "private": true,
   "dependencies": {
@@ -72,6 +73,7 @@
     "@types/uuid": "10.0.0",
     "@vitejs/plugin-react": "4.5.0",
     "@vitest/ui": "^3.0.0",
+    "argon2": "0.43.0",
     "autoprefixer": "10.4.13",
     "connect-redis": "8.1.0",
     "cookie-parser": "1.4.7",
