@@ -1,5 +1,4 @@
 import path from 'path';
-import { pathToFileURL } from 'url';
 import fg from 'fast-glob';
 import { env } from '../../../config/env';
 import { createLoggerWithContext } from '../libs/logger';
@@ -9,8 +8,7 @@ const logger = createLoggerWithContext('SeederLoader');
 export async function loadSeeders(): Promise<Array<new () => BaseSeeder>> {
   const isProd = env.NODE_ENV === 'production';
   const cwd = path.resolve(__dirname, isProd ? '../../../modules' : '../..');
-  const seedPatterns = isProd ? ['**/seeds/*-prod.seed.js'] : ['**/seeds/*.seed.ts'];
-
+  const seedPatterns = isProd ? ['**/seeds/*-prod.seed.js'] : ['**/seeds/*.seed.js'];
   logger.info('🔍 Loading seeders...', {
     env: env.NODE_ENV,
     cwd,
@@ -24,7 +22,8 @@ export async function loadSeeders(): Promise<Array<new () => BaseSeeder>> {
 
   for (const file of seedFiles) {
     try {
-      const mod = await import(pathToFileURL(file).href);
+      // const mod = await import(pathToFileURL(file).href);
+      const mod = require(file);
       const SeederClass = mod.default;
       if (typeof SeederClass === 'function') {
         // 断言为符合 BaseSeeder 构造函数

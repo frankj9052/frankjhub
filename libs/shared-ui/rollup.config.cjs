@@ -1,4 +1,4 @@
-const { getExternalDeps } = require('@frankjhub/shared-utils');
+const { getExternalDeps } = require('@frankjhub/server-common');
 const { withNx } = require('@nx/rollup/with-nx');
 const url = require('@rollup/plugin-url');
 const svg = require('@svgr/rollup');

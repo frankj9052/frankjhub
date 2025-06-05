@@ -6,6 +6,9 @@
       "path": "../shared-utils"
     },
     {
+      "path": "../server-common"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {
