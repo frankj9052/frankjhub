@@ -39,14 +39,14 @@ const baseOptions = {
   entities: [
     toPosix(
       isProd
-        ? path.join(rootDir, 'dist/modules/**/entities/*.js')
+        ? path.join(rootDir, 'dist/apps/main-server/src/modules/**/entities/*.js')
         : path.join(rootDir, 'src/modules/**/entities/*.{ts,js}')
     ),
   ],
   migrations: [
     toPosix(
       isProd
-        ? path.join(rootDir, 'dist/migrations/*.js')
+        ? path.join(rootDir, 'dist/apps/main-server/src/migrations/*.js')
         : path.join(rootDir, 'src/migrations/*.{ts,js}')
     ),
   ],
