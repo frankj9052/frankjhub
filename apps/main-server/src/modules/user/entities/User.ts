@@ -1,8 +1,9 @@
-import { Entity, Column, Index, BeforeInsert, BeforeUpdate, BaseEntity } from 'typeorm';
+import { Entity, Column, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { Gender } from '../../common/enums/gender.enum';
 import { Honorific } from '../../common/enums/honorific.enum';
+import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -18,7 +19,7 @@ export class User extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private async hashPassword(): Promise<void> {
+  protected async hashPassword(): Promise<void> {
     if (!this.password) return;
 
     // 避免重复 hash（已加密的 password 通常以 "$argon2" 开头）
@@ -81,7 +82,7 @@ export class User extends BaseEntity {
    * 改变此字段可让旧 session token（或 Redis session）全部失效。
    */
   @BeforeInsert()
-  private setDefaultSessionVersion(): void {
+  protected setDefaultSessionVersion(): void {
     if (!this.sessionVersion) {
       this.sessionVersion = uuidv4();
     }

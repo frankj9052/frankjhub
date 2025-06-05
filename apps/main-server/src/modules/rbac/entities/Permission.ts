@@ -35,7 +35,7 @@ export class Permission extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private setName(): void {
+  protected setName(): void {
     if (!this.resource?.name || !this._actionNames) return;
 
     this.name = buildPermissionName(

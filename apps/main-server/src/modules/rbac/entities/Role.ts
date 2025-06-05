@@ -24,7 +24,7 @@ export class Role extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private setCode(): void {
+  protected setCode(): void {
     if (!this.organization?.id || !this.name) return;
     this.code = buildRoleCode(this.organization.id, this.name.toLowerCase());
   }

@@ -29,7 +29,7 @@ export class UserOrganizationRole extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private setName(): void {
+  protected setName(): void {
     if (!this.user?.id || !this.organization?.id || !this.role?.id) return;
     this.name = buildFullUserOrgRoleName(this.user.id, this.organization.id, this.role.code);
   }

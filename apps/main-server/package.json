@@ -86,7 +86,7 @@
       "migration:generate": {
         "executor": "nx:run-commands",
         "options": {
-          "command": "tsx scripts/typeorm-command.ts migration:generate apps/main-server/src/migrations/AutoMigration",
+          "command": "NODE_ENV=development DOTENV_FLOW_PATH=apps/main-server TS_NODE_PROJECT=apps/main-server/tsconfig.app.json ts-node -r tsconfig-paths/register -r reflect-metadata ./node_modules/typeorm/cli.js -d apps/main-server/src/config/data-source.ts migration:generate apps/main-server/src/migrations/AutoMigration",
           "cwd": "."
         }
       },

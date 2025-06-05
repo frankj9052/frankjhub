@@ -24,7 +24,7 @@ export class RolePermission extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private setName(): void {
+  protected setName(): void {
     if (!this.role?.code || !this.permission?.name) return;
     this.name = buildRolePermissionName(this.role.code, this.permission.name);
   }
