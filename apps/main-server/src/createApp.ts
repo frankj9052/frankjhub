@@ -8,6 +8,7 @@ import { errorHandler } from './middlewares/errorHandler';
 import { generateSwaggerDocs } from './swagger/swagger';
 import { sessionMiddleware } from './middlewares/sessionMiddleware';
 import { securityHeaders } from './middlewares/securityHeaders';
+import { currentUser } from './middlewares/currentUser';
 
 export async function createApp() {
   const app = express();
@@ -25,6 +26,7 @@ export async function createApp() {
   // 其它中间件
   app.use(requestId);
   app.use(sessionMiddleware);
+  app.use(currentUser);
 
   // ---- 动态注册业务路由（异步操作）----
   const apiRouter = Router();

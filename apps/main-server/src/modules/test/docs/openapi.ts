@@ -6,10 +6,10 @@ registry.registerPath({
   method: 'get',
   path: '/test',
   tags: ['Test'],
-  summary: '测试 API 是否存活',
+  summary: 'Check if the API is alive',
   responses: {
     200: {
-      description: 'OK',
+      description: 'Server is running normally',
       content: {
         'application/json': {
           schema: z.object({

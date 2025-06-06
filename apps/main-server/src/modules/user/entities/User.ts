@@ -7,7 +7,7 @@ import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 export class User extends BaseEntity {
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 100, default: 'Unnamed' })
   userName!: string;
 
   @Index({ unique: true }) // 唯一索引
