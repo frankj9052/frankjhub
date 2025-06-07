@@ -2,6 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import { env } from '../../../config/env';
+import { getJose } from '../libs/lazyJose';
 
 let cachedJwks: any | null = null;
 
@@ -10,7 +11,7 @@ export async function getJWKS(): Promise<{ keys: any[] }> {
 
   const publicKeyPath = path.resolve(env.JWT_SERVICE_PUBLIC_KEY_PATH);
   const pem = fs.readFileSync(publicKeyPath, 'utf8');
-  const { exportJWK, importSPKI } = await import('jose');
+  const { exportJWK, importSPKI } = await getJose();
 
   const key = await importSPKI(pem, 'RS256');
   const jwk = await exportJWK(key);
