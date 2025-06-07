@@ -14,8 +14,9 @@ export class ServiceClient {
     private readonly targetServiceUrl: string,
     private readonly authConfig: ServiceAuthOptions
   ) {
+    this.targetServiceUrl = targetServiceUrl;
     this.client = axios.create({
-      baseURL: targetServiceUrl,
+      baseURL: this.targetServiceUrl,
       timeout: 5000,
     });
   }
