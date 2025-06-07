@@ -1,7 +1,6 @@
 // RS256 签名 / 验证 JWT 的核心逻辑
 import fs from 'fs';
 import path from 'path';
-import { SignJWT, jwtVerify, importPKCS8, importSPKI, JWTPayload } from 'jose';
 import { env } from '../../config/env';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { createLoggerWithContext } from '../common/libs/logger';
@@ -14,6 +13,7 @@ let cachedPublicKey: CryptoKey | null = null;
 const getPrivateKey = async (): Promise<CryptoKey> => {
   if (cachedPrivateKey) return cachedPrivateKey;
   const privatePem = fs.readFileSync(path.resolve(env.JWT_SERVICE_PRIVATE_KEY_PATH), 'utf8');
+  const { importPKCS8 } = await import('jose');
   cachedPrivateKey = await importPKCS8(privatePem, 'RS256');
   return cachedPrivateKey;
 };
@@ -21,18 +21,28 @@ const getPrivateKey = async (): Promise<CryptoKey> => {
 const getPublicKey = async (): Promise<CryptoKey> => {
   if (cachedPublicKey) return cachedPublicKey;
   const publicPem = fs.readFileSync(path.resolve(env.JWT_SERVICE_PUBLIC_KEY_PATH), 'utf8');
+  const { importSPKI } = await import('jose');
   cachedPublicKey = await importSPKI(publicPem, 'RS256');
   return cachedPublicKey;
 };
 
-export interface ServiceTokenPayload extends JWTPayload {
+export interface ServiceTokenPayload {
   serviceId: string;
   scopes: string[];
+  iss?: string;
+  sub?: string;
+  aud?: string | string[];
+  exp?: number;
+  nbf?: number;
+  iat?: number;
+  jti?: string;
+  [key: string]: unknown;
 }
 
 export class ServiceTokenService {
   static async signToken(payload: ServiceTokenPayload): Promise<string> {
     const privateKey = await getPrivateKey();
+    const { SignJWT } = await import('jose');
     const jwt = await new SignJWT(payload)
       .setProtectedHeader({ alg: 'RS256' })
       .setIssuedAt()
@@ -45,6 +55,7 @@ export class ServiceTokenService {
   static async verifyToken(token: string): Promise<ServiceTokenPayload> {
     try {
       const publicKey = await getPublicKey();
+      const { jwtVerify } = await import('jose');
       const { payload } = await jwtVerify(token, publicKey, {
         issuer: env.JWT_SERVICE_ISSUER,
       });
