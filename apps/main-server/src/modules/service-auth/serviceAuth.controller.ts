@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { ServiceTokenService } from './serviceToken.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
+import { getJWKS } from './jwks/jwks.service';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),
@@ -38,5 +39,14 @@ export const serviceLoginController = async (req: Request, res: Response, next: 
     res.status(200).json({ status: 'success', data: { token } });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getJwksController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const jwks = await getJWKS();
+    res.status(200).json(jwks);
+  } catch (err) {
+    next(err);
   }
 };
