@@ -1,4 +1,5 @@
 // 注册所有 service-auth 路由
+import './docs/openapi';
 import { Router } from 'express';
 import { getJwksController, serviceLoginController } from './serviceAuth.controller';
 
