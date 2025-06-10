@@ -38,5 +38,6 @@ export async function createApp() {
 
   // ---- 全局错误处理器 ----
   app.use(errorHandler);
+
   return app;
 }

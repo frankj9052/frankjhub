@@ -64,3 +64,35 @@ registry.registerPath({
     },
   },
 });
+
+// ✅ Register API path: /auth/logout
+registry.registerPath({
+  method: 'get',
+  path: '/auth/logout',
+  tags: ['Auth'],
+  summary: 'Logout current user',
+  responses: {
+    200: {
+      description: 'Logout successful',
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.literal('success'),
+            message: z.literal('Logout successful'),
+          }),
+        },
+      },
+    },
+    500: {
+      description: 'Logout failed (server error)',
+      content: {
+        'application/json': {
+          schema: z.object({
+            status: z.literal('error'),
+            message: z.literal('Logout failed'),
+          }),
+        },
+      },
+    },
+  },
+});

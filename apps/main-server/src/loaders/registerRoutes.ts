@@ -37,8 +37,8 @@ export async function registerRoutes(parent: Router) {
   }
 
   // 添加局部 404 捕获路由
-  parent.all(/.*/, () => {
-    throw new NotFoundError();
+  parent.all(/.*/, (req, res, next) => {
+    next(new NotFoundError());
   });
   logger.info(`🛣️ Route registration complete: ${files.length} files processed`);
 }

@@ -11,7 +11,6 @@ type SchemaMap = {
 export function validateRequest(schemas: SchemaMap): RequestHandler {
   return (req: Request, _res: Response, next: NextFunction) => {
     const allErrors: Record<string, string> = {};
-
     // 校验 body/query/params（如果提供）
     for (const key of ['body', 'query', 'params'] as const) {
       const schema = schemas[key];

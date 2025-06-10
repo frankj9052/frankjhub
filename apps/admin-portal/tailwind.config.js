@@ -19,7 +19,11 @@ module.exports = {
     '../../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      height: {
+        'screen-minus-64': 'calc(100vh - 64px)',
+      },
+    },
   },
   plugins: [heroui()],
 };

@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as Sentry from '@sentry/node';
 import { BaseError } from '../modules/common/errors/BaseError';
 import { InternalServerError } from '../modules/common/errors/InternalServerError';
@@ -11,12 +11,8 @@ interface WithRequestId {
   requestId?: string;
 }
 
-interface WithCause {
-  cause?: unknown;
-}
-
-export const errorHandler = (err: Error, req: Request, res: Response) => {
-  // 1. 统一错误封装
+export const errorHandler = (err: Error, req: Request, res: Response, _next: NextFunction) => {
+  // 1. 统一错误封装（非 BaseError 的错误将转为 InternalServerError）
   const appError =
     err instanceof BaseError
       ? err
@@ -39,13 +35,13 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
     requestId: req.requestId,
     stack: appError.stack,
     status: appError.status,
-    cause: (appError as WithCause).cause ?? undefined,
+    cause: appError.cause ?? undefined,
     path: req.path,
     method: req.method,
     user: req.currentUser?.id,
   });
 
-  // 5. sentry 报错（仅限严重错误 && 生产环境）
+  // 5. Sentry 报错（仅限严重错误 && 生产环境）
   if (env.NODE_ENV === 'production' && appError.status >= 500) {
     Sentry.captureException(err, {
       tags: {
@@ -61,18 +57,6 @@ export const errorHandler = (err: Error, req: Request, res: Response) => {
     });
   }
 
-  // 6. 客户端响应（非生产环境返回更多信息）
-  const responsePayload = {
-    status: 'error',
-    message: appError.message,
-    ...(env.NODE_ENV !== 'production' && {
-      name: appError.name,
-      requestId: req.requestId,
-      stack: appError.stack,
-      cause: (appError as WithCause).cause,
-    }),
-  };
-
-  // 7. 响应
-  res.status(appError.status).json(responsePayload);
+  // 6. 客户端响应（安全的 JSON 输出，使用统一的 toJSON）
+  res.status(appError.status).json(appError.toJSON());
 };
