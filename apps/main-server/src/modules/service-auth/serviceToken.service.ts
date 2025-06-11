@@ -49,6 +49,7 @@ export class ServiceTokenService {
       .setIssuedAt()
       .setExpirationTime('1h')
       .setIssuer(env.JWT_SERVICE_ISSUER)
+      .setAudience(payload.serviceId)
       .sign(privateKey);
 
     return jwt;

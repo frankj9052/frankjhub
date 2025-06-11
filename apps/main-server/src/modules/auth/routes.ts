@@ -9,7 +9,7 @@ const router = Router();
 
 router.post('/auth/login', validateRequest({ body: loginSchema }), loginController);
 router.get('/auth/current-user', requireAuth, currentUserController);
-router.get('/auth/logout', logoutController);
+router.get('/auth/logout', requireAuth, logoutController);
 
 export function register(parent: Router) {
   parent.use('/', router);

@@ -9,19 +9,23 @@ const orgRoleSchema = z.object({
   permissionStrings: z.array(z.string()),
 });
 
+const userPayloadSchema = z.object({
+  id: z.string().uuid(),
+  userName: z.string(),
+  email: z.string().email().optional(),
+  emailVerified: z.boolean().optional(),
+  profileCompleted: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  sessionVersion: z.string().uuid(),
+  orgRoles: z.array(orgRoleSchema),
+});
+
 export const currentUserSchema = registry.register(
   'CurrentUserResponse',
   z.object({
     status: z.literal('success'),
-    data: z.object({
-      id: z.string().uuid(),
-      userName: z.string(),
-      email: z.string().email().optional(),
-      emailVerified: z.boolean().optional(),
-      profileCompleted: z.boolean().optional(),
-      isActive: z.boolean().optional(),
-      sessionVersion: z.string().uuid(),
-      orgRoles: z.array(orgRoleSchema),
-    }),
+    data: userPayloadSchema,
   })
 );
+
+export type UserPayload = z.infer<typeof userPayloadSchema>;

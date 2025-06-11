@@ -4,36 +4,58 @@ import { z } from 'zod';
 import { ServiceTokenService } from './serviceToken.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { getJWKS } from './jwks/jwks.service';
+import AppDataSource from '../../config/data-source';
+import { Service } from './entities/Service';
+import * as argon2 from 'argon2';
+import { ServiceRole } from './entities/ServiceRole';
+import { RolePermission } from '../rbac/entities/RolePermission';
+import { In } from 'typeorm';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),
   serviceSecret: z.string(),
 });
 
-// 示例：服务认证信息可迁移至数据库
-const mockServiceSecrets: Record<string, { secret: string; scopes: string[] }> = {
-  'main-server': {
-    secret: 'abc123',
-    scopes: ['read:booking', 'write:booking'],
-  },
-  'billing-service': {
-    secret: 'xyz456',
-    scopes: ['read:billing'],
-  },
-};
-
 export const serviceLoginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { serviceId, serviceSecret } = serviceLoginSchema.parse(req.body);
 
-    const entry = mockServiceSecrets[serviceId];
-    if (!entry || entry.secret !== serviceSecret) {
+    const serviceRepo = AppDataSource.getRepository(Service);
+    const service = await serviceRepo.findOne({ where: { serviceId } });
+
+    if (
+      !service ||
+      !service.isActive ||
+      !(await argon2.verify(service.serviceSecret, serviceSecret))
+    ) {
       throw new UnauthorizedError('Invalid service credentials');
     }
 
+    const serviceRoleRepo = AppDataSource.getRepository(ServiceRole);
+    const serviceRoles = await serviceRoleRepo.find({
+      where: { service: { id: service.id } },
+      relations: ['role'],
+    });
+    // 拿到所有 role.id
+    const roleIds = serviceRoles.map(sr => sr.role.id);
+
+    const rolePermissionRepo = AppDataSource.getRepository(RolePermission);
+    const rolePermissions = await rolePermissionRepo.find({
+      where: {
+        role: {
+          id: In(roleIds),
+        },
+      },
+      relations: ['permission'],
+    });
+
+    const scopes = rolePermissions
+      .map(rp => rp.permission.name)
+      .filter((name): name is string => Boolean(name));
+
     const token = await ServiceTokenService.signToken({
       serviceId,
-      scopes: entry.scopes,
+      scopes,
     });
 
     res.status(200).json({ status: 'success', data: { token } });

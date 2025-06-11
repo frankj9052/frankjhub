@@ -12,7 +12,7 @@ export async function loginClient(data: LoginSchema): Promise<ActionResult<any>>
     return { status: 'success', data: result.data };
   } catch (error) {
     const message = axios.isAxiosError(error)
-      ? error.response?.data?.message || error.message
+      ? error.response?.data?.details || error.message
       : 'Unknown login error';
     return { status: 'error', error: message };
   }

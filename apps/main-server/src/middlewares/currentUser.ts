@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { AuthService } from '../modules/auth/auth.service';
-import { NotAuthorizedError } from '../modules/common/errors/NotAuthorizedError';
-import { UnauthorizedError } from '../modules/common/errors/UnauthorizedError';
 import { createLoggerWithContext } from '../modules/common/libs/logger';
 
 const logger = createLoggerWithContext('CurrentUserMiddleware');
@@ -35,7 +33,12 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
     // 检查 sessionVersion 是否匹配（防止用旧权限）
     if (fullUser.sessionVersion !== sessionUser.sessionVersion) {
       logger.warn(`Session version mismatch for user ${sessionUser.id}`);
-      throw new UnauthorizedError('Session expired. Please log in again.');
+      // 清除旧 session
+      req.session.destroy(() => {
+        /* noop */
+      });
+      res.clearCookie('sid');
+      return next();
     }
 
     req.currentUser = fullUser;
@@ -43,11 +46,11 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
   } catch (error) {
     // 若用户不存在或查失败，仍继续流程（req.currentUser 保持 undefined）
     logger.warn(`Failed to build currentUser: ${error instanceof Error ? error.message : error}`);
-    // 无法解析用户（如用户被删），抛出错误
-    return next(
-      error instanceof UnauthorizedError || error instanceof NotAuthorizedError
-        ? error
-        : new NotAuthorizedError('currentUser', { cause: error })
-    );
+    // 若 user 查不到，清除 session & cookie
+    req.session.destroy(() => {
+      /* noop */
+    });
+    res.clearCookie('sid');
+    return next();
   }
 };

@@ -1,6 +1,5 @@
 import { verifyPassword } from './utils/password';
 import { In } from 'typeorm';
-import { UserPayload } from './types/UserPayload';
 import { NotAuthorizedError } from '../common/errors/NotAuthorizedError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { User } from '../user/entities/User';
@@ -8,6 +7,7 @@ import AppDataSource from '../../config/data-source';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { UserOrganizationRole } from '../organization/entities/UserOrganizationRole';
 import { RolePermission } from '../rbac/entities/RolePermission';
+import { UserPayload } from './dto/currentUser.dto';
 
 const logger = createLoggerWithContext('AuthService');
 
@@ -22,14 +22,14 @@ export class AuthService {
 
     if (!user || !user.password) {
       log.warn(`User ${email} not exist`);
-      throw new NotAuthorizedError('login', { email });
+      throw new NotAuthorizedError('Invalid email or password');
     }
 
     const isMatch = await verifyPassword(user.password, password);
 
     if (!isMatch) {
       log.warn(`User ${email} password not match`);
-      throw new UnauthorizedError();
+      throw new UnauthorizedError('Invalid email or password');
     }
 
     if (!user.isActive) {
