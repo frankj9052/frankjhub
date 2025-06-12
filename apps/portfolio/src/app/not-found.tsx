@@ -1,5 +1,5 @@
 'use client';
-import { FrankButtonBase } from '@frankjhub/shared-ui';
+import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 

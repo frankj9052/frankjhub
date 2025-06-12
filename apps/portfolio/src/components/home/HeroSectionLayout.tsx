@@ -3,7 +3,7 @@ import { Spacer } from '@heroui/react';
 import { AvatarImage } from './heroSectionLayout/AvatarImage';
 import { Info } from './heroSectionLayout/Info';
 import { MediaIcons } from './heroSectionLayout/MediaIcons';
-import { FrankButtonBase } from '@frankjhub/shared-ui';
+import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import { motion } from 'framer-motion';
 import { IoArrowDown } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';

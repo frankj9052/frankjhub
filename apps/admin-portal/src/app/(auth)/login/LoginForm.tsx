@@ -3,7 +3,7 @@ import { useDispatch } from '@/libs/redux';
 import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
 import { LoginSchema, loginSchema } from '@/libs/schemas/loginSchema';
 import { loginClient } from '@/services/auth';
-import { FrankCard } from '@frankjhub/shared-ui';
+import { FrankCard } from '@frankjhub/shared-ui-hero-ssr';
 import { Button, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';

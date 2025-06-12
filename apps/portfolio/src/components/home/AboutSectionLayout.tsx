@@ -1,5 +1,6 @@
 'use client';
-import { FrankButtonBase, HeroTitle } from '@frankjhub/shared-ui';
+import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
+import { HeroTitle } from '@frankjhub/shared-ui-core';
 import { Divider } from '@heroui/react';
 import Image from 'next/image';
 import { NumberRiserComponent } from './AboutSectionLayout/NumberRiserComponent';

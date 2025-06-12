@@ -1,5 +1,5 @@
 'use client';
-import { FrankSpinner } from '@frankjhub/shared-ui';
+import { FrankSpinner } from '@frankjhub/shared-ui-hero-ssr';
 
 const Loading = () => {
   return (

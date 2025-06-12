@@ -1,6 +1,6 @@
 'use client';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
-import { SocialMediaLinks } from '@frankjhub/shared-ui';
+import { SocialMediaLinks } from '@frankjhub/shared-ui-core';
 import { SiStorybook } from 'react-icons/si';
 
 const reactIcons = [
