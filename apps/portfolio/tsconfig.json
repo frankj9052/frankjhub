@@ -49,7 +49,16 @@
       "path": "../../libs/shared-utils"
     },
     {
-      "path": "../../libs/shared-ui"
+      "path": "../../libs/shared-ui-hero-client"
+    },
+    {
+      "path": "../../libs/shared-ui-client"
+    },
+    {
+      "path": "../../libs/shared-ui-core"
+    },
+    {
+      "path": "../../libs/shared-ui-hero-ssr"
     }
   ]
 }
