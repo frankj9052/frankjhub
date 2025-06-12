@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { LinearGradientTextColor } from './LinearGradientTextColor';
 
 const meta = {
-  title: 'StaticEffects/LinearGradientTextColor',
+  title: 'Shared-UI-Core/StaticEffects/LinearGradientTextColor',
   component: LinearGradientTextColor,
   tags: ['autodocs'],
   parameters: {

@@ -5,7 +5,14 @@ import react from '@vitejs/plugin-react';
 import path, { join } from 'path';
 
 const config: StorybookConfig = {
-  stories: ['../../shared-ui/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
+  stories: [
+    '../../shared-ui-core/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+    '../../shared-ui-client/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+    '../../shared-ui-hero-ssr/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+    '../../shared-ui-hero-client/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+    '../../shared-ui-shadcn/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+    '../../shared-ui/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
+  ],
   addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
   framework: {
     name: '@storybook/react-vite',

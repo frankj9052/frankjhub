@@ -1,1 +1,1 @@
-export * from './lib/shared-ui-core';
+export * from './lib/staticEffects';

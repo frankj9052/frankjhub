@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { NumberRiser } from './NumberRiser';
 
 const meta = {
-  title: 'Aminations/NumberRiser',
+  title: 'Shared-UI-Client/Aminations/NumberRiser',
   component: NumberRiser,
   tags: ['autodocs'],
   parameters: {

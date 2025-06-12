@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import SharedUi from './HeroTitle';
 
 const meta = {
-  title: 'StaticEffects/HeroTitle',
+  title: 'Shared-UI-Core/StaticEffects/HeroTitle',
   component: SharedUi,
   tags: ['autodocs'],
   parameters: {

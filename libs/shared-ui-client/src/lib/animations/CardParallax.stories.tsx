@@ -3,7 +3,7 @@ import { CardParallax } from './CardParallax';
 import { MotionValue } from 'framer-motion';
 
 const meta = {
-  title: 'Aminations/CardParallax',
+  title: 'Shared-UI-Client/Aminations/CardParallax',
   component: CardParallax,
   tags: ['autodocs'],
   parameters: {

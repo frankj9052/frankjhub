@@ -1,1 +1,1 @@
-export * from './lib/shared-ui-client';
+export * from './lib/animations';

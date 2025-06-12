@@ -34,10 +34,13 @@
       "path": "./libs/shared-ui-client"
     },
     {
-      "path": "./libs/shared-ui-chadcn"
+      "path": "./libs/shared-ui-shadcn"
     },
     {
-      "path": "./libs/shared-ui-hero"
+      "path": "./libs/shared-ui-hero-ssr"
+    },
+    {
+      "path": "./libs/shared-ui-hero-client"
     }
   ],
   "ts-node": {
