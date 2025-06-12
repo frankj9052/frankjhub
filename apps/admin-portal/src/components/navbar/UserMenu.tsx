@@ -1,5 +1,7 @@
 'use client';
-import { Session } from '@/libs/redux/slices/currentUserSlice/currentUserSlice';
+import { currentUserSlice, useDispatch, useSelector } from '@/libs/redux';
+import { getUserProfileAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
+import { logoutClient } from '@/services/auth';
 import {
   Avatar,
   Dropdown,
@@ -9,13 +11,15 @@ import {
   DropdownTrigger,
 } from '@heroui/react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
+import { toast } from 'react-toastify';
 
-type Props = {
-  session: Session;
-};
-
-export default function UserMenu({ session }: Props) {
+export default function UserMenu() {
+  const dispatch = useDispatch();
+  const userProfile = useSelector(state => state.currentUser.userProfile);
+  useEffect(() => {
+    dispatch(getUserProfileAsync());
+  }, [dispatch]);
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger>
@@ -24,9 +28,9 @@ export default function UserMenu({ session }: Props) {
           as="button"
           className="transition-transform"
           color="secondary"
-          // name={user?.userName || 'user avatar'}
+          name={userProfile?.userName || 'user avatar'}
           size="sm"
-          // src={user?.image || '/images/user.png'}
+          src={userProfile?.avatarImage}
         />
       </DropdownTrigger>
       <DropdownMenu variant="flat" aria-label="User actions menu">
@@ -38,7 +42,7 @@ export default function UserMenu({ session }: Props) {
             aria-label="username"
             key={'signIn Info'}
           >
-            {/* Signed in as {user?.userName} */}
+            Signed in as {userProfile?.userName}
           </DropdownItem>
         </DropdownSection>
 
@@ -47,10 +51,11 @@ export default function UserMenu({ session }: Props) {
         </DropdownItem>
         <DropdownItem
           color="danger"
-          onPress={
-            () => console.log('clicked')
-            // async () => await signOutUser()
-          }
+          onPress={async () => {
+            await logoutClient();
+            dispatch(currentUserSlice.actions.setSession(null));
+            toast.success('You have been logged out.');
+          }}
           key={'logout'}
         >
           Log out

@@ -14,6 +14,8 @@
     }
   },
   "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-ui",
     "targets": {
       "deploy": {
         "dependsOn": [

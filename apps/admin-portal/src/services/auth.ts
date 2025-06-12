@@ -2,7 +2,7 @@ import { LoginSchema } from '@/libs/schemas/loginSchema';
 import { ActionResult } from '@/types';
 import axios from 'axios';
 
-const baseURL = 'http://localhost:3100';
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function loginClient(data: LoginSchema): Promise<ActionResult<any>> {
   try {

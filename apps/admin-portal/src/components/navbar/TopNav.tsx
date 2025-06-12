@@ -22,7 +22,7 @@ export default async function TopNav() {
         </div>
       </NavbarBrand>
       <NavbarContent justify="center" className="text-gray-200">
-        <NavLink href="/members" label="Matches" />
+        <NavLink href="/dashboard" label="Dashboard" />
         <NavLink href="/lists" label="Lists" />
         <NavLink href="/messages" label="Messages" />
       </NavbarContent>

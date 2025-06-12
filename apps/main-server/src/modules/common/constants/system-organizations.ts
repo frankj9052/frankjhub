@@ -2,10 +2,18 @@ export const SYSTEM_ORGANIZATIONS = {
   PUBLIC: {
     name: 'public',
     description: 'Shared organization for unscoped data',
+    category: {
+      name: 'public',
+      description: 'Shared organization for unscoped data',
+    },
   },
   PLATFORM: {
     name: 'platform',
     description: 'Platform organization with global system authority',
+    category: {
+      name: 'platform',
+      description: 'Platform organization with global system authority',
+    },
   },
 } as const;
 

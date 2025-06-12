@@ -1,7 +1,10 @@
 'use client';
+import { useDispatch } from '@/libs/redux';
+import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
 import { LoginSchema, loginSchema } from '@/libs/schemas/loginSchema';
 import { loginClient } from '@/services/auth';
-import { Button, Card, CardBody, CardHeader, Input } from '@heroui/react';
+import { FrankCard } from '@frankjhub/shared-ui';
+import { Button, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -11,6 +14,8 @@ import { toast } from 'react-toastify';
 
 export default function LoginForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -23,6 +28,7 @@ export default function LoginForm() {
     const result = await loginClient(data);
     if (result.status === 'success') {
       toast.success('Login successful!');
+      dispatch(getSessionAsync());
       router.back(); // 登录成功返回上一页
     } else if (result.status === 'error') {
       const message = Array.isArray(result.error)
@@ -33,36 +39,44 @@ export default function LoginForm() {
     }
   };
   return (
-    <Card className="w-2/5 mx-auto">
-      <CardHeader className="flex flex-col items-center justify-center">
-        <div className="flex flex-col gap-2 items-center text-secondary">
-          <div className="flex flex-row items-center gap-3">
-            <GiPadlock size={30} />
-            <h1 className="text-3xl font-semibold">Login</h1>
+    <FrankCard
+      className="w-2/5 mx-auto"
+      cardHeight={370}
+      cardHeader={
+        <div className="flex flex-col items-center justify-center w-full">
+          <div className="flex flex-col gap-2 items-center text-secondary">
+            <div className="flex flex-row items-center gap-3">
+              <GiPadlock size={30} />
+              <h1 className="text-3xl font-semibold">Login</h1>
+            </div>
+            <p className="text-neutral-500">Welcome back to Admin Portal</p>
           </div>
-          <p className="text-neutral-500">Welcome back to Admin Portal</p>
         </div>
-      </CardHeader>
-      <CardBody>
+      }
+      cardBody={
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
-            <Input
-              defaultValue=""
-              label="Email"
-              variant="bordered"
-              {...register('email')}
-              isInvalid={!!errors.email}
-              errorMessage={errors.email?.message as string}
-            />
-            <Input
-              defaultValue=""
-              label="Password"
-              variant="bordered"
-              type="password"
-              {...register('password')}
-              isInvalid={!!errors.password}
-              errorMessage={errors.password?.message as string}
-            />
+            <div className="h-[70px]">
+              <Input
+                defaultValue=""
+                label="Email"
+                variant="bordered"
+                {...register('email')}
+                isInvalid={!!errors.email}
+                errorMessage={errors.email?.message as string}
+              />
+            </div>
+            <div className="h-[70px]">
+              <Input
+                defaultValue=""
+                label="Password"
+                variant="bordered"
+                type="password"
+                {...register('password')}
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message as string}
+              />
+            </div>
             <Button
               isDisabled={!isValid}
               fullWidth
@@ -74,7 +88,7 @@ export default function LoginForm() {
             </Button>
           </div>
         </form>
-      </CardBody>
-    </Card>
+      }
+    />
   );
 }

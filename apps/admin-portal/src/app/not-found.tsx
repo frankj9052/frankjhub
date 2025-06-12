@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   const router = useRouter();
 
   return (
-    <section className="w-full h-screen bg-[#051928] bg-opacity-60 flex justify-center items-center text-barlow">
+    <section className="w-full h-screen-minus-64 bg-[#051928] bg-opacity-60 flex justify-center items-center text-barlow">
       <div className="flex flex-col gap-8 items-center">
         <h4 className="font-bold text-4xl leading-[43.2px] text-white text-center">
           Page Not Found

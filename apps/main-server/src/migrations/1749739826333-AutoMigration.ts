@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AutoMigration1749588221028 implements MigrationInterface {
-  name = 'AutoMigration1749588221028';
+export class AutoMigration1749739826333 implements MigrationInterface {
+  name = 'AutoMigration1749739826333';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -14,7 +14,10 @@ export class AutoMigration1749588221028 implements MigrationInterface {
       `CREATE TABLE "service" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "service_id" character varying(100) NOT NULL, "service_secret" text NOT NULL, "description" text, "is_active" boolean NOT NULL DEFAULT false, CONSTRAINT "UQ_48c5a0e13da2b2948fb7f3a0c4a" UNIQUE ("service_id"), CONSTRAINT "PK_85a21558c006647cd76fdce044b" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
-      `CREATE TABLE "organization" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "name" character varying(255) NOT NULL, "description" character varying(255), "is_active" boolean NOT NULL DEFAULT true, CONSTRAINT "UQ_c21e615583a3ebbb0977452afb0" UNIQUE ("name"), CONSTRAINT "PK_472c1f99a32def1b0abb219cd67" PRIMARY KEY ("id"))`
+      `CREATE TABLE "organization_category" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "name" character varying(255) NOT NULL, "description" character varying(255), CONSTRAINT "UQ_55c820e4a83f2297b554235b72e" UNIQUE ("name"), CONSTRAINT "PK_5a13c87e5b3030dae16de403c91" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(
+      `CREATE TABLE "organization" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "name" character varying(255) NOT NULL, "description" character varying(255), "is_active" boolean NOT NULL DEFAULT true, "category_id" uuid NOT NULL, CONSTRAINT "UQ_c21e615583a3ebbb0977452afb0" UNIQUE ("name"), CONSTRAINT "PK_472c1f99a32def1b0abb219cd67" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE TABLE "role" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "code" character varying(255) NOT NULL, "name" character varying(50) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "is_active" boolean NOT NULL DEFAULT true, "organization_id" uuid NOT NULL, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`
@@ -69,6 +72,9 @@ export class AutoMigration1749588221028 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_uor_name" ON "user_organization_role" ("name") `
+    );
+    await queryRunner.query(
+      `ALTER TABLE "organization" ADD CONSTRAINT "FK_5a13c87e5b3030dae16de403c91" FOREIGN KEY ("category_id") REFERENCES "organization_category"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE "role" ADD CONSTRAINT "FK_2c1fc97f79b82800ef15372b98c" FOREIGN KEY ("organization_id") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
@@ -137,6 +143,9 @@ export class AutoMigration1749588221028 implements MigrationInterface {
       `ALTER TABLE "service_role" DROP CONSTRAINT "FK_de14f0d28528ba981fd4238373f"`
     );
     await queryRunner.query(`ALTER TABLE "role" DROP CONSTRAINT "FK_2c1fc97f79b82800ef15372b98c"`);
+    await queryRunner.query(
+      `ALTER TABLE "organization" DROP CONSTRAINT "FK_5a13c87e5b3030dae16de403c91"`
+    );
     await queryRunner.query(`DROP INDEX "public"."IDX_uor_name"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_7f5c86bce22799ea96da511092"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_b87b3b8bd97142de2c54dd4d67"`);
@@ -156,6 +165,7 @@ export class AutoMigration1749588221028 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."IDX_ee999bb389d7ac0fd967172c41"`);
     await queryRunner.query(`DROP TABLE "role"`);
     await queryRunner.query(`DROP TABLE "organization"`);
+    await queryRunner.query(`DROP TABLE "organization_category"`);
     await queryRunner.query(`DROP TABLE "service"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_e12875dfb3b1d92d7d7c5377e2"`);
     await queryRunner.query(`DROP TABLE "user"`);

@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getSessionAsync, getUserProfileAsync } from './thunks';
 
 export interface Session {
@@ -45,7 +45,11 @@ const initialState: CurrentUserSliceState = {
 export const currentUserSlice = createSlice({
   name: 'currentUser',
   initialState,
-  reducers: {},
+  reducers: {
+    setSession: (state, action: PayloadAction<Session | null>) => {
+      state.session = action.payload;
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(getSessionAsync.pending, state => {

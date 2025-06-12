@@ -19,6 +19,8 @@
     "date-fns": "4.1.0"
   },
   "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-utils",
     "targets": {
       "deploy": {
         "dependsOn": ["build"],
