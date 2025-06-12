@@ -3,7 +3,28 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-utils"
+    },
+    {
+      "path": "../shared-ui-core"
+    },
+    {
+      "path": "../shared-ui-client"
+    },
+    {
+      "path": "../shared-ui-hero-ssr"
+    },
+    {
+      "path": "../shared-hooks"
+    },
+    {
+      "path": "../server-common"
+    },
+    {
       "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
     }
   ],
   "extends": "../../tsconfig.base.json"

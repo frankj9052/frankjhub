@@ -5,7 +5,6 @@ const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
 module.exports = {
   content: [
     ...createGlobPatternsForDependencies(__dirname),
-    '../shared-ui/src/lib/**/*!(*.stories|*.spec).{ts,tsx,html}',
     '../shared-ui-core/src/lib/**/*!(*.stories|*.spec).{ts,tsx,html}',
     '../shared-ui-client/src/lib/**/*!(*.stories|*.spec).{ts,tsx,html}',
     '../shared-ui-chadcn/src/lib/**/*!(*.stories|*.spec).{ts,tsx,html}',

@@ -11,7 +11,6 @@ const config: StorybookConfig = {
     '../../shared-ui-hero-ssr/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
     '../../shared-ui-hero-client/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
     '../../shared-ui-shadcn/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
-    '../../shared-ui/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
   ],
   addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
   framework: {

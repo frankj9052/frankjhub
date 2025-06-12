@@ -21,7 +21,29 @@
     "src/**/*.test.jsx",
     "eslint.config.js",
     "eslint.config.cjs",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "**/*.stories.ts",
+    "**/*.stories.tsx"
   ],
-  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    {
+      "path": "../shared-utils/tsconfig.lib.json"
+    },
+    {
+      "path": "../shared-ui-core/tsconfig.lib.json"
+    },
+    {
+      "path": "../shared-ui-client/tsconfig.lib.json"
+    },
+    {
+      "path": "../shared-ui-hero-ssr/tsconfig.lib.json"
+    },
+    {
+      "path": "../shared-hooks/tsconfig.lib.json"
+    },
+    {
+      "path": "../server-common/tsconfig.lib.json"
+    }
+  ]
 }

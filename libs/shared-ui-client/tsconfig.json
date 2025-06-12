@@ -3,10 +3,19 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-ui-core"
+    },
+    {
       "path": "../shared-utils"
     },
     {
+      "path": "../server-common"
+    },
+    {
       "path": "./tsconfig.lib.json"
+    },
+    {
+      "path": "./tsconfig.storybook.json"
     }
   ],
   "extends": "../../tsconfig.base.json"

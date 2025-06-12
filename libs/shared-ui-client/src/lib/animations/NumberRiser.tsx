@@ -25,6 +25,7 @@ export function NumberRiser({ number, duration = 1 }: { number: number; duration
       return () => controls.stop();
     } else {
       count.set(1);
+      return;
     }
   }, [isStarted, number, duration, count]);
 
