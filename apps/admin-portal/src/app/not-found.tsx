@@ -21,7 +21,7 @@ export default function NotFoundPage() {
           <Button
             className="w-[170px] h-[49px] px-6 py-4 bg-[#FFC72C] font-bold text-[14px] leading-[16.8px] tracking-[1px] text-[#051928] relative overflow-hidden flex justify-center items-center"
             radius="full"
-            onClick={() => {
+            onPress={() => {
               router.back();
             }}
           >

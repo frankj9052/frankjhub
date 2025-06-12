@@ -52,18 +52,19 @@ export function generateSwaggerDocs(app: Express) {
   const openapiDocument = generator.generateDocument({
     openapi: '3.0.0',
     info: {
-      title: 'Main-Server API 文档',
+      title: 'Main-Server API Documentation',
       version: '1.0.0',
-      description: '基于 Zod 自动生成的 API 文档',
+      description:
+        'This API documentation is auto-generated based on Zod schemas. The Main Server provides core services including user registration, authentication, multi-tenant organization management, role-based access control (RBAC), and inter-service communication for a distributed platform.',
     },
     servers: [
       {
         url: `http://localhost:${env.PORT}/api`,
-        description: '开发环境',
+        description: 'Development Environment',
       },
       {
         url: 'https://your-domain.com/api',
-        description: '生产环境',
+        description: 'Production Environment',
       },
     ],
     security: [{ bearerAuth: [] }],

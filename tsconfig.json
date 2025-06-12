@@ -23,6 +23,21 @@
     },
     {
       "path": "./apps/portfolio"
+    },
+    {
+      "path": "./libs/shared-hooks"
+    },
+    {
+      "path": "./libs/shared-ui-core"
+    },
+    {
+      "path": "./libs/shared-ui-client"
+    },
+    {
+      "path": "./libs/shared-ui-chadcn"
+    },
+    {
+      "path": "./libs/shared-ui-hero"
     }
   ],
   "ts-node": {

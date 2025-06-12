@@ -16,7 +16,8 @@ const externalDeps = getExternalDeps({
 
 module.exports = withNx(
   {
-    main: './src/index.ts',
+    main: './src/lib/animations/index.ts',   
+    additionalEntryPoints: ['./src/lib/staticEffects/index.ts', './src/lib/useHooks/index.ts', './src/lib/components/index.ts'], 
     outputPath: './dist',
     tsConfig: './tsconfig.lib.json',
     compiler: 'babel',
