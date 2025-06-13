@@ -1,6 +1,6 @@
 export function StorybookHost() {
   return (
-    <div className={styles['container']}>
+    <div>
       <h1>Welcome to StorybookHost!</h1>
     </div>
   );

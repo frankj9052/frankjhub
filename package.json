@@ -42,7 +42,7 @@
     "@nx/node": "^21.1.2",
     "@nx/react": "21.1.2",
     "@nx/rollup": "21.1.2",
-    "@nx/storybook": "21.1.2",
+    "@nx/storybook": "^21.2.0",
     "@nx/vite": "21.1.2",
     "@nx/web": "21.1.2",
     "@nx/workspace": "21.1.2",
@@ -50,12 +50,10 @@
     "@rollup/plugin-url": "^8.0.2",
     "@sentry/node": "9.24.0",
     "@sentry/tracing": "7.120.3",
-    "@storybook/addon-essentials": "8.6.14",
-    "@storybook/addon-interactions": "^8.6.11",
-    "@storybook/core-server": "8.6.14",
+    "@storybook/addon-docs": "9.0.9",
     "@storybook/jest": "^0.2.3",
-    "@storybook/react-vite": "8.6.14",
-    "@storybook/test-runner": "^0.22.0",
+    "@storybook/react-vite": "9.0.9",
+    "@storybook/test-runner": "^0.23.0",
     "@storybook/testing-library": "^0.2.2",
     "@svgr/rollup": "^8.1.0",
     "@swc-node/register": "~1.9.1",
@@ -96,6 +94,7 @@
     "eslint-plugin-jsx-a11y": "6.10.1",
     "eslint-plugin-react": "7.35.0",
     "eslint-plugin-react-hooks": "5.0.0",
+    "eslint-plugin-storybook": "9.0.9",
     "express-async-errors": "3.1.1",
     "express-session": "1.18.1",
     "framer-motion": "12.16.0",
@@ -127,7 +126,7 @@
     "react-toastify": "11.0.5",
     "reflect-metadata": "0.2.2",
     "rollup": "^4.14.0",
-    "storybook": "8.6.14",
+    "storybook": "9.0.9",
     "styled-components": "6.1.18",
     "swagger-ui-express": "5.0.1",
     "swc-loader": "0.1.15",
@@ -161,5 +160,8 @@
       "eslint --fix",
       "prettier --write"
     ]
+  },
+  "overrides": {
+    "storybook": "$storybook"
   }
 }
