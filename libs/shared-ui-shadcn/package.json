@@ -18,6 +18,13 @@
     "projectType": "library",
     "sourceRoot": "libs/shared-ui-shadcn",
     "targets": {
+      "shadcn:add": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/add-shadcn-component.ts",
+          "cwd": "."
+        }
+      },
       "deploy": {
         "dependsOn": [
           "build"
@@ -29,5 +36,8 @@
         }
       }
     }
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "1.2.3"
   }
 }
