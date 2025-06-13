@@ -9,7 +9,7 @@ import react from '@vitejs/plugin-react';
 const require = createRequire(import.meta.url);
 
 const config: StorybookConfig = {
-  stories: ['../src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
+  stories: ['../src/components/**/*.@(mdx|stories.@(js|jsx|ts|tsx))'],
   addons: [getAbsolutePath('@storybook/addon-docs')],
   framework: {
     name: getAbsolutePath('@storybook/react-vite'),
