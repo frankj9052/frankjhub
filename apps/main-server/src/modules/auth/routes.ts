@@ -7,11 +7,8 @@ import { validateRequest } from '../common/middlewares/validateRequest';
 
 const router = Router();
 
-// 这个先弃用
+// 统一登录入口 + 客户端用 currentUser 判断其权限 + 服务端通过中间件保护权限
 router.post('/auth/login', validateRequest({ body: loginSchema }), loginController);
-
-// platform admin login
-router.post('/auth/platform/login');
 router.get('/auth/current-user', requireAuth, currentUserController);
 router.get('/auth/logout', requireAuth, logoutController);
 

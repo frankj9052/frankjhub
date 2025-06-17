@@ -51,7 +51,7 @@ export class AuthService {
     // 1. 查询用户在所有组织中的角色
     const orgRoles = await this.userOrgRoleRepo.find({
       where: { user: { id: user.id } },
-      relations: ['organization', 'role'],
+      relations: ['organization', 'role', 'organization.orgType'],
     });
 
     const roleIds = orgRoles.map(orgRole => orgRole.role.id);
