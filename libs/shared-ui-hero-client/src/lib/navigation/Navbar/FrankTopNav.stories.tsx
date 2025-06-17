@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankTopNav from './FrankTopNav';
 import { NavLinkType } from '@frankjhub/shared-utils';
 import Link from 'next/link';

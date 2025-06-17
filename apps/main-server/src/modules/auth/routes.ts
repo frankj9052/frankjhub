@@ -7,7 +7,11 @@ import { validateRequest } from '../common/middlewares/validateRequest';
 
 const router = Router();
 
+// 这个先弃用
 router.post('/auth/login', validateRequest({ body: loginSchema }), loginController);
+
+// platform admin login
+router.post('/auth/platform/login');
 router.get('/auth/current-user', requireAuth, currentUserController);
 router.get('/auth/logout', requireAuth, logoutController);
 

@@ -3,15 +3,16 @@ import { Service } from '../entities/Service';
 import { ServiceRole } from '../entities/ServiceRole';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
 import { SYSTEM_SERVICES } from '../../common/constants/system-services';
-import { Organization } from '../../organization/entities/Organization';
 import { Role } from '../../rbac/entities/Role';
+import { RoleSource } from '../../common/enums/roleSource.enum';
 
 export default class ServiceProdSeed extends BaseSeeder {
   private servicesToInsert: Service[] = [];
   private serviceRoleConfigs: {
     serviceId: string;
     roleName: string;
-    organizationName: string;
+    roleSource: RoleSource;
+    orgNameOrType: string;
   }[] = [];
 
   // 决定是否执行该种子
@@ -29,10 +30,9 @@ export default class ServiceProdSeed extends BaseSeeder {
         continue;
       }
 
-      // 构建 Service 实体（尚未保存）
       const service = serviceRepo.create({
         serviceId: config.serviceId,
-        serviceSecret: config.secret, // 将通过实体内 @BeforeInsert() hash
+        serviceSecret: config.secret, // @BeforeInsert 中进行 hash
         description: config.description,
         isActive: true,
       });
@@ -43,7 +43,8 @@ export default class ServiceProdSeed extends BaseSeeder {
         this.serviceRoleConfigs.push({
           serviceId: config.serviceId,
           roleName: role.name,
-          organizationName: role.organizationName,
+          roleSource: role.roleSource,
+          orgNameOrType: role.orgNameOrType,
         });
       }
     }
@@ -51,7 +52,6 @@ export default class ServiceProdSeed extends BaseSeeder {
     return this.servicesToInsert.length > 0;
   }
 
-  // 实际执行数据插入
   async run(dataSource: DataSource): Promise<void> {
     if (this.servicesToInsert.length === 0) {
       this.logger.warn('⚠️ No services to insert. Skipping.');
@@ -60,13 +60,11 @@ export default class ServiceProdSeed extends BaseSeeder {
 
     const serviceRepo = dataSource.getRepository(Service);
     const serviceRoleRepo = dataSource.getRepository(ServiceRole);
-    const orgRepo = dataSource.getRepository(Organization);
     const roleRepo = dataSource.getRepository(Role);
 
     this.logger.info('🚀 Inserting services...');
     const savedServices = await serviceRepo.save(this.servicesToInsert);
 
-    // 构建一个 Map 来查找刚刚保存的 Service 实体
     const serviceMap = new Map<string, Service>();
     for (const service of savedServices) {
       serviceMap.set(service.serviceId, service);
@@ -81,23 +79,32 @@ export default class ServiceProdSeed extends BaseSeeder {
         continue;
       }
 
-      const organization = await orgRepo.findOne({ where: { name: config.organizationName } });
-      if (!organization) {
-        this.logger.error(`❌ Organization "${config.organizationName}" not found. Skipping.`);
-        continue;
-      }
+      let role: Role | null = null;
 
-      const role = await roleRepo.findOne({
-        where: {
-          name: config.roleName,
-          organization: { id: organization.id },
-        },
-        relations: ['organization'],
-      });
+      // 根据 roleSource 选择正确的角色定位方式（organization.name 或 organizationType.name）
+      if (config.roleSource === RoleSource.ORG) {
+        role = await roleRepo.findOne({
+          where: {
+            name: config.roleName,
+            roleSource: RoleSource.ORG,
+            organization: { name: config.orgNameOrType },
+          },
+          relations: ['organization'],
+        });
+      } else if (config.roleSource === RoleSource.TYPE) {
+        role = await roleRepo.findOne({
+          where: {
+            name: config.roleName,
+            roleSource: RoleSource.TYPE,
+            organizationType: { name: config.orgNameOrType },
+          },
+          relations: ['organizationType'],
+        });
+      }
 
       if (!role) {
         this.logger.error(
-          `❌ Role "${config.roleName}" not found in org "${organization.name}". Skipping.`
+          `❌ Role "${config.roleName}" not found (source: ${config.roleSource}, orgNameOrType: "${config.orgNameOrType}"). Skipping.`
         );
         continue;
       }

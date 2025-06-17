@@ -1,15 +1,25 @@
+import { RoleSource } from '../enums/roleSource.enum';
+import { SYSTEM_ORGANIZATION_TYPES } from './system-organizationTypes';
 import { SYSTEM_ORGANIZATIONS } from './system-organizations';
 
 export const SYSTEM_ROLES = {
   ADMIN: {
     name: 'admin',
     description: 'Administrator with full access',
-    organizationName: SYSTEM_ORGANIZATIONS.PLATFORM.name,
+    roleSource: RoleSource.TYPE,
+    orgNameOrType: SYSTEM_ORGANIZATION_TYPES.PLATFORM.name,
   },
   CLIENT: {
     name: 'client',
     description: 'Client with limited access',
-    organizationName: SYSTEM_ORGANIZATIONS.PUBLIC.name,
+    roleSource: RoleSource.TYPE,
+    orgNameOrType: SYSTEM_ORGANIZATION_TYPES.PUBLIC.name,
+  },
+  PLATFORM_CUSTOMIZED_ROLE: {
+    name: 'platformCustomizedRole',
+    description: 'Test role',
+    roleSource: RoleSource.ORG,
+    orgNameOrType: SYSTEM_ORGANIZATIONS.PLATFORM.name,
   },
 } as const;
 

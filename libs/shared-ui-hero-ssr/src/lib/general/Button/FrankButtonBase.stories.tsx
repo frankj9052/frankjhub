@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankButtonBase from './FrankButtonBase';
 import { FaArrowAltCircleRight } from 'react-icons/fa';
 import { IoArrowDown } from 'react-icons/io5';

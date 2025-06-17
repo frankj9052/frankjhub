@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrankAutocomplete } from './FrankAutocomplete';
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';

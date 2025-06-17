@@ -4,6 +4,7 @@ import { registry } from '../../../config/openapiRegistry';
 const orgRoleSchema = z.object({
   orgId: z.string().uuid(),
   orgName: z.string(),
+  orgType: z.string(),
   roleCode: z.string(),
   roleName: z.string(),
   permissionStrings: z.array(z.string()),

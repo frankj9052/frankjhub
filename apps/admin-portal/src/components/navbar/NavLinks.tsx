@@ -13,9 +13,9 @@ const unreadCount = 0;
 
 export default function NavLink({ href, label }: Props) {
   const pathname = usePathname();
-
+  const basepath = '/' + pathname.split('/')[1];
   return (
-    <NavbarItem isActive={pathname === href} as={Link} href={href}>
+    <NavbarItem isActive={basepath === href} as={Link} href={href}>
       <span>{label}</span>
       {
         // 当message为0的时候，不显示0

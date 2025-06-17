@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
-import { OrganizationCategory } from './OrganizationCategory';
+import { OrganizationType } from './OrganizationType';
 
 @Entity()
 export class Organization extends BaseEntity {
@@ -10,8 +10,8 @@ export class Organization extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   description?: string;
 
-  @ManyToOne(() => OrganizationCategory, { nullable: false })
-  category?: OrganizationCategory;
+  @ManyToOne(() => OrganizationType, { nullable: false })
+  orgType?: OrganizationType;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;

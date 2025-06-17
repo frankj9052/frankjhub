@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankToggleButton from './FrankToggleButton';
 import { FrankSVGIcon } from '@frankjhub/shared-ui-core';
 const meta = {

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AccordionItemType, FrankAccordion } from './FrankAccordion';
 import { FaMinus, FaPlus } from 'react-icons/fa6';
 const meta = {

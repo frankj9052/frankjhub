@@ -1,5 +1,5 @@
 import '@styles/global';
-import type { Preview } from '@storybook/react';
+import type { Preview } from '@storybook/react-vite';
 import { HeroUIProvider } from '@heroui/react';
 
 const preview: Preview = {

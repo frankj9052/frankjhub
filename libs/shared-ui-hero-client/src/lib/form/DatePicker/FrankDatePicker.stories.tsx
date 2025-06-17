@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrankDatePicker } from './FrankDatePicker';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
 

@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { getSessionServer } from '../actions/auth';
 import { redirect } from 'next/navigation';
-import { Button } from '@frankjhub/shared-ui-shadcn';
+import { Sidebar } from '@/components/sidebar/Sidebar';
 
 export default async function layout({ children }: { children: ReactNode }) {
   const session = await getSessionServer();
@@ -12,9 +12,7 @@ export default async function layout({ children }: { children: ReactNode }) {
     <div className="bg-gray-100 h-screen-minus-64">
       <div className="flex h-full">
         {/* 侧边栏 */}
-        <div className="w-[250px] border-r-1 p-3">
-          <Button variant="default">Test Button</Button>
-        </div>
+        <Sidebar />
         {/* 主窗口 */}
         <div className="flex-1 p-3">{children}</div>
       </div>

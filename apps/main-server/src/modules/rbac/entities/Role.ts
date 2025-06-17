@@ -1,10 +1,12 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
+import { RoleSource } from '../../common/enums/roleSource.enum';
+import { OrganizationType } from '../../organization/entities/OrganizationType';
 
 @Entity()
-@Index(['name', 'organization'], { unique: true })
+@Index(['name', 'roleSource', 'organizationType', 'organization'], { unique: true })
 @Index(['code'], { unique: true })
 export class Role extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
@@ -19,13 +21,32 @@ export class Role extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  @ManyToOne(() => Organization, { nullable: false, onDelete: 'CASCADE' })
-  organization!: Organization;
+  /**
+   * Source type of the role
+   * - 'type': template role bound to an organization type
+   * - 'org': custom role belonging to a specific organization
+   */
+  @Column({ type: 'enum', enum: RoleSource, default: RoleSource.TYPE })
+  roleSource!: RoleSource;
+
+  @ManyToOne(() => OrganizationType, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationTypeId' })
+  organizationType?: OrganizationType;
+
+  @ManyToOne(() => Organization, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationId' })
+  organization?: Organization;
 
   @BeforeInsert()
   @BeforeUpdate()
   protected setCode(): void {
-    if (!this.organization?.id || !this.name) return;
-    this.code = buildRoleCode(this.organization.id, this.name.toLowerCase());
+    const roleName = this.name?.toLowerCase().trim();
+    if (!roleName || !this.roleSource) return;
+
+    if (this.roleSource === RoleSource.ORG && this.organization?.id) {
+      this.code = buildRoleCode(RoleSource.ORG, this.organization.id, roleName);
+    } else if (this.roleSource === RoleSource.TYPE && this.organizationType?.id) {
+      this.code = buildRoleCode(RoleSource.TYPE, this.organizationType.id, roleName);
+    }
   }
 }

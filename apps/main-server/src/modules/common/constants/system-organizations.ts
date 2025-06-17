@@ -1,19 +1,15 @@
+import { SYSTEM_ORGANIZATION_TYPES } from './system-organizationTypes';
+
 export const SYSTEM_ORGANIZATIONS = {
   PUBLIC: {
     name: 'public',
     description: 'Shared organization for unscoped data',
-    category: {
-      name: 'public',
-      description: 'Shared organization for unscoped data',
-    },
+    typeName: SYSTEM_ORGANIZATION_TYPES.PUBLIC.name,
   },
   PLATFORM: {
     name: 'platform',
     description: 'Platform organization with global system authority',
-    category: {
-      name: 'platform',
-      description: 'Platform organization with global system authority',
-    },
+    typeName: SYSTEM_ORGANIZATION_TYPES.PLATFORM.name,
   },
 } as const;
 

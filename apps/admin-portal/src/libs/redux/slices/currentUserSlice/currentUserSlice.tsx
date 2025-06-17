@@ -11,6 +11,7 @@ export interface Session {
   orgRoles: {
     orgId: string;
     orgName: string;
+    orgStragegy: string;
     roleCode: string;
     roleName: string;
     permissionStrings: string[];

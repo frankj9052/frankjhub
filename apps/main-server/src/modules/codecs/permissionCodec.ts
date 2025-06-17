@@ -1,6 +1,8 @@
 // 它不是通用工具，而是一个DSL 构造器（领域专用语言的编码器）
 // src/modules/rbac/utils/permissionCodec.ts
 
+import { RoleSource } from '../common/enums/roleSource.enum';
+
 /** -----------------------------
  * Permission Name <==> Parsed Form
  * ------------------------------ */
@@ -104,31 +106,43 @@ export const parsePermissionName = (permissionName: string): ParsedPermission =>
  * Role Code <==> Parsed Form
  * ------------------------------ */
 export interface ParsedRoleCode {
-  orgId: string;
+  roleSource: RoleSource;
+  orgIdOrType: string;
   roleName: string;
 }
 
 /**
  * 构建角色编码
- * @param orgId - 组织 ID，例如 'org123'
+ * @param roleSource - 角色来源类型，'org' 表示组织级角色，'type' 表示组织类型级角色
+ * @param orgIdOrType - 组织 ID 或组织类型，例如 'org123' 或 'clinic'
  * @param roleName - 角色名称，例如 'admin'
- * @returns 构建后的角色编码，例如 'org123::admin'
+ * @returns 构建后的角色编码，例如 'org|org123::admin' 或 'type|clinic::doctor'
  */
-export const buildRoleCode = (orgId: string, roleName: string): string => `${orgId}::${roleName}`;
+export const buildRoleCode = (
+  roleSource: RoleSource,
+  orgIdOrType: string,
+  roleName: string
+): string => `${roleSource}|${orgIdOrType}::${roleName}`;
 
 /**
  * 解析角色编码
- * @param roleCode - 角色编码字符串，例如 'org123::admin'
- * @returns 解析后的对象 { orgId, roleName }
+ * @param roleCode - 角色编码字符串，例如 'org|org123::admin'
+ * @returns 解析后的对象 { roleSource, orgIdOrType, roleName }
  */
 export const parseRoleCode = (roleCode: string): ParsedRoleCode => {
-  const parts = roleCode.split('::');
+  const [prefix, rest] = roleCode.split('|');
+  if ((prefix !== RoleSource.ORG && prefix !== RoleSource.TYPE) || !rest) {
+    throw new Error(`Invalid roleCode format (missing prefix): ${roleCode}`);
+  }
+
+  const parts = rest.split('::');
   if (parts.length !== 2 || !parts[0] || !parts[1]) {
-    throw new Error(`Invalid roleCode format: ${roleCode}`);
+    throw new Error(`Invalid roleCode format (missing orgId/type and roleName): ${roleCode}`);
   }
 
   return {
-    orgId: parts[0],
+    roleSource: prefix as RoleSource,
+    orgIdOrType: parts[0],
     roleName: parts[1],
   };
 };
@@ -143,16 +157,16 @@ export interface ParsedRolePermissionName {
 
 /**
  * 构建角色权限关联标识
- * @param roleCode - 角色编码，例如 'org123::admin'
+ * @param roleCode - 角色编码，例如 'org|org123::admin'
  * @param permissionName - 权限字符串
- * @returns 构建后的标识，例如 'org123::admin=>user:[read]'
+ * @returns 构建后的标识，例如 'org|org123::admin=>user:[read]'
  */
 export const buildRolePermissionName = (roleCode: string, permissionName: string): string =>
   `${roleCode}=>${permissionName}`;
 
 /**
  * 解析角色权限关联标识
- * @param name - 组合字符串，例如 'org123::admin=>user:[read]'
+ * @param name - 组合字符串，例如 'org|org123::admin=>user:[read]'
  * @returns 解析后的对象 { roleCode, permissionName }
  */
 export const parseRolePermissionName = (name: string): ParsedRolePermissionName => {
@@ -186,14 +200,14 @@ export interface ParsedFullUserOrgRoleName {
  * @param userId - 用户 ID
  * @param orgId - 组织 ID
  * @param roleCode - 角色编码
- * @returns 构建后的标识字符串，例如 'user456@org123#org123::admin'
+ * @returns 构建后的标识字符串，例如 'user456@org123#org|org123::admin'
  */
 export const buildFullUserOrgRoleName = (userId: string, orgId: string, roleCode: string): string =>
   `${userId}@${orgId}#${roleCode}`;
 
 /**
  * 解析用户-组织-角色标识
- * @param name - 复合字符串，例如 'user456@org123#org123::admin'
+ * @param name - 复合字符串，例如 'user456@org123#org|org123::admin'
  * @returns 结构化对象 { userId, orgId, roleCode }
  */
 export const parseFullUserOrgRoleName = (name: string): ParsedFullUserOrgRoleName => {

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankModal from './FrankModal';
 import { useDisclosure } from '@heroui/react';
 import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';

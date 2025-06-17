@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import NoqButton from './NoqButton';
 import { FrankSVGIcon } from '@frankjhub/shared-ui-core';
 

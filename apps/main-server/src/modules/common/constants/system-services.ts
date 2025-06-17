@@ -7,7 +7,8 @@ export const SYSTEM_SERVICES = {
     roles: [
       {
         name: SYSTEM_ROLES.ADMIN.name,
-        organizationName: SYSTEM_ROLES.ADMIN.organizationName,
+        roleSource: SYSTEM_ROLES.ADMIN.roleSource,
+        orgNameOrType: SYSTEM_ROLES.ADMIN.orgNameOrType,
       },
     ],
     description: 'Core backend server for platform ops',
@@ -18,7 +19,8 @@ export const SYSTEM_SERVICES = {
     roles: [
       {
         name: SYSTEM_ROLES.ADMIN.name,
-        organizationName: SYSTEM_ROLES.ADMIN.organizationName,
+        roleSource: SYSTEM_ROLES.ADMIN.roleSource,
+        orgNameOrType: SYSTEM_ROLES.ADMIN.orgNameOrType,
       },
     ],
     description: 'admin management portal',
@@ -29,7 +31,8 @@ export const SYSTEM_SERVICES = {
     roles: [
       {
         name: SYSTEM_ROLES.ADMIN.name,
-        organizationName: SYSTEM_ROLES.ADMIN.organizationName,
+        roleSource: SYSTEM_ROLES.ADMIN.roleSource,
+        orgNameOrType: SYSTEM_ROLES.ADMIN.orgNameOrType,
       },
     ],
     description: 'Handles billing and payment workflows',
@@ -40,7 +43,8 @@ export const SYSTEM_SERVICES = {
     roles: [
       {
         name: SYSTEM_ROLES.ADMIN.name,
-        organizationName: SYSTEM_ROLES.ADMIN.organizationName,
+        roleSource: SYSTEM_ROLES.ADMIN.roleSource,
+        orgNameOrType: SYSTEM_ROLES.ADMIN.orgNameOrType,
       },
     ],
     description: 'Handles appointment booking logic',

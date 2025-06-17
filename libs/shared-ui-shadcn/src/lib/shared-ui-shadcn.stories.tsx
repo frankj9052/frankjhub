@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import SharedUiShadcn from './shared-ui-shadcn';
 
 const meta = {

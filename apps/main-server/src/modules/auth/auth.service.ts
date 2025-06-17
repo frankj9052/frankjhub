@@ -81,6 +81,7 @@ export class AuthService {
     const formattedOrgRoles = orgRoles.map(orgRole => ({
       orgId: orgRole.organization.id,
       orgName: orgRole.organization.name,
+      orgType: orgRole.organization.orgType?.name || 'No Category',
       roleCode: orgRole.role.code,
       roleName: orgRole.role.name,
       permissionStrings: permissionMap.get(orgRole.role.id) ?? [],
