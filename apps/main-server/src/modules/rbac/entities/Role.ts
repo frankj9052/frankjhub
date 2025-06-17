@@ -43,10 +43,10 @@ export class Role extends BaseEntity {
     const roleName = this.name?.toLowerCase().trim();
     if (!roleName || !this.roleSource) return;
 
-    if (this.roleSource === RoleSource.ORG && this.organization?.id) {
-      this.code = buildRoleCode(RoleSource.ORG, this.organization.id, roleName);
-    } else if (this.roleSource === RoleSource.TYPE && this.organizationType?.id) {
-      this.code = buildRoleCode(RoleSource.TYPE, this.organizationType.id, roleName);
+    if (this.roleSource === RoleSource.ORG && this.organization?.name) {
+      this.code = buildRoleCode(RoleSource.ORG, this.organization.name, roleName);
+    } else if (this.roleSource === RoleSource.TYPE && this.organizationType?.name) {
+      this.code = buildRoleCode(RoleSource.TYPE, this.organizationType.name, roleName);
     }
   }
 }

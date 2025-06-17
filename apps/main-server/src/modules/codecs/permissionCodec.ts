@@ -107,22 +107,22 @@ export const parsePermissionName = (permissionName: string): ParsedPermission =>
  * ------------------------------ */
 export interface ParsedRoleCode {
   roleSource: RoleSource;
-  orgIdOrType: string;
+  orgNameOrType: string;
   roleName: string;
 }
 
 /**
  * 构建角色编码
  * @param roleSource - 角色来源类型，'org' 表示组织级角色，'type' 表示组织类型级角色
- * @param orgIdOrType - 组织 ID 或组织类型，例如 'org123' 或 'clinic'
+ * @param orgNameOrType - 组织 ID 或组织类型，例如 'org123' 或 'clinic'
  * @param roleName - 角色名称，例如 'admin'
  * @returns 构建后的角色编码，例如 'org|org123::admin' 或 'type|clinic::doctor'
  */
 export const buildRoleCode = (
   roleSource: RoleSource,
-  orgIdOrType: string,
+  orgNameOrType: string,
   roleName: string
-): string => `${roleSource}|${orgIdOrType}::${roleName}`;
+): string => `${roleSource}|${orgNameOrType}::${roleName}`;
 
 /**
  * 解析角色编码
@@ -142,7 +142,7 @@ export const parseRoleCode = (roleCode: string): ParsedRoleCode => {
 
   return {
     roleSource: prefix as RoleSource,
-    orgIdOrType: parts[0],
+    orgNameOrType: parts[0],
     roleName: parts[1],
   };
 };

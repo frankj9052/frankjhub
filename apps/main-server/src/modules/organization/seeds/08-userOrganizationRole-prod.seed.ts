@@ -8,6 +8,7 @@ import { waitForEntity } from '../../common/utils/waitForEntity';
 import { SYSTEM_ORGANIZATIONS } from '../../common/constants/system-organizations';
 import { env } from '../../../config/env';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
+import { buildRoleCode } from '../../codecs/permissionCodec';
 
 export default class UserOrganizationRoleProdSeed extends BaseSeeder {
   private readonly email = env.SUPER_ADMIN_EMAIL;
@@ -33,8 +34,11 @@ export default class UserOrganizationRoleProdSeed extends BaseSeeder {
     this.role = await waitForEntity(
       roleRepo,
       {
-        name: SYSTEM_ROLES.ADMIN.name,
-        organization: { id: this.org?.id },
+        code: buildRoleCode(
+          SYSTEM_ROLES.ADMIN.roleSource,
+          SYSTEM_ROLES.ADMIN.orgNameOrType,
+          SYSTEM_ROLES.ADMIN.name
+        ),
       },
       'admin role in platform'
     );
