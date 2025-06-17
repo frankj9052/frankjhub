@@ -2,6 +2,7 @@ import type { DataSource } from 'typeorm';
 import { useSeederFactoryManager } from 'typeorm-extension';
 import { createLoggerWithContext } from '../libs/logger';
 import { BaseSeeder } from '../libs/BaseSeeder';
+import { loadFactories } from './loadFactories';
 
 const logger = createLoggerWithContext('SeederRunner');
 /**
@@ -12,6 +13,9 @@ export async function runSeedersInOrder(
   seeders: Array<new () => BaseSeeder>
 ) {
   const executed: string[] = [];
+
+  // ✅ Step 0: 加载并注册所有 factory
+  await loadFactories();
   const factoryManager = useSeederFactoryManager();
 
   for (const SeederClass of seeders) {

@@ -1,3 +1,4 @@
+import { Not } from 'typeorm';
 import AppDataSource from '../../config/data-source';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
@@ -31,5 +32,9 @@ export class UserService {
       oauthProvider: user.oauthProvider,
       avatarImage: user.avatarImage,
     };
+  }
+  async getUsersAll(email: string): Promise<User[]> {
+    const users = await this.userRepo.find({ where: { email: Not(email) } });
+    return users;
   }
 }

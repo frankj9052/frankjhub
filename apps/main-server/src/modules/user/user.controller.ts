@@ -27,3 +27,18 @@ export const getCurrentUserProfileController: RequestHandler = async (
     next(error);
   }
 };
+
+export const getUsersAll: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const email = req.currentUser?.email;
+    if (!email) throw new UnauthorizedError('User identity not found in request');
+    const users = await userService.getUsersAll(email);
+    res.status(200).json(users);
+  } catch (error) {
+    next(error);
+  }
+};
