@@ -2,6 +2,7 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { UserService } from './user.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { UserProfileResponse } from './dto/userProfile.dto';
+import { userAllProfilePaginationSchema } from './dto/userAllProfilePagination.dto';
 
 const userService = new UserService();
 
@@ -28,7 +29,7 @@ export const getCurrentUserProfileController: RequestHandler = async (
   }
 };
 
-export const getUsersAll: RequestHandler = async (
+export const getUsersAllProfileController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,7 +37,8 @@ export const getUsersAll: RequestHandler = async (
   try {
     const email = req.currentUser?.email;
     if (!email) throw new UnauthorizedError('User identity not found in request');
-    const users = await userService.getUsersAll(email);
+    const pagination = userAllProfilePaginationSchema.parse(req.query);
+    const users = await userService.getUsersAllProfile(email, pagination);
     res.status(200).json(users);
   } catch (error) {
     next(error);
