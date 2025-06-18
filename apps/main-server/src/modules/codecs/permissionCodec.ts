@@ -122,7 +122,7 @@ export const buildRoleCode = (
   roleSource: RoleSource,
   orgNameOrType: string,
   roleName: string
-): string => `${roleSource}|${orgNameOrType}::${roleName}`;
+): string => `${roleSource}|${orgNameOrType}::${roleName.toLowerCase().trim()}`;
 
 /**
  * 解析角色编码

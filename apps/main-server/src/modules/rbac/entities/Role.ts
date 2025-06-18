@@ -40,13 +40,12 @@ export class Role extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   protected setCode(): void {
-    const roleName = this.name?.toLowerCase().trim();
-    if (!roleName || !this.roleSource) return;
+    if (!this.name || !this.roleSource) return;
 
     if (this.roleSource === RoleSource.ORG && this.organization?.name) {
-      this.code = buildRoleCode(RoleSource.ORG, this.organization.name, roleName);
+      this.code = buildRoleCode(RoleSource.ORG, this.organization.name, this.name);
     } else if (this.roleSource === RoleSource.TYPE && this.organizationType?.name) {
-      this.code = buildRoleCode(RoleSource.TYPE, this.organizationType.name, roleName);
+      this.code = buildRoleCode(RoleSource.TYPE, this.organizationType.name, this.name);
     }
   }
 }
