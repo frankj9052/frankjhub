@@ -1,8 +1,8 @@
 import { getSessionClient } from '@/services/auth';
 import { getUserProfileClient } from '@/services/user';
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { createAppAsyncThunk } from '../../createAppAsyncThunk';
 
-export const getSessionAsync = createAsyncThunk('getCurrentUserSessionData', async () => {
+export const getSessionAsync = createAppAsyncThunk('getCurrentUserSessionData', async () => {
   const session = await getSessionClient();
   if (session) {
     return session.data;
@@ -11,7 +11,7 @@ export const getSessionAsync = createAsyncThunk('getCurrentUserSessionData', asy
   }
 });
 
-export const getUserProfileAsync = createAsyncThunk('getUserProfileData', async () => {
+export const getUserProfileAsync = createAppAsyncThunk('getUserProfileData', async () => {
   const userProfile = await getUserProfileClient();
   if (userProfile.status === 'success') {
     return userProfile.data.data;

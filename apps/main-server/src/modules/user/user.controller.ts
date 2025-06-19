@@ -1,8 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { UserService } from './user.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
-import { UserProfileResponse } from './dto/userProfile.dto';
-import { userAllProfilePaginationSchema } from './dto/userAllProfilePagination.dto';
+import { UserProfileResponse, userAllProfilePaginationSchema } from '@frankjhub/shared-schema';
 
 const userService = new UserService();
 

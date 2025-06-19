@@ -1,7 +1,31 @@
 import z from 'zod';
 import { registry } from '../../../config/openapiRegistry';
-import { loginSchema } from '../dto/login.dto';
-import { currentUserSchema } from '../dto/currentUser.dto';
+import { loginSchema, currentUserSchema } from '@frankjhub/shared-schema';
+import { userPayloadExample } from './examples';
+
+// LoginRequest
+registry.register(
+  'LoginRequest',
+  loginSchema.openapi({
+    description: 'Login request body containing user credentials',
+    example: {
+      email: 'test@example.com',
+      password: 'password123',
+    },
+  })
+);
+
+// CurrentUserResponse
+registry.register(
+  'CurrentUserResponse',
+  currentUserSchema.openapi({
+    description: 'Response schema containing the current authenticated user information',
+    example: {
+      status: 'success',
+      data: userPayloadExample,
+    },
+  })
+);
 
 // ✅ Register API path: /auth/login
 registry.registerPath({
@@ -14,7 +38,9 @@ registry.registerPath({
       description: 'Email and password required for login',
       content: {
         'application/json': {
-          schema: loginSchema,
+          schema: {
+            $ref: '#/components/schemas/LoginRequest',
+          },
         },
       },
     },
@@ -24,14 +50,9 @@ registry.registerPath({
       description: 'Login successful',
       content: {
         'application/json': {
-          schema: z.object({
-            status: z.literal('success'),
-            data: z.object({
-              id: z.string(),
-              email: z.string().email(),
-              userName: z.string(),
-            }),
-          }),
+          schema: {
+            $ref: '#components/schemas/CurrentUserResponse',
+          },
         },
       },
     },
@@ -55,7 +76,9 @@ registry.registerPath({
       description: 'User is authenticated. Returns session-bound user information.',
       content: {
         'application/json': {
-          schema: currentUserSchema,
+          schema: {
+            $ref: '#components/schemas/CurrentUserResponse',
+          },
         },
       },
     },

@@ -74,7 +74,6 @@ export const currentUserSlice = createSlice({
       .addCase(getUserProfileAsync.fulfilled, (state, action) => {
         state.userProfile = action.payload;
         state.status = 'idle';
-        console.log('user profile ===> ', action.payload);
       });
   },
 });

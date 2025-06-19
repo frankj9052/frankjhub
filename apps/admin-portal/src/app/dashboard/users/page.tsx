@@ -1,3 +1,4 @@
-export default function UsersPage() {
-  return <div>manage users</div>;
+import UsersTable from './UsersTable';
+export default async function UsersPage() {
+  return <UsersTable />;
 }

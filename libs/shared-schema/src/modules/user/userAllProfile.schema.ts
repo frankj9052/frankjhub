@@ -1,6 +1,6 @@
-import { Gender } from 'src/enums/gender.enum';
-import { Honorific } from 'src/enums/honorific.enum';
-import { z } from 'zod';
+import { Gender } from '../../enums/gender.enum';
+import { Honorific } from '../../enums/honorific.enum';
+import { z, zInfer } from '../../libs/z';
 
 /**
  * 用户展示用字段 schema（分页项 / 用户详情 / 非敏感输出）
@@ -28,9 +28,14 @@ export const userAllProfileSchema = z.object({
 
   /** OAuth 相关（只暴露 provider） */
   oauthProvider: z.string().nullable(),
+  oauthId: z.string().nullable(),
 
   /** 用户状态 */
   isActive: z.boolean(),
+  emailVerified: z.boolean(),
+  profileCompleted: z.boolean(),
+  refreshToken: z.string().nullable(),
+  sessionVersion: z.string(),
 
   /** 审计时间字段（来自 BaseEntity） */
   createdAt: z.string(),
@@ -44,5 +49,5 @@ export const userAllProfileResponseSchema = z.object({
   status: z.literal('success'),
   data: userAllProfileSchema,
 });
-export type UserAllProfilePayload = z.infer<typeof userAllProfileSchema>;
-export type UserAllProfileResponse = z.infer<typeof userAllProfileResponseSchema>;
+export type UserAllProfilePayload = zInfer<typeof userAllProfileSchema>;
+export type UserAllProfileResponse = zInfer<typeof userAllProfileResponseSchema>;

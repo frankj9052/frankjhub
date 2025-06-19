@@ -7,7 +7,7 @@ import AppDataSource from '../../config/data-source';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { UserOrganizationRole } from '../organization/entities/UserOrganizationRole';
 import { RolePermission } from '../rbac/entities/RolePermission';
-import { UserPayload } from './dto/currentUser.dto';
+import { UserPayload } from '@frankjhub/shared-schema';
 
 const logger = createLoggerWithContext('AuthService');
 

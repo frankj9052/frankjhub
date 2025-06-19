@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '../../libs/z';
 
 export const loginSchema = z.object({
   email: z.string().email(),

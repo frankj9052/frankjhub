@@ -1,7 +1,7 @@
 import './docs/openapi';
 import { Router } from 'express';
 import { currentUserController, loginController, logoutController } from './auth.controller';
-import { loginSchema } from './dto/login.dto';
+import { loginSchema } from '@frankjhub/shared-schema';
 import { requireAuth } from './middlewares/requireAuth';
 import { validateRequest } from '../common/middlewares/validateRequest';
 

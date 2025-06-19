@@ -1,4 +1,5 @@
-import { z } from 'zod';
+import { ZodTypeAny } from 'zod';
+import { z } from '../libs/z';
 
 /**
  * 创建通用分页响应 schema（支持类型推导和前后端一致性）
@@ -15,7 +16,7 @@ import { z } from 'zod';
  * @param itemSchema - 用于单个数据项的 Zod schema（例如用户、文章等）
  * @returns 包含分页元信息的完整 schema（可用于校验与类型推导）
  */
-export function createOffsetPaginatedResponseSchema<T extends z.ZodTypeAny>(itemSchema: T) {
+export function createOffsetPaginatedResponseSchema<T extends ZodTypeAny>(itemSchema: T) {
   return z.object({
     data: z.array(itemSchema),
     total: z.number().int().nonnegative(),

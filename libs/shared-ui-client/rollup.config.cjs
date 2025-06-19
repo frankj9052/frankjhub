@@ -19,8 +19,8 @@ module.exports = withNx(
     external: externalDeps,
     format: ['esm', 'cjs'],
     assets: [
-      { input: 'libs/shared-ui', output: '.', glob: 'README.md' },
-      { input: 'libs/shared-ui', output: '.', glob: 'package.json' },
+      { input: 'libs/shared-ui-client', output: '.', glob: 'README.md' },
+      { input: 'libs/shared-ui-client', output: '.', glob: 'package.json' },
     ],
   },
   {

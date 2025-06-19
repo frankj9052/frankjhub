@@ -2,11 +2,14 @@ import { Not } from 'typeorm';
 import AppDataSource from '../../config/data-source';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
-import { UserProfilePayload } from './dto/userProfile.dto';
+import {
+  UserProfilePayload,
+  UserAllProfilePayload,
+  UserPaginatedResponse,
+  UserPaginationParams,
+} from '@frankjhub/shared-schema';
 import { User } from './entities/User';
-import { UserAllProfilePayload } from './dto/userAllProfile.dto';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
-import { UserPaginatedResponse, UserPaginationParams } from './dto/userAllProfilePagination.dto';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -49,12 +52,23 @@ export class UserService {
       gender: user.gender ?? null,
       dateOfBirth: user.dateOfBirth ? user.dateOfBirth.toISOString() : null,
       honorific: user.honorific ?? null,
+
       avatarImage: user.avatarImage ?? null,
 
+      // OAuth 信息
       oauthProvider: user.oauthProvider ?? null,
+      oauthId: user.oauthId ?? null,
 
+      // 安全认证相关
+      emailVerified: user.emailVerified,
+      profileCompleted: user.profileCompleted,
+      refreshToken: user.refreshToken ?? null,
+      sessionVersion: user.sessionVersion,
+
+      // 状态控制
       isActive: user.isActive,
 
+      // 时间戳
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

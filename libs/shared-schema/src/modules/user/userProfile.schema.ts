@@ -1,6 +1,6 @@
-import { Gender } from 'src/enums/gender.enum';
-import { Honorific } from 'src/enums/honorific.enum';
-import { z } from 'zod';
+import { Gender } from '../../enums/gender.enum';
+import { Honorific } from '../../enums/honorific.enum';
+import { z, zInfer } from '../../libs/z';
 
 export const userProfileSchema = z.object({
   userName: z.string(),
@@ -22,5 +22,5 @@ export const userProfileResponseSchema = z.object({
 });
 
 // 🔸 类型导出
-export type UserProfilePayload = z.infer<typeof userProfileSchema>;
-export type UserProfileResponse = z.infer<typeof userProfileResponseSchema>;
+export type UserProfilePayload = zInfer<typeof userProfileSchema>;
+export type UserProfileResponse = zInfer<typeof userProfileResponseSchema>;

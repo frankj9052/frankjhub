@@ -1,4 +1,4 @@
-import { UserPayload } from '../../auth/dto/currentUser.dto';
+import { UserPayload } from '@frankjhub/shared-schema';
 
 /**
  * 提取用户在所有组织角色中的权限字符串（扁平化）

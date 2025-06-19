@@ -10,4 +10,4 @@ export const UserOrderByFieldsEnum = {
 } as const;
 
 // 👇 类型提取（用于 typing）
-export type UserOrderByFieldsEnum = typeof UserOrderByFieldsEnum;
+export type UserOrderByField = (typeof UserOrderByFieldsEnum)[keyof typeof UserOrderByFieldsEnum];

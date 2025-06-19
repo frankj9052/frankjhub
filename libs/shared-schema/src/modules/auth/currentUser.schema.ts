@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z, zInfer } from '../../libs/z';
 
 const orgRoleSchema = z.object({
   orgId: z.string().uuid(),
@@ -25,4 +25,4 @@ export const currentUserSchema = z.object({
   data: userPayloadSchema,
 });
 
-export type UserPayload = z.infer<typeof userPayloadSchema>;
+export type UserPayload = zInfer<typeof userPayloadSchema>;

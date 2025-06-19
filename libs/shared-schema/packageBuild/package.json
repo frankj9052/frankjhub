@@ -1,9 +1,9 @@
 {
   "name": "@frankjhub/shared-schema",
   "version": "0.0.1",
-  "main": "./dist/index.esm.js",
-  "module": "./dist/index.esm.js",
-  "types": "./dist/index.esm.d.ts",
+  "main": "./index.esm.js",
+  "module": "./index.esm.js",
+  "types": "./index.esm.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {

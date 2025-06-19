@@ -5,7 +5,7 @@ import { getCurrentUserProfileController, getUsersAllProfileController } from '.
 import { requirePermission } from '../common/middlewares/requirePermission';
 import { buildPermissionName } from '../codecs/permissionCodec';
 import { validateRequest } from '../common/middlewares/validateRequest';
-import { userAllProfilePaginationSchema } from './dto/userAllProfilePagination.dto';
+import { userAllProfilePaginationSchema } from '@frankjhub/shared-schema';
 
 const router = Router();
 

@@ -1,5 +1,5 @@
-import { OrderEnum } from 'src/enums/order.enum';
-import { z } from 'zod';
+import { OrderEnum } from '../enums/order.enum';
+import { z } from '../libs/z';
 
 /**
  * 创建基于 limit/offset 模式的分页参数校验 schema
