@@ -8,3 +8,4 @@ export * from './utils/eventUtils';
 export * from './utils/dateUtils';
 export * from './utils/colorUtils';
 export * from './utils/chatUtils';
+export * from './utils/tableUtils';

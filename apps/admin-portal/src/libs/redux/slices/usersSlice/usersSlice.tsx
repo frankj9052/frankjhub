@@ -1,5 +1,6 @@
 import {
   OrderEnum,
+  userAllData,
   UserOrderByField,
   UserOrderByFieldsEnum,
   UserPaginatedResponse,
@@ -7,11 +8,44 @@ import {
 } from '@frankjhub/shared-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUsersAllProfileAsync } from './thunk';
+import { generateColumnsFromData } from '@frankjhub/shared-utils';
+import { Key } from 'react';
+
+const INITIAL_VISIBLE_COLUMNS: string[] = [
+  'userName',
+  'oauthProvider',
+  'emailVerified',
+  'profileCompleted',
+  'isActive',
+  'createdAt',
+  'deletedAt',
+  'actions',
+];
+
+const sortableFields = new Set(Object.values(UserOrderByFieldsEnum));
+const columns = generateColumnsFromData(userAllData, {
+  sortableFields,
+  extraColumns: [
+    {
+      name: 'Actions',
+      uid: 'actions',
+      sortable: false,
+    },
+  ],
+  exclude: ['email', 'avatarImage', 'refreshToken', 'sessionVersion'],
+});
 
 export interface UsersSliceState {
   usersAllProfile: UserPaginatedResponse;
   usersAllProfilePagination: UserPaginationParams;
   status: 'idle' | 'loading' | 'failed';
+  columns: {
+    name: string;
+    uid: string;
+    sortable?: boolean;
+  }[];
+  visibleColumns: Key[] | 'all';
+  filterValue: string;
 }
 
 const initialState: UsersSliceState = {
@@ -23,12 +57,16 @@ const initialState: UsersSliceState = {
     currentPage: 0,
   },
   usersAllProfilePagination: {
-    limit: 20,
+    limit: 10,
     offset: 0,
     order: OrderEnum.DESC,
     orderBy: UserOrderByFieldsEnum.USER_NAME,
+    search: '',
   },
-  status: 'idle',
+  status: 'loading',
+  columns,
+  visibleColumns: INITIAL_VISIBLE_COLUMNS,
+  filterValue: '',
 };
 
 export const usersSlice = createSlice({
@@ -58,6 +96,15 @@ export const usersSlice = createSlice({
     },
     cleanOrderBy: state => {
       state.usersAllProfilePagination.orderBy = UserOrderByFieldsEnum.USER_NAME;
+    },
+    setVisibleColumn: (state, action: PayloadAction<Key[]>) => {
+      state.visibleColumns = action.payload;
+    },
+    setSearchValue: (state, action: PayloadAction<string>) => {
+      state.usersAllProfilePagination.search = action.payload;
+    },
+    cleanSearchValue: state => {
+      state.usersAllProfilePagination.search = '';
     },
   },
   extraReducers(builder) {

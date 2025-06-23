@@ -1,4 +1,4 @@
-import { UserPayload } from '@frankjhub/shared-schema';
+import { UserPayload } from "../modules/auth/currentUser.schema";
 
 export const userPayloadExample: UserPayload = {
   id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',

@@ -1,9 +1,7 @@
-import {
-  Gender,
-  Honorific,
-  UserAllProfilePayload,
-  UserProfilePayload,
-} from '@frankjhub/shared-schema';
+import { Honorific } from "../enums/honorific.enum";
+import { Gender } from "../enums/gender.enum";
+import { UserProfilePayload } from "../modules/user/userProfile.schema";
+import { UserAllProfilePayload } from "../modules/user/userAllProfile.schema";
 
 export const userBasicData: UserProfilePayload = {
   userName: 'frankjia',
@@ -37,5 +35,9 @@ export const userAllData: UserAllProfilePayload = {
   refreshToken: null,
   sessionVersion: 'v1',
   createdAt: '2024-01-01T12:00:00.000Z',
+  createdBy: null,
   updatedAt: '2024-06-01T12:00:00.000Z',
+  updatedBy: null,
+  deletedAt: null,
+  deletedBy: null
 };

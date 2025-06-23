@@ -1,0 +1,41 @@
+/**
+ * 根据给定的数据对象生成 UI 表格列配置数组
+ *
+ * @param data - 用户数据对象（如 userAllData），用于提取字段名生成列配置
+ * @param options - 可选配置项
+ *   - customMappings: 自定义列名映射（如 { userName: 'NAME' }）
+ *   - extraColumns: 额外添加的列（如操作列、派生字段 AGE、STATUS 等）
+ *   - exclude: 要从数据中排除的字段（如 refreshToken 等敏感字段）
+ *   - sortableFields: 标记为可排序的字段集合（通常来源于某个 enum）
+ *
+ * @returns columns - 列配置数组，用于前端表格展示
+ */
+export function generateColumnsFromData(
+  data: Record<string, unknown>,
+  {
+    customMappings = {},
+    extraColumns = [],
+    exclude = [],
+    sortableFields = new Set<string>(),
+  }: {
+    customMappings?: Record<string, string>; // 用于设置字段名 → 显示名映射
+    extraColumns?: { name: string; uid: string; sortable?: boolean }[]; // 非数据字段手动追加
+    exclude?: string[]; // 忽略掉不想展示的字段
+    sortableFields?: Set<string>; // 定义哪些字段可以排序
+  } = {}
+) {
+  return [
+    // 遍历 data 中的 key，排除 exclude 中的字段
+    ...Object.keys(data)
+      .filter(key => !exclude.includes(key))
+      .map(key => ({
+        uid: key, // 字段名
+        // 显示名：优先使用 customMappings 映射，否则将 camelCase 转换为大写空格分隔
+        name: customMappings[key] ?? key.replace(/([A-Z])/g, ' $1').toUpperCase(),
+        // 是否可排序：由 sortableFields 决定
+        sortable: sortableFields.has(key),
+      })),
+    // 追加额外的列（如 AGE、ROLE、ACTIONS）
+    ...extraColumns,
+  ];
+}

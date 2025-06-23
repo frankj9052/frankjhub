@@ -5,18 +5,22 @@ import { z } from '../libs/z';
  * 创建基于 limit/offset 模式的分页参数校验 schema
  *
  * @param orderByEnum - 允许排序的字段枚举（如 UserOrderByFieldsEnum）
- * @returns 返回带 limit、offset、order、orderBy 的分页参数校验 schema
+ * @returns 返回包含分页、排序和搜索字段的校验 schema
  *
- * 特性：
+ * 特性说明：
  * - limit：每页最大条数，默认 20，最大限制 100
  * - offset：跳过条数，默认 0
- * - order：排序方向，'ASC' 或 'DESC'，默认 'DESC'
+ * - order：排序方向，可选 'ASC' 或 'DESC'，默认 'DESC'
  * - orderBy：排序字段，必须是指定 enum 中的合法值，默认 enum 中第一个值
+ * - search：搜索关键词（模糊匹配），支持 1 到 100 字符之间的任意字符串
  */
 export function createOffsetPaginationSchema<T extends Record<string, string>>(orderByEnum: T) {
   return z.object({
     /**
-     * 每页条数限制，默认 20，最大 100
+     * 每页条数限制
+     * - 类型：number 或 string（自动转换）
+     * - 默认值：20
+     * - 最大值：100
      */
     limit: z
       .union([z.string(), z.number()])
@@ -27,7 +31,10 @@ export function createOffsetPaginationSchema<T extends Record<string, string>>(o
       }),
 
     /**
-     * 偏移量，用于跳过多少条数据，默认 0
+     * 数据偏移量（用于跳过前面的数据）
+     * - 类型：number 或 string（自动转换）
+     * - 默认值：0
+     * - 最小值：0
      */
     offset: z
       .union([z.string(), z.number()])
@@ -38,7 +45,9 @@ export function createOffsetPaginationSchema<T extends Record<string, string>>(o
       }),
 
     /**
-     * 排序方向，支持 ASC / DESC，默认 DESC（不区分大小写）
+     * 排序方向
+     * - 类型：'ASC' | 'DESC'（不区分大小写）
+     * - 默认值：'DESC'
      */
     order: z
       .string()
@@ -49,11 +58,21 @@ export function createOffsetPaginationSchema<T extends Record<string, string>>(o
       }),
 
     /**
-     * 排序字段，必须是传入的枚举中的合法字段，默认取 enum 的第一个值
+     * 排序字段
+     * - 类型：传入枚举中的合法字段值
+     * - 默认值：枚举中的第一个字段
      */
     orderBy: z
       .nativeEnum(orderByEnum)
       .optional()
       .default(Object.values(orderByEnum)[0] as T[keyof T]),
+
+    /**
+     * 搜索关键词（用于模糊匹配）
+     * - 类型：string
+     * - 默认值：undefined（不搜索）
+     * - 限制：最少 1 个字符，最多 100 个字符
+     */
+    search: z.string().trim().max(100, { message: 'Search keyword too long' }).optional(),
   });
 }

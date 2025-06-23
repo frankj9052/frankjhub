@@ -37,6 +37,7 @@ export default class UserProdSeed extends BaseSeeder {
       emailVerified: true,
       profileCompleted: true,
       isActive: true,
+      createdBy: 'Seeder',
     });
 
     await userRepo.save(user);

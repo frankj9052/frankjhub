@@ -50,6 +50,9 @@
       "path": "../../libs/shared-ui-client"
     },
     {
+      "path": "../../libs/shared-utils"
+    },
+    {
       "path": "../../libs/shared-schema"
     },
     {

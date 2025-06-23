@@ -4,8 +4,9 @@ import {
   userAllProfilePaginationSchema,
   userProfileResponseSchema,
   userAllProfileResponseSchema,
+  userAllData,
+  userBasicData,
 } from '@frankjhub/shared-schema';
-import { userAllData, userBasicData } from './examples';
 
 // UserProfileResponse
 registry.register(

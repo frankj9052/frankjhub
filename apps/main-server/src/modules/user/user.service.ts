@@ -71,6 +71,10 @@ export class UserService {
       // 时间戳
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
+      deletedAt: user.deletedAt?.toISOString() ?? null,
+      createdBy: user.createdBy ?? null,
+      updatedBy: user.updatedBy ?? null,
+      deletedBy: user.deletedBy ?? null,
     };
   }
 
@@ -82,6 +86,15 @@ export class UserService {
       repo: this.userRepo,
       where: { email: Not(email) },
       pagination,
+      modifyQueryBuilder: qb => {
+        if (pagination.search) {
+          qb.andWhere(
+            `(t.userName ILIKE :search OR t.email ILIKE :search OR t.lastName ILIKE :search OR t.firstName ILIKE :search)`,
+            { search: `%${pagination.search.trim()}%` }
+          );
+        }
+        return qb;
+      },
     });
     const response = {
       ...paginatedUsers,

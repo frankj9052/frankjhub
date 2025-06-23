@@ -1,5 +1,5 @@
 import { ZodTypeAny } from 'zod';
-import { z } from '../libs/z';
+import { z, zInfer } from '../libs/z';
 
 /**
  * 创建通用分页响应 schema（支持类型推导和前后端一致性）
@@ -23,5 +23,13 @@ export function createOffsetPaginatedResponseSchema<T extends ZodTypeAny>(itemSc
     pageCount: z.number().int().nonnegative(),
     currentPage: z.number().int().nonnegative(),
     pageSize: z.number().int().nonnegative(),
+
+    // 可选搜索关键词字段
+    search: z.string().optional(),
   });
 }
+
+// ✅ 加上 T extends z.ZodTypeAny 泛型约束
+export type OffsetPaginatedZoeResponse<T extends ZodTypeAny> = zInfer<
+  ReturnType<typeof createOffsetPaginatedResponseSchema<T>>
+>;

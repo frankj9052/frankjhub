@@ -1,9 +1,14 @@
 'use client';
 import { useDispatch, usersSlice, useSelector } from '@/libs/redux';
 import { getUsersAllProfileAsync } from '@/libs/redux/slices/usersSlice/thunk';
+import { OrderEnum, UserAllProfilePayload, UserOrderByField } from '@frankjhub/shared-schema';
 import {
-  getKeyValue,
-  Pagination,
+  Button,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Spinner,
   Table,
   TableBody,
@@ -11,68 +16,165 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  User,
 } from '@heroui/react';
-import { useEffect } from 'react';
+import { Key, useCallback, useEffect, useMemo } from 'react';
+import { TopContent } from './TopContent';
+import { BottomContent } from './BottomContent';
+import { HiDotsVertical } from 'react-icons/hi';
+import { dateToCalendarDate, formatShortDateTime } from '@frankjhub/shared-utils';
 
 export default function UsersTable() {
   const dispatch = useDispatch();
   const paginatedUsers = useSelector(state => state.users.usersAllProfile);
   const pagination = useSelector(state => state.users.usersAllProfilePagination);
   const state = useSelector(state => state.users.status);
+  const visibleColumns = useSelector(state => state.users.visibleColumns);
+  const columns = useSelector(state => state.users.columns);
   const loadingState = state === 'loading' ? 'loading' : 'idle';
+  const { data } = paginatedUsers;
+  const classNames = useMemo(
+    () => ({
+      wrapper: ['max-h-[382px]', 'max-w-3xl'],
+      th: ['bg-transparent', 'text-default-500', 'border-b', 'border-divider'],
+      td: [
+        // changing the rows border radius
+        // first
+        'group-data-[first=true]/tr:first:before:rounded-none',
+        'group-data-[first=true]/tr:last:before:rounded-none',
+        // middle
+        'group-data-[middle=true]/tr:before:rounded-none',
+        // last
+        'group-data-[last=true]/tr:first:before:rounded-none',
+        'group-data-[last=true]/tr:last:before:rounded-none',
+      ],
+    }),
+    []
+  );
 
-  const { data, total, pageCount, pageSize, currentPage } = paginatedUsers;
+  const headerColumns = useMemo(() => {
+    if (visibleColumns === 'all') return columns;
+
+    return columns.filter(column => Array.from(visibleColumns).includes(column.uid));
+  }, [visibleColumns, columns]);
+
+  // 渲染每个record
+  const renderCell = useCallback((user: UserAllProfilePayload, columnKey: Key) => {
+    const cellValue = user[columnKey as keyof UserAllProfilePayload];
+
+    switch (columnKey) {
+      case 'userName':
+        return (
+          <User
+            avatarProps={{ radius: 'full', size: 'sm', src: user.avatarImage ?? undefined }}
+            classNames={{
+              description: 'text-default-500',
+            }}
+            description={user.email}
+            name={cellValue}
+          >
+            {user.email}
+          </User>
+        );
+      case 'dateOfBirth':
+        return <div>{dateToCalendarDate(new Date(String(cellValue))).toString()}</div>;
+      case 'oauthProvider':
+        if (!cellValue) {
+          return <Chip color="secondary">Platform</Chip>;
+        }
+        return <Chip color="secondary">{cellValue}</Chip>;
+      case 'isActive':
+        if (cellValue) {
+          return <Chip color="success">Active</Chip>;
+        }
+        return <Chip color="default">Inactive</Chip>;
+      case 'emailVerified':
+        if (cellValue) {
+          return <Chip color="success">Verified</Chip>;
+        }
+        return <Chip color="warning">Unverified</Chip>;
+      case 'profileCompleted':
+        if (cellValue) {
+          return <Chip color="success">Completed</Chip>;
+        }
+        return <Chip color="warning">Incompleted</Chip>;
+      case 'createdAt':
+      case 'updatedAt':
+      case 'deletedAt':
+        if (cellValue) {
+          return <div>{formatShortDateTime(new Date(String(cellValue)))}</div>;
+        }
+        return cellValue;
+      case 'actions':
+        return (
+          <div>
+            <div className="relative flex justify-end items-center gap-2">
+              <Dropdown className="bg-background border-1 border-default-200">
+                <DropdownTrigger>
+                  <Button isIconOnly radius="full" size="sm" variant="light">
+                    <HiDotsVertical className="text-default-400" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem key="view">View</DropdownItem>
+                  <DropdownItem key="edit">Edit</DropdownItem>
+                  <DropdownItem key="delete">Delete</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          </div>
+        );
+      default:
+        return cellValue;
+    }
+  }, []);
 
   useEffect(() => {
     dispatch(getUsersAllProfileAsync({ pagination }));
   }, [pagination, dispatch]);
 
-  useEffect(() => {
-    console.log('data ===> ', data);
-  }, [data]);
-
   return (
     <Table
+      isCompact
+      removeWrapper
       aria-label="async paginated users data"
-      bottomContent={
-        pageCount > 0 ? (
-          <div className="flex w-full justify-center">
-            <Pagination
-              isCompact
-              showControls
-              showShadow
-              color="primary"
-              page={currentPage}
-              total={total}
-              onChange={page => {
-                const offset = (page - 1) * pageSize;
-                dispatch(usersSlice.actions.setOffset(offset));
-              }}
-            />
-          </div>
-        ) : null
-      }
+      selectionMode="single"
+      color="secondary"
+      topContent={<TopContent />}
+      topContentPlacement="outside"
+      bottomContent={<BottomContent />}
+      bottomContentPlacement="outside"
+      classNames={classNames}
+      onSortChange={sortDescriptor => {
+        const { column, direction } = sortDescriptor;
+        if (direction === 'ascending') {
+          dispatch(usersSlice.actions.setOrder(OrderEnum.ASC));
+        } else if (direction === 'descending') {
+          dispatch(usersSlice.actions.setOrder(OrderEnum.DESC));
+        }
+        dispatch(usersSlice.actions.setOrderBy(String(column) as UserOrderByField));
+      }}
     >
-      <TableHeader>
-        <TableColumn key="id">ID</TableColumn>
-        <TableColumn key="userName">User Name</TableColumn>
-        <TableColumn key="email">Email</TableColumn>
-        <TableColumn key="lastName">Last Name</TableColumn>
-        <TableColumn key="firstName">First Name</TableColumn>
-        <TableColumn key="middleName">Middle Name</TableColumn>
-        <TableColumn key="gender">Gender</TableColumn>
-        <TableColumn key="oauthProvider">Provider</TableColumn>
-        <TableColumn key="isActive">Active</TableColumn>
+      <TableHeader columns={headerColumns}>
+        {column => (
+          <TableColumn
+            key={column.uid}
+            align={column.uid === 'action' ? 'center' : 'start'}
+            allowsSorting={column.sortable}
+          >
+            {column.name}
+          </TableColumn>
+        )}
       </TableHeader>
       <TableBody
         items={data ?? []}
-        loadingContent={<Spinner />}
+        loadingContent={<Spinner color="secondary" />}
         loadingState={loadingState}
-        emptyContent={'No data to display'}
+        emptyContent={'No users found'}
       >
         {item => (
           <TableRow key={item.id}>
-            {columnKey => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
+            {columnKey => <TableCell>{renderCell(item, columnKey)}</TableCell>}
           </TableRow>
         )}
       </TableBody>

@@ -4,4 +4,5 @@ export interface OffsetPaginatedResponse<T> {
   pageCount: number;
   currentPage: number;
   pageSize: number;
+  search?: string;
 }

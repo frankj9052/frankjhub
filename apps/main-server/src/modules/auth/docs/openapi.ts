@@ -1,7 +1,6 @@
 import z from 'zod';
 import { registry } from '../../../config/openapiRegistry';
-import { loginSchema, currentUserSchema } from '@frankjhub/shared-schema';
-import { userPayloadExample } from './examples';
+import { loginSchema, currentUserSchema, userPayloadExample } from '@frankjhub/shared-schema';
 
 // LoginRequest
 registry.register(

@@ -39,7 +39,11 @@ export const userAllProfileSchema = z.object({
 
   /** 审计时间字段（来自 BaseEntity） */
   createdAt: z.string(),
+  createdBy: z.string().nullable(),
   updatedAt: z.string(),
+  updatedBy: z.string().nullable(),
+  deletedAt: z.string().nullable(),
+  deletedBy: z.string().nullable(),
 });
 
 /**

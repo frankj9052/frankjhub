@@ -20,6 +20,7 @@ export default setSeederFactory(User, () => {
   user.emailVerified = true;
   user.profileCompleted = true;
   user.isActive = true;
+  user.createdBy = 'Seeder';
 
   return user;
 });
