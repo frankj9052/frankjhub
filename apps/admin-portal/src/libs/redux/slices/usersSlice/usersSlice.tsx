@@ -7,7 +7,6 @@ import {
   UserPaginatedResponse,
   UserPaginationParams,
   LabeledEnumItem,
-  UserStatusFilter,
 } from '@frankjhub/shared-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUsersAllProfileAsync } from './thunk';
