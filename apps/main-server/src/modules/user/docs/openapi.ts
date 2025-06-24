@@ -120,3 +120,49 @@ registry.registerPath({
     },
   },
 });
+
+registry.registerPath({
+  method: 'get',
+  path: '/user/{id}',
+  tags: ['User'],
+  summary: 'Get full profile of a user by ID',
+  description: 'Returns full detailed profile data of a specific user by their ID.',
+  security: [
+    {
+      bearerAuth: [], // 或 cookieAuth，看你用的认证方式
+    },
+  ],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      required: true,
+      schema: {
+        type: 'string',
+        format: 'uuid', // 假设你的 ID 是 UUID 类型的
+      },
+      description: 'User ID to look up',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'User found and full profile returned.',
+      content: {
+        'application/json': {
+          schema: {
+            $ref: '#/components/schemas/UserAllProfileResponse',
+          },
+        },
+      },
+    },
+    401: {
+      description: 'Unauthorized - user is not authenticated.',
+    },
+    403: {
+      description: 'Forbidden - user lacks the required permission.',
+    },
+    404: {
+      description: 'User not found.',
+    },
+  },
+});

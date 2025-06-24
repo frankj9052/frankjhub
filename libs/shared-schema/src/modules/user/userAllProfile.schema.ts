@@ -55,3 +55,7 @@ export const userAllProfileResponseSchema = z.object({
 });
 export type UserAllProfilePayload = zInfer<typeof userAllProfileSchema>;
 export type UserAllProfileResponse = zInfer<typeof userAllProfileResponseSchema>;
+
+export const userIdParamsSchema = z.object({
+  id: z.string().uuid('Invalid user ID format'),
+});

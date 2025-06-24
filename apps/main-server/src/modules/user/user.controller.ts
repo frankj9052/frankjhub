@@ -37,8 +37,22 @@ export const getUsersAllProfileController: RequestHandler = async (
     const email = req.currentUser?.email;
     if (!email) throw new UnauthorizedError('User identity not found in request');
     const pagination = userAllProfilePaginationSchema.parse(req.query);
-    const users = await userService.getUsersAllProfile(email, pagination);
-    res.status(200).json(users);
+    const response = await userService.getUsersAllProfile(email, pagination);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserAllProfileByIdController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const response = await userService.getUserAllProfileById(id);
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }

@@ -7,6 +7,7 @@ import {
   UserAllProfilePayload,
   UserPaginatedResponse,
   UserPaginationParams,
+  UserAllProfileResponse,
 } from '@frankjhub/shared-schema';
 import { User } from './entities/User';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
@@ -122,6 +123,24 @@ export class UserService {
       ...paginatedUsers,
       data: paginatedUsers.data.map(user => this.buildUserAllProfile(user)),
     } as UserPaginatedResponse;
+    return response;
+  }
+
+  async getUserAllProfileById(id: string): Promise<UserAllProfileResponse> {
+    const log = logger.child({ method: 'getUserAllProfileById', id });
+    const user = await this.userRepo.findOne({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      log.warn(`User id ${id} not exist`);
+      throw new NotFoundError(`User with id ${id} not found`);
+    }
+    const response: UserAllProfileResponse = {
+      data: this.buildUserAllProfile(user),
+      status: 'success',
+    };
     return response;
   }
 }
