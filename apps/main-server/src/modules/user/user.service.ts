@@ -13,6 +13,14 @@ import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 
 const logger = createLoggerWithContext('UserService');
 
+const userFilterConditionMap: Record<string, string> = {
+  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
+  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
+  deleted: `(t."deleted_at" IS NOT NULL)`,
+  unverifiedEmail: `(t."email_verified" = false AND t."deleted_at" IS NULL)`,
+  incompleteProfile: `(t."profile_completed" = false AND t."deleted_at" IS NULL)`,
+};
+
 export class UserService {
   private userRepo = AppDataSource.getRepository(User);
   async getCurrentUserInfo(id: string, email: string): Promise<UserProfilePayload> {
@@ -87,19 +95,33 @@ export class UserService {
       where: { email: Not(email) },
       pagination,
       modifyQueryBuilder: qb => {
-        if (pagination.search) {
+        const { search, filters } = pagination;
+
+        // 搜索条件
+        if (search) {
           qb.andWhere(
             `(t.userName ILIKE :search OR t.email ILIKE :search OR t.lastName ILIKE :search OR t.firstName ILIKE :search)`,
-            { search: `%${pagination.search.trim()}%` }
+            { search: `%${search.trim()}%` }
           );
+        }
+
+        // 态筛选（支持多选 OR 组合）
+        if (filters?.length) {
+          const validConditions = filters
+            .map(status => userFilterConditionMap[status])
+            .filter(Boolean);
+
+          if (validConditions.length > 0) {
+            qb.andWhere(`(${validConditions.join(' OR ')})`);
+          }
         }
         return qb;
       },
     });
-    const response = {
+    const response: UserPaginatedResponse = {
       ...paginatedUsers,
       data: paginatedUsers.data.map(user => this.buildUserAllProfile(user)),
-    };
+    } as UserPaginatedResponse;
     return response;
   }
 }

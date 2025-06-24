@@ -39,6 +39,7 @@ export async function getUsersAllProfile({
     });
     return { status: 'success', data: res.data };
   } catch (err) {
+    console.log(err);
     const message = axios.isAxiosError(err)
       ? err.response?.data?.details || err.message
       : 'Unknown get users error';

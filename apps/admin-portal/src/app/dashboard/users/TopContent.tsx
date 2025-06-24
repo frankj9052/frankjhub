@@ -7,41 +7,37 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
-  Selection,
   SharedSelection,
 } from '@heroui/react';
-import { useCallback, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { MdKeyboardArrowDown } from 'react-icons/md';
-
-const statusOptions = [
-  { name: 'Active', uid: 'active' },
-  { name: 'Inactive', uid: 'inactive' },
-  { name: 'Deleted', uid: 'deleted' },
-  { name: 'Unverified Email', uid: 'unverifiedEmail' },
-  { name: 'Incomplete Profile', uid: 'incompleteProfile' },
-];
+import { useEffect, useState } from 'react';
+import { useDebouncedCallback } from '@frankjhub/shared-hooks';
 
 export const TopContent = () => {
   const dispatch = useDispatch();
-  const [statusFilter, setStatusFilter] = useState<Selection>('all');
   const visibleColumns = useSelector(state => state.users.visibleColumns);
   const columns = useSelector(state => state.users.columns);
-  const filterValue = useSelector(state => state.users.usersAllProfilePagination.search);
+  const pagination = useSelector(state => state.users.usersAllProfilePagination);
   const paginatedUsers = useSelector(state => state.users.usersAllProfile);
-  const { total, pageSize } = paginatedUsers;
+  const statusOptions = useSelector(state => state.users.statusOptions);
+  const [searchValue, setSearchValue] = useState('');
+  const { limit, filters } = pagination;
+  const { total } = paginatedUsers;
 
-  const onSearchChange = useCallback(
-    (value?: string) => {
-      if (value) {
-        dispatch(usersSlice.actions.setSearchValue(value));
-        dispatch(usersSlice.actions.cleanOffset());
-      } else {
-        dispatch(usersSlice.actions.cleanSearchValue());
-      }
-    },
-    [dispatch]
-  );
+  const debouncedSearchChange = useDebouncedCallback((value?: string) => {
+    if (value) {
+      dispatch(usersSlice.actions.setSearchValue(value));
+      dispatch(usersSlice.actions.cleanOffset());
+    } else {
+      dispatch(usersSlice.actions.cleanSearchValue());
+    }
+  }, 500);
+
+  useEffect(() => {
+    debouncedSearchChange(searchValue);
+  }, [dispatch, searchValue, debouncedSearchChange]);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-between gap-3 items-end">
@@ -54,12 +50,12 @@ export const TopContent = () => {
           placeholder="Search by name..."
           size="sm"
           startContent={<IoSearchOutline className="text-default-300" />}
-          value={filterValue}
+          value={searchValue}
           variant="bordered"
           onClear={() => {
-            dispatch(usersSlice.actions.cleanSearchValue());
+            setSearchValue('');
           }}
-          onValueChange={onSearchChange}
+          onValueChange={setSearchValue}
         />
         <div className="flex gap-3">
           <Dropdown>
@@ -76,14 +72,15 @@ export const TopContent = () => {
               disallowEmptySelection
               aria-label="status selection"
               closeOnSelect={false}
-              selectedKeys={statusFilter}
+              selectedKeys={new Set(filters)}
               selectionMode="multiple"
-              onSelectionChange={setStatusFilter}
+              onSelectionChange={selection => {
+                const selectionArray = Array.from(selection);
+                dispatch(usersSlice.actions.setStatusFilter(selectionArray as string[]));
+              }}
             >
               {statusOptions.map(status => (
-                <DropdownItem key={status.uid} className="capitalize">
-                  {status.name}
-                </DropdownItem>
+                <DropdownItem key={status.uid}>{status.name}</DropdownItem>
               ))}
             </DropdownMenu>
           </Dropdown>
@@ -125,9 +122,9 @@ export const TopContent = () => {
             className="bg-transparent outline-none text-default-400 text-small"
             onChange={e => {
               dispatch(usersSlice.actions.setLimit(Number(e.target.value)));
-              dispatch(usersSlice.actions.setOffset(0));
+              dispatch(usersSlice.actions.cleanOffset());
             }}
-            value={String(pageSize)}
+            value={String(limit)}
           >
             <option value="5">5</option>
             <option value="10">10</option>

@@ -10,7 +10,6 @@ export const getUsersAllProfileAsync = createAppAsyncThunk(
   async ({ pagination }: Props) => {
     const result = await getUsersAllProfile({ pagination });
     if (result.status === 'success') {
-      console.log('check ===> ', result.data);
       return result.data;
     } else {
       throw null;

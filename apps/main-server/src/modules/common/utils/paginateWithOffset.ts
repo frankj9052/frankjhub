@@ -10,7 +10,12 @@ import { FindOptionsWhere, ObjectLiteral, Repository, SelectQueryBuilder } from 
  */
 export async function paginateWithOffset<
   T extends ObjectLiteral,
-  P extends { limit: number; offset: number; order: 'ASC' | 'DESC'; orderBy: string & keyof T }
+  P extends {
+    limit: number;
+    offset: number;
+    order: 'ASC' | 'DESC';
+    orderBy: string & keyof T;
+  } & Record<string, any>
 >({
   repo,
   where,
@@ -57,6 +62,13 @@ export async function paginateWithOffset<
 
   if ('search' in pagination && typeof pagination.search === 'string') {
     result.search = pagination.search;
+  }
+  if (
+    'filters' in pagination &&
+    Array.isArray(pagination.filters) &&
+    pagination.filters.every(item => typeof item === 'string')
+  ) {
+    result.filters = pagination.filters;
   }
   return result;
 }

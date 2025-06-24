@@ -1,3 +1,4 @@
+import { LabeledEnumItem } from '@frankjhub/shared-schema';
 /**
  * 根据给定的数据对象生成 UI 表格列配置数组
  *
@@ -38,4 +39,18 @@ export function generateColumnsFromData(
     // 追加额外的列（如 AGE、ROLE、ACTIONS）
     ...extraColumns,
   ];
+}
+
+/**
+ * 将一个 as const 枚举对象转为 { name, uid } 数组
+ * @param enumObj 枚举对象
+ * @returns 可用于展示的数组
+ */
+export function getLabeledEnumList<T extends Record<string, string>>(
+  enumObj: T
+): LabeledEnumItem[] {
+  return Object.entries(enumObj).map(([key, value]) => ({
+    name: key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), // 格式化名称（可自定义）
+    uid: value,
+  }));
 }
