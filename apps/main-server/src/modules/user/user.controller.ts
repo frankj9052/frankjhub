@@ -1,7 +1,12 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { UserService } from './user.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
-import { UserProfileResponse, userAllProfilePaginationSchema } from '@frankjhub/shared-schema';
+import {
+  UserProfileResponse,
+  userAdminUpdateSchema,
+  userAllProfilePaginationSchema,
+  userIdParamsSchema,
+} from '@frankjhub/shared-schema';
 
 const userService = new UserService();
 
@@ -52,6 +57,78 @@ export const getUserAllProfileByIdController: RequestHandler = async (
   try {
     const { id } = req.params;
     const response = await userService.getUserAllProfileById(id);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const softDeleteUserController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsed = userIdParamsSchema.parse(req.body);
+    const userName = req.currentUser?.userName;
+    if (!userName) {
+      throw new UnauthorizedError('User identity not found in request');
+    }
+    const response = await userService.softDeleteUser(parsed.id, userName);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restoreSoftDeletedUserController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsed = userIdParamsSchema.parse(req.body);
+    const userName = req.currentUser?.userName;
+    if (!userName) {
+      throw new UnauthorizedError('User identity not found in request');
+    }
+    const response = await userService.restoreSoftDeletedUser(parsed.id, userName);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const hardDeleteUserController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsed = userIdParamsSchema.parse(req.body);
+    const userName = req.currentUser?.userName;
+    if (!userName) {
+      throw new UnauthorizedError('User identity not found in request');
+    }
+    const response = await userService.hardDeleteUser(parsed.id, userName);
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateUserByAdminController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsed = userAdminUpdateSchema.parse(req.body);
+    const userName = req.currentUser?.userName;
+    if (!userName) {
+      throw new UnauthorizedError('User identity not found in request');
+    }
+    const response = await userService.updateUserByAdmin(parsed, userName);
     res.status(200).json(response);
   } catch (error) {
     next(error);

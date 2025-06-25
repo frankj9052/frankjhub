@@ -6,6 +6,10 @@ import {
   userAllProfileResponseSchema,
   userAllData,
   userBasicData,
+  createSuccessResponseSchema,
+  userIdParamsSchema,
+  userAdminUpdateSchema,
+  adminUpdateUserExample,
 } from '@frankjhub/shared-schema';
 
 // UserProfileResponse
@@ -43,6 +47,19 @@ registry.register(
       pageCount: 1,
       currentPage: 1,
       pageSize: 10,
+    },
+  })
+);
+
+// 注册统一成功响应 schema（可复用）
+registry.register(
+  'SuccessResponse',
+  createSuccessResponseSchema().openapi({
+    description: 'Generic success response with optional message and data',
+    example: {
+      status: 'success',
+      message: 'User updated successfully',
+      data: { id: '123', name: 'Alice' },
     },
   })
 );
@@ -121,6 +138,7 @@ registry.registerPath({
   },
 });
 
+// 取用户全部数据
 registry.registerPath({
   method: 'get',
   path: '/user/{id}',
@@ -164,5 +182,137 @@ registry.registerPath({
     404: {
       description: 'User not found.',
     },
+  },
+});
+
+// 软删除用户
+registry.registerPath({
+  method: 'patch',
+  path: '/user/soft-delete',
+  tags: ['User'],
+  summary: 'Soft delete a user',
+  description: 'Marks a user as soft-deleted (sets deletedAt and deletedBy).',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: userIdParamsSchema.openapi({
+            example: { id: 'user-uuid-123' },
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'User soft-deleted successfully.',
+      content: {
+        'application/json': {
+          schema: { $ref: '#/components/schemas/SuccessResponse' },
+        },
+      },
+    },
+    401: { description: 'Unauthorized.' },
+    404: { description: 'User not found.' },
+  },
+});
+
+// 恢复软删除用户
+registry.registerPath({
+  method: 'patch',
+  path: '/user/restore',
+  tags: ['User'],
+  summary: 'Restore a soft-deleted user',
+  description: 'Restores a user by clearing deletedAt and deletedBy.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: userIdParamsSchema.openapi({
+            example: { id: 'user-uuid-123' },
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'User restored successfully.',
+      content: {
+        'application/json': {
+          schema: { $ref: '#/components/schemas/SuccessResponse' },
+        },
+      },
+    },
+    401: { description: 'Unauthorized.' },
+    404: { description: 'User not found.' },
+  },
+});
+
+// 永久删除用户
+registry.registerPath({
+  method: 'delete',
+  path: '/user/hard-delete',
+  tags: ['User'],
+  summary: 'Hard delete a user',
+  description: 'Permanently deletes a user and cascades related records.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: userIdParamsSchema.openapi({
+            example: { id: 'user-uuid-123' },
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'User permanently deleted.',
+      content: {
+        'application/json': {
+          schema: { $ref: '#/components/schemas/SuccessResponse' },
+        },
+      },
+    },
+    401: { description: 'Unauthorized.' },
+    404: { description: 'User not found.' },
+  },
+});
+
+// 管理员更新用户信息
+registry.registerPath({
+  method: 'patch',
+  path: '/user/admin-update',
+  tags: ['User'],
+  summary: 'Update user by admin',
+  description: 'Allows privileged roles to update user fields including isActive and deletedAt.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: userAdminUpdateSchema.openapi({
+            example: adminUpdateUserExample,
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'User updated successfully.',
+      content: {
+        'application/json': {
+          schema: { $ref: '#/components/schemas/SuccessResponse' },
+        },
+      },
+    },
+    401: { description: 'Unauthorized.' },
+    404: { description: 'User not found.' },
   },
 });

@@ -1,18 +1,17 @@
-import { Gender } from '../../enums/gender.enum';
-import { Honorific } from '../../enums/honorific.enum';
 import { z, zInfer } from '../../libs/z';
+import { userAllProfileSchema } from './userAllProfile.schema';
 
-export const userProfileSchema = z.object({
-  userName: z.string(),
-  email: z.string().email().optional(),
-  lastName: z.string(),
-  firstName: z.string(),
-  middleName: z.string().optional(),
-  gender: z.nativeEnum(Gender),
-  dateOfBirth: z.string(),
-  honorific: z.nativeEnum(Honorific),
-  oauthProvider: z.string().optional(),
-  avatarImage: z.string().url(),
+export const userProfileSchema = userAllProfileSchema.pick({
+  userName: true,
+  email: true,
+  lastName: true,
+  firstName: true,
+  middleName: true,
+  gender: true,
+  dateOfBirth: true,
+  honorific: true,
+  oauthProvider: true,
+  avatarImage: true,
 });
 
 // 🔸 标准 API 响应结构（用于 Swagger 注册和 controller 返回）

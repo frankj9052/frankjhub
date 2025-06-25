@@ -12,7 +12,7 @@ export class UserOrganizationRole extends BaseEntity {
   name!: string;
 
   /* 外键 */
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, org => org.userOrganizationRoles, { nullable: false, onDelete: 'CASCADE' })
   @Index()
   user!: User;
 
@@ -30,7 +30,9 @@ export class UserOrganizationRole extends BaseEntity {
   @BeforeInsert()
   @BeforeUpdate()
   protected setName(): void {
-    if (!this.user?.id || !this.organization?.id || !this.role?.id) return;
+    if (!this.user?.id || !this.organization?.id || !this.role?.id) {
+      return;
+    }
     this.name = buildFullUserOrgRoleName(this.user.id, this.organization.id, this.role.code);
   }
 }

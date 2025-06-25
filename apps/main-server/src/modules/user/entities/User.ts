@@ -1,9 +1,10 @@
-import { Entity, Column, Index, BeforeInsert, BeforeUpdate } from 'typeorm';
+import { Entity, Column, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { Gender } from '../../common/enums/gender.enum';
 import { Honorific } from '../../common/enums/honorific.enum';
 import { BaseEntity } from '../../common/entities/BaseEntity';
+import { UserOrganizationRole } from '../../organization/entities/UserOrganizationRole';
 
 @Entity()
 export class User extends BaseEntity {
@@ -78,6 +79,8 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   sessionVersion!: string;
 
+  @OneToMany(() => UserOrganizationRole, uor => uor.user, { cascade: true, onDelete: 'CASCADE' })
+  userOrganizationRoles?: UserOrganizationRole[];
   /**
    * sessionVersion 用于控制用户所有 session 的失效。
    * 改变此字段可让旧 session token（或 Redis session）全部失效。

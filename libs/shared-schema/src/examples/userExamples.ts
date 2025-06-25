@@ -2,6 +2,7 @@ import { Honorific } from "../enums/honorific.enum";
 import { Gender } from "../enums/gender.enum";
 import { UserProfilePayload } from "../modules/user/userProfile.schema";
 import { UserAllProfilePayload } from "../modules/user/userAllProfile.schema";
+import { UserAdminUpdateSchema } from "../modules/user/userAdminUpdateSchema";
 
 export const userBasicData: UserProfilePayload = {
   userName: 'frankjia',
@@ -41,3 +42,20 @@ export const userAllData: UserAllProfilePayload = {
   deletedAt: null,
   deletedBy: null
 };
+
+export const adminUpdateUserExample: UserAdminUpdateSchema = {
+                  id: '8c315298-90f6-4af1-bb33-6b37e58973ae',
+              userName: 'johndoe',
+              email: 'johndoe@example.com',
+              firstName: 'John',
+              lastName: 'Doe',
+              middleName: 'A.',
+              gender: Gender.MALE, // 来自 Gender enum
+              dateOfBirth: '1990-01-01',
+              honorific: Honorific.MR, // 来自 Honorific enum
+              avatarImage: 'https://example.com/avatar.jpg',
+              isActive: true,
+              emailVerified: true,
+              profileCompleted: true,
+
+}

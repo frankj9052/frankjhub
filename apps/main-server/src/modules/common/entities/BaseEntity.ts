@@ -18,7 +18,7 @@ export abstract class BaseEntity {
   updatedAt!: Date;
 
   @DeleteDateColumn({ type: 'timestamp with time zone', nullable: true })
-  deletedAt?: Date;
+  deletedAt?: Date | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   createdBy?: string;
@@ -27,5 +27,5 @@ export abstract class BaseEntity {
   updatedBy?: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  deletedBy?: string;
+  deletedBy?: string | null;
 }
