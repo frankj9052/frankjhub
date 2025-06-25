@@ -7,9 +7,10 @@ import {
   UserPaginatedResponse,
   UserPaginationParams,
   LabeledEnumItem,
+  UserAllProfilePayload,
 } from '@frankjhub/shared-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getUsersAllProfileAsync } from './thunk';
+import { getUserAllProfileByIdAsync, getUsersAllProfileAsync } from './thunk';
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 import { Key } from 'react';
 
@@ -50,6 +51,7 @@ export interface UsersSliceState {
   }[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
+  targetUser?: UserAllProfilePayload;
 }
 
 const initialState: UsersSliceState = {
@@ -72,6 +74,7 @@ const initialState: UsersSliceState = {
   columns,
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
+  targetUser: undefined,
 };
 
 export const usersSlice = createSlice({
@@ -117,6 +120,9 @@ export const usersSlice = createSlice({
     cleanStatusFilter: state => {
       state.usersAllProfilePagination.filters = initialStatusFilter;
     },
+    cleanTargetUser: state => {
+      state.targetUser = undefined;
+    },
   },
   extraReducers(builder) {
     builder
@@ -128,6 +134,16 @@ export const usersSlice = createSlice({
       })
       .addCase(getUsersAllProfileAsync.fulfilled, (state, action) => {
         state.usersAllProfile = action.payload;
+        state.status = 'idle';
+      })
+      .addCase(getUserAllProfileByIdAsync.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(getUserAllProfileByIdAsync.rejected, state => {
+        state.status = 'failed';
+      })
+      .addCase(getUserAllProfileByIdAsync.fulfilled, (state, action) => {
+        state.targetUser = action.payload;
         state.status = 'idle';
       });
   },

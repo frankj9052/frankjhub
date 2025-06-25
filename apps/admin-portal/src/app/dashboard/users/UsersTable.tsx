@@ -23,9 +23,11 @@ import { TopContent } from './TopContent';
 import { BottomContent } from './BottomContent';
 import { HiDotsVertical } from 'react-icons/hi';
 import { dateToCalendarDate, formatShortDateTime } from '@frankjhub/shared-utils';
+import { useRouter } from 'next/navigation';
 
 export default function UsersTable() {
   const dispatch = useDispatch();
+  const router = useRouter();
   const paginatedUsers = useSelector(state => state.users.usersAllProfile);
   const pagination = useSelector(state => state.users.usersAllProfilePagination);
   const state = useSelector(state => state.users.status);
@@ -116,8 +118,22 @@ export default function UsersTable() {
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
-                  <DropdownItem key="view">View</DropdownItem>
-                  <DropdownItem key="edit">Edit</DropdownItem>
+                  <DropdownItem
+                    key="view"
+                    onPress={() => {
+                      router.push(`/dashboard/users/view/${user.id}`);
+                    }}
+                  >
+                    View
+                  </DropdownItem>
+                  <DropdownItem
+                    key="edit"
+                    onPress={() => {
+                      router.push(`/dashboard/users/edit/${user.id}`);
+                    }}
+                  >
+                    Edit
+                  </DropdownItem>
                   <DropdownItem key="delete">Delete</DropdownItem>
                 </DropdownMenu>
               </Dropdown>

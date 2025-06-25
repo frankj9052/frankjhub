@@ -1,5 +1,10 @@
 import { ActionResult } from '@/types';
-import { userAllProfilePaginationSchema, UserPaginatedResponse } from '@frankjhub/shared-schema';
+import {
+  userAllProfilePaginationSchema,
+  UserAllProfileResponse,
+  userIdParamsSchema,
+  UserPaginatedResponse,
+} from '@frankjhub/shared-schema';
 import axios from 'axios';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -43,6 +48,26 @@ export async function getUsersAllProfile({
     const message = axios.isAxiosError(err)
       ? err.response?.data?.details || err.message
       : 'Unknown get users error';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function getUserAllProfileById({
+  id,
+}: {
+  id: string;
+}): Promise<ActionResult<UserAllProfileResponse>> {
+  try {
+    const parsed = userIdParamsSchema.parse({ id });
+    const res = await axios.get(`${baseURL}/api/user/${parsed.id}`, {
+      withCredentials: true,
+    });
+    return { status: 'success', data: res.data };
+  } catch (err) {
+    console.log(err);
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Unknown get user error';
     return { status: 'error', error: message };
   }
 }

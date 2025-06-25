@@ -53,9 +53,30 @@ export const userAllProfileResponseSchema = z.object({
   status: z.literal('success'),
   data: userAllProfileSchema,
 });
-export type UserAllProfilePayload = zInfer<typeof userAllProfileSchema>;
-export type UserAllProfileResponse = zInfer<typeof userAllProfileResponseSchema>;
 
 export const userIdParamsSchema = z.object({
   id: z.string().uuid('Invalid user ID format'),
 });
+
+export const userEditSchema = userAllProfileSchema
+  .pick({
+    userName: true,
+    email: true,
+    firstName: true,
+    lastName: true,
+    middleName: true,
+    gender: true,
+    dateOfBirth: true,
+    honorific: true,
+    avatarImage: true,
+    isActive: true,
+    emailVerified: true,
+    profileCompleted: true,
+  })
+  .extend({
+    password: z.string().optional(),
+  });
+
+export type UserEditSchema = zInfer<typeof userEditSchema>;
+export type UserAllProfilePayload = zInfer<typeof userAllProfileSchema>;
+export type UserAllProfileResponse = zInfer<typeof userAllProfileResponseSchema>;
