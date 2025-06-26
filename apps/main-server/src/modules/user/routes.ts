@@ -52,7 +52,7 @@ router.patch(
 router.delete(
   '/user/hard-delete',
   requirePermission(buildPermissionName('user', ['delete'])),
-  validateRequest({ body: userIdParamsSchema }),
+  validateRequest({ query: userIdParamsSchema }),
   hardDeleteUserController
 );
 

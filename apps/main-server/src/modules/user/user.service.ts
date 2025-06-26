@@ -206,6 +206,7 @@ export class UserService {
       const user = await this.userRepo.findOne({
         where: { id },
         relations: ['userOrganizationRoles'],
+        withDeleted: true,
       });
       if (!user) {
         log.warn(`User ${id} not found for hard deletion.`);
@@ -231,7 +232,7 @@ export class UserService {
   ): Promise<SuccessResponse> {
     const { id } = data;
     const log = logger.child({ method: 'updateUserByAdmin', id, performedBy });
-    const user = await this.userRepo.findOneBy({ id });
+    const user = await this.userRepo.findOne({ where: { id }, withDeleted: true });
     if (!user) {
       log.warn(`User ${id} not found for admin update`);
       throw new NotFoundError('User not found');

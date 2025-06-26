@@ -1,37 +1,60 @@
 'use client';
 
-import { Gender, Honorific, userEditSchema, UserEditSchema } from '@frankjhub/shared-schema';
+import {
+  Gender,
+  Honorific,
+  userAdminUpdateSchema,
+  UserAdminUpdateSchema,
+} from '@frankjhub/shared-schema';
 import { Input, Button, Form, Select, SelectItem } from '@heroui/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useDispatch, useSelector } from '@/libs/redux';
-import { useParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import { getUserAllProfileByIdAsync } from '@/libs/redux/slices/usersSlice/thunk';
 import { format, subYears } from 'date-fns';
-import { testDelay } from '@frankjhub/shared-utils';
+import { handleFormServerErrors } from '@frankjhub/shared-utils';
 import { GoBackButton } from '@/components/buttons/GoBackButton';
 import { LoadingSpinner } from '@/components/loadings/LodingSpinner';
+import { adminUpdateUser, hardDeleteUser, restoreDeletedUser } from '@/services/user';
+import { FrankModal } from '@frankjhub/shared-ui-hero-client';
+import { toast } from 'react-toastify';
 
 export default function EditUserPage() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { id } = useParams();
+  const user = useSelector(state => state.users.targetUser);
   const {
     handleSubmit,
     control,
     reset,
-    formState: { isDirty, isSubmitting },
-  } = useForm<UserEditSchema>({
-    resolver: zodResolver(userEditSchema),
+    setError,
+    getValues,
+    formState: { isDirty, isSubmitting, errors },
+  } = useForm<UserAdminUpdateSchema>({
+    resolver: zodResolver(userAdminUpdateSchema),
     mode: 'onTouched',
   });
 
-  const user = useSelector(state => state.users.targetUser);
   const loading = useSelector(state => state.users.status);
+  const [localLoading, setLocalLoading] = useState(false);
+  const [openModal, setOpenModal] = useState<
+    | {
+        header: string;
+        body: string;
+        action: () => void;
+        color: 'danger' | 'success' | 'secondary';
+        text: 'Delete Permanently' | 'Recover' | 'Update';
+      }
+    | undefined
+  >(undefined);
 
   const initialUserValue = useMemo(() => {
     if (!user) return undefined;
     return {
+      id: user.id,
       userName: user.userName,
       email: user.email ?? '',
       firstName: user.firstName,
@@ -59,9 +82,24 @@ export default function EditUserPage() {
     }
   }, [id, dispatch]);
 
-  const onSubmit = async (data: UserEditSchema) => {
-    await testDelay();
-    dispatch(getUserAllProfileByIdAsync({ id: String(id) }));
+  const onSubmit = (data: UserAdminUpdateSchema) => {
+    setOpenModal({
+      header: 'Update',
+      body: `Are you sure you want to update user ${user?.userName}`,
+      color: 'secondary',
+      text: 'Update',
+      action: async () => {
+        const result = await adminUpdateUser(data);
+        if (result.status === 'success') {
+          toast.success(result.data);
+          setOpenModal(undefined);
+          dispatch(getUserAllProfileByIdAsync({ id: String(id) }));
+        } else if (result.status === 'error') {
+          handleFormServerErrors(result, setError);
+          setOpenModal(undefined);
+        }
+      },
+    });
   };
 
   const handleReset = () => {
@@ -320,6 +358,9 @@ export default function EditUserPage() {
               )}
             />
           </div>
+          {errors?.root?.serverError && (
+            <p className="text-danger text-sm">{errors.root.serverError.message}</p>
+          )}
         </div>
 
         <div className="flex gap-4 justify-end">
@@ -337,11 +378,101 @@ export default function EditUserPage() {
             className="bg-secondary text-white"
             isDisabled={!isDirty}
             isLoading={isSubmitting}
+            onPress={() => {
+              onSubmit(getValues());
+            }}
           >
             Update
           </Button>
+          <Button
+            type="button"
+            variant="solid"
+            color="danger"
+            isDisabled={isSubmitting}
+            isLoading={localLoading}
+            onPress={() => {
+              setOpenModal({
+                header: 'Delete Permanently',
+                body: `Are you sure you want to delete the user: ${user.userName} permanently?`,
+                color: 'danger',
+                text: 'Delete Permanently',
+                action: async () => {
+                  setLocalLoading(true);
+                  const result = await hardDeleteUser(user.id);
+                  if (result.status === 'success') {
+                    toast.success(result.data);
+                    setOpenModal(undefined);
+                    router.back();
+                  } else if (result.status === 'error') {
+                    toast.error(String(result.error));
+                  }
+                  setLocalLoading(false);
+                },
+              });
+            }}
+          >
+            Delete permanently
+          </Button>
+          <Button
+            type="button"
+            variant="solid"
+            color="success"
+            isDisabled={isSubmitting || !user.deletedAt}
+            isLoading={localLoading}
+            onPress={() => {
+              setOpenModal({
+                header: 'Recover',
+                body: `Are you sure you want to recover the user: ${user.userName}?`,
+                color: 'success',
+                text: 'Recover',
+                action: async () => {
+                  setLocalLoading(true);
+                  const result = await restoreDeletedUser(user.id);
+                  if (result.status === 'success') {
+                    toast.success(result.data);
+                    setOpenModal(undefined);
+                    dispatch(getUserAllProfileByIdAsync({ id: String(id) }));
+                  } else if (result.status === 'error') {
+                    toast.error(String(result.error));
+                  }
+                  setLocalLoading(false);
+                },
+              });
+            }}
+          >
+            Recovery
+          </Button>
         </div>
       </Form>
+      <FrankModal
+        isOpen={!!openModal}
+        onClose={() => {
+          setOpenModal(undefined);
+        }}
+        header={openModal?.header}
+        backdrop="opaque"
+        body={openModal?.body}
+        footerButtons={[
+          {
+            color: 'default',
+            variant: 'light',
+            customizeContent: <div className="h-8 flex items-center justify-center">Cancel</div>,
+            onPress: () => {
+              setOpenModal(undefined);
+            },
+            isLoading: localLoading,
+          },
+          {
+            color: openModal?.color,
+            variant: 'solid',
+            customizeContent: (
+              <div className="h-8 flex items-center justify-center">{openModal?.text}</div>
+            ),
+            onPress: openModal?.action,
+            isLoading: localLoading,
+          },
+        ]}
+      />
     </div>
   );
 }

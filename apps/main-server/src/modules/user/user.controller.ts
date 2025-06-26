@@ -105,7 +105,7 @@ export const hardDeleteUserController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = userIdParamsSchema.parse(req.body);
+    const parsed = userIdParamsSchema.parse(req.query);
     const userName = req.currentUser?.userName;
     if (!userName) {
       throw new UnauthorizedError('User identity not found in request');

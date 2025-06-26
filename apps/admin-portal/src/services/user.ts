@@ -1,5 +1,7 @@
 import { ActionResult } from '@/types';
 import {
+  userAdminUpdateSchema,
+  UserAdminUpdateSchema,
   userAllProfilePaginationSchema,
   UserAllProfileResponse,
   userIdParamsSchema,
@@ -68,6 +70,89 @@ export async function getUserAllProfileById({
     const message = axios.isAxiosError(err)
       ? err.response?.data?.details || err.message
       : 'Unknown get user error';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function softDeleteUser(id: string): Promise<ActionResult<string>> {
+  try {
+    const parsed = userIdParamsSchema.parse({ id });
+    await axios.patch(
+      `${baseURL}/api/user/soft-delete`,
+      {
+        id: parsed.id,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    return { status: 'success', data: 'Delete successfully' };
+  } catch (err) {
+    console.log(err);
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Unknown get user error';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function restoreDeletedUser(id: string): Promise<ActionResult<string>> {
+  try {
+    const parsed = userIdParamsSchema.parse({ id });
+    await axios.patch(
+      `${baseURL}/api/user/restore`,
+      {
+        id: parsed.id,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    return { status: 'success', data: 'User restored successfully' };
+  } catch (err) {
+    console.log(err);
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Unknown get user error';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function hardDeleteUser(id: string): Promise<ActionResult<string>> {
+  try {
+    const parsed = userIdParamsSchema.parse({ id });
+    await axios.delete(`${baseURL}/api/user/hard-delete`, {
+      withCredentials: true,
+      params: {
+        id: parsed.id,
+      },
+    });
+    return { status: 'success', data: 'User deleted permanently!' };
+  } catch (err) {
+    console.log(err);
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Unknown get user error';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function adminUpdateUser(data: UserAdminUpdateSchema): Promise<ActionResult<string>> {
+  try {
+    const parsed = userAdminUpdateSchema.parse(data);
+    await axios.patch(
+      `${baseURL}/api/user/admin-update`,
+      { ...parsed },
+      {
+        withCredentials: true,
+      }
+    );
+    return { status: 'success', data: 'User data updated!' };
+  } catch (err) {
+    console.log(err);
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Unknown admin update user error';
     return { status: 'error', error: message };
   }
 }
