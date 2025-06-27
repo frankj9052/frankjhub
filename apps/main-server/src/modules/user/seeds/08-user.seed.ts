@@ -10,7 +10,8 @@ import { buildRoleCode } from '../../codecs/permissionCodec';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
 import { NotFoundError } from '../../common/errors/NotFoundError';
 
-const totalUsers = 100;
+const totalUsers = 10;
+// 如果数据库处理速度有要求，调低这个属性
 const batchSize = 10;
 export default class UserSeed extends BaseSeeder {
   override async shouldRun(dataSource: DataSource): Promise<boolean> {

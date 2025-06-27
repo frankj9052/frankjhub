@@ -2,7 +2,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Organization } from '../entities/Organization';
 import { SYSTEM_ORGANIZATIONS } from '../../common/constants/system-organizations';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
-import { OrganizationType } from '../entities/OrganizationType';
+import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 
 /**
  * Seeder: OrganizationProdSeed

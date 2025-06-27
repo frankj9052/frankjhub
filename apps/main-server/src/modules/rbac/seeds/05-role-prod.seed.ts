@@ -2,9 +2,9 @@ import { DataSource, Repository } from 'typeorm';
 import { Role } from '../entities/Role';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
 import { Organization } from '../../organization/entities/Organization';
-import { OrganizationType } from '../../organization/entities/OrganizationType';
 import { RoleSource } from '../../common/enums/roleSource.enum';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
+import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 
 /**
  * Seeder: RoleProdSeed

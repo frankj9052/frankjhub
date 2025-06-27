@@ -3,7 +3,7 @@ import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { RoleSource } from '../../common/enums/roleSource.enum';
-import { OrganizationType } from '../../organization/entities/OrganizationType';
+import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 
 @Entity()
 @Index(['name', 'roleSource', 'organizationType', 'organization'], { unique: true })

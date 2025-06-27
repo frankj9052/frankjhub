@@ -1,6 +1,6 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
-import { OrganizationType } from './OrganizationType';
+import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 
 @Entity()
 export class Organization extends BaseEntity {
