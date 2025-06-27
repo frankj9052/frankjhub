@@ -1,5 +1,3 @@
-import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
-import Link from 'next/link';
 import { ReactNode } from 'react';
 import { SidebarNavLink } from './SidebarNavLink';
 
@@ -28,10 +26,20 @@ const sidebarData: SidebarDataType[] = [
         label: 'Users',
         src: '/dashboard/users',
       },
+    ],
+  },
+  {
+    category: 'Organization',
+    list: [
       {
-        icon: <div>2</div>,
+        icon: <div>3</div>,
+        label: 'Organization Types',
+        src: '/dashboard/organization-types',
+      },
+      {
+        icon: <div>1</div>,
         label: 'Organizations',
-        src: '/dashboard/organizations',
+        src: '/dashboard/Organizations',
       },
     ],
   },
@@ -51,7 +59,7 @@ export const Sidebar = ({ width }: Props) => {
     >
       {sidebarData &&
         sidebarData.map(category => (
-          <div key={category.category}>
+          <div key={category.category} className="pb-3">
             <h1 className="text-xl text-black select-none">{category.category}</h1>
             {category.list &&
               category.list.map(item => (

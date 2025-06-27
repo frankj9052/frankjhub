@@ -1,4 +1,4 @@
-import { useDispatch, usersSlice, useSelector } from '@/libs/redux';
+import { organizationTypeSlice, useDispatch, useSelector } from '@/libs/redux';
 import { Pagination } from '@heroui/react';
 
 export const BottomContent = () => {
@@ -18,7 +18,7 @@ export const BottomContent = () => {
         variant="light"
         onChange={page => {
           const offset = (page - 1) * pageSize;
-          dispatch(usersSlice.actions.setOffset(offset));
+          dispatch(organizationTypeSlice.actions.setOffset(offset));
         }}
       />
     </div>

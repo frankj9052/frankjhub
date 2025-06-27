@@ -1,7 +1,18 @@
 'use client';
-import { useDispatch, usersSlice, useSelector } from '@/libs/redux';
-import { getUsersAllProfileAsync } from '@/libs/redux/slices/usersSlice/thunk';
-import { OrderEnum, UserAllProfilePayload, UserOrderByField } from '@frankjhub/shared-schema';
+
+import {
+  getAllOrganizationTypesAsync,
+  organizationTypeSlice,
+  useDispatch,
+  useSelector,
+} from '@/libs/redux';
+import { getDefaultTableClassNames } from '@/utils/tableClassnames';
+import {
+  OrderEnum,
+  OrganizationTypeOrderByField,
+  OrganizationTypeSchema,
+} from '@frankjhub/shared-schema';
+import { formatShortDateTime } from '@frankjhub/shared-utils';
 import {
   Button,
   Chip,
@@ -16,36 +27,33 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  User,
 } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 import { Key, useCallback, useEffect, useMemo, useState } from 'react';
+import { HiDotsVertical } from 'react-icons/hi';
 import { TopContent } from './TopContent';
 import { BottomContent } from './BottomContent';
-import { HiDotsVertical } from 'react-icons/hi';
-import { dateToCalendarDate, formatShortDateTime } from '@frankjhub/shared-utils';
-import { useRouter } from 'next/navigation';
 import { FrankModal } from '@frankjhub/shared-ui-hero-client';
-import { softDeleteUser } from '@/services/user';
+import { softDeleteOrganizationType } from '@/services/organizationType';
 import { toast } from 'react-toastify';
-import { getDefaultTableClassNames } from '@/utils/tableClassnames';
 
-export default function UsersTable() {
+export const OrganizationTypeTable = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const paginatedUsers = useSelector(state => state.users.usersAllProfile);
-  const pagination = useSelector(state => state.users.usersAllProfilePagination);
-  const state = useSelector(state => state.users.status);
-  const visibleColumns = useSelector(state => state.users.visibleColumns);
-  const columns = useSelector(state => state.users.columns);
+  const paginatedOrgType = useSelector(state => state.organizationType.all);
+  const pagination = useSelector(state => state.organizationType.pagination);
+  const state = useSelector(state => state.organizationType.status);
+  const visibleColumns = useSelector(state => state.organizationType.visibleColumns);
+  const columns = useSelector(state => state.organizationType.columns);
   const loadingState = state === 'loading' ? 'loading' : 'idle';
   const [openModal, setOpenModal] = useState<
     | {
-        userName: string;
+        name: string;
         id: string;
       }
     | undefined
   >(undefined);
-  const { data } = paginatedUsers;
+  const { data } = paginatedOrgType;
   const classNames = useMemo(() => getDefaultTableClassNames(), []);
 
   const headerColumns = useMemo(() => {
@@ -56,45 +64,15 @@ export default function UsersTable() {
 
   // 渲染每个record
   const renderCell = useCallback(
-    (user: UserAllProfilePayload, columnKey: Key) => {
-      const cellValue = user[columnKey as keyof UserAllProfilePayload];
+    (orgType: OrganizationTypeSchema, columnKey: Key) => {
+      const cellValue = orgType[columnKey as keyof OrganizationTypeSchema];
 
       switch (columnKey) {
-        case 'userName':
-          return (
-            <User
-              avatarProps={{ radius: 'full', size: 'sm', src: user.avatarImage ?? undefined }}
-              classNames={{
-                description: 'text-default-500',
-              }}
-              description={user.email}
-              name={cellValue}
-            >
-              {user.email}
-            </User>
-          );
-        case 'dateOfBirth':
-          return <div>{dateToCalendarDate(new Date(String(cellValue))).toString()}</div>;
-        case 'oauthProvider':
-          if (!cellValue) {
-            return <Chip color="secondary">Platform</Chip>;
-          }
-          return <Chip color="secondary">{cellValue}</Chip>;
         case 'isActive':
           if (cellValue) {
             return <Chip color="success">Active</Chip>;
           }
           return <Chip color="default">Inactive</Chip>;
-        case 'emailVerified':
-          if (cellValue) {
-            return <Chip color="success">Verified</Chip>;
-          }
-          return <Chip color="warning">Unverified</Chip>;
-        case 'profileCompleted':
-          if (cellValue) {
-            return <Chip color="success">Completed</Chip>;
-          }
-          return <Chip color="warning">Incompleted</Chip>;
         case 'createdAt':
         case 'updatedAt':
         case 'deletedAt':
@@ -114,17 +92,9 @@ export default function UsersTable() {
                   </DropdownTrigger>
                   <DropdownMenu>
                     <DropdownItem
-                      key="view"
-                      onPress={() => {
-                        router.push(`/dashboard/users/view/${user.id}`);
-                      }}
-                    >
-                      View
-                    </DropdownItem>
-                    <DropdownItem
                       key="edit"
                       onPress={() => {
-                        router.push(`/dashboard/users/edit/${user.id}`);
+                        router.push(`/dashboard/organization-types/edit/${orgType.id}`);
                       }}
                     >
                       Edit
@@ -133,8 +103,8 @@ export default function UsersTable() {
                       key="delete"
                       onPress={() => {
                         setOpenModal({
-                          userName: user.userName,
-                          id: user.id,
+                          name: orgType.name,
+                          id: orgType.id,
                         });
                       }}
                     >
@@ -153,7 +123,7 @@ export default function UsersTable() {
   );
 
   useEffect(() => {
-    dispatch(getUsersAllProfileAsync({ pagination }));
+    dispatch(getAllOrganizationTypesAsync({ pagination }));
   }, [pagination, dispatch]);
 
   return (
@@ -172,11 +142,13 @@ export default function UsersTable() {
         onSortChange={sortDescriptor => {
           const { column, direction } = sortDescriptor;
           if (direction === 'ascending') {
-            dispatch(usersSlice.actions.setOrder(OrderEnum.ASC));
+            dispatch(organizationTypeSlice.actions.setOrder(OrderEnum.ASC));
           } else if (direction === 'descending') {
-            dispatch(usersSlice.actions.setOrder(OrderEnum.DESC));
+            dispatch(organizationTypeSlice.actions.setOrder(OrderEnum.DESC));
           }
-          dispatch(usersSlice.actions.setOrderBy(String(column) as UserOrderByField));
+          dispatch(
+            organizationTypeSlice.actions.setOrderBy(String(column) as OrganizationTypeOrderByField)
+          );
         }}
       >
         <TableHeader columns={headerColumns}>
@@ -194,7 +166,7 @@ export default function UsersTable() {
           items={data ?? []}
           loadingContent={<Spinner color="secondary" />}
           loadingState={loadingState}
-          emptyContent={'No users found'}
+          emptyContent={'No organization type found'}
         >
           {item => (
             <TableRow key={item.id}>
@@ -210,7 +182,7 @@ export default function UsersTable() {
         }}
         header={'Delete'}
         backdrop="opaque"
-        body={<p>Are you sure you want to delete user {openModal?.userName}?</p>}
+        body={<p>Are you sure you want to delete organization type: {openModal?.name}?</p>}
         footerButtons={[
           {
             color: 'default',
@@ -226,11 +198,11 @@ export default function UsersTable() {
             customizeContent: <div className="h-8 flex items-center justify-center">Delete</div>,
             onPress: async () => {
               if (openModal) {
-                const result = await softDeleteUser(openModal.id);
+                const result = await softDeleteOrganizationType(openModal.id);
                 if (result.status === 'success') {
                   toast.success(result.data);
                   setOpenModal(undefined);
-                  dispatch(getUsersAllProfileAsync({ pagination }));
+                  dispatch(getAllOrganizationTypesAsync({ pagination }));
                 } else if (result.status === 'error') {
                   toast.error(String(result.error));
                 }
@@ -241,4 +213,4 @@ export default function UsersTable() {
       />
     </div>
   );
-}
+};
