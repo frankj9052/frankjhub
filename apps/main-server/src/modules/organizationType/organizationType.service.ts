@@ -14,6 +14,12 @@ import {
 
 const logger = createLoggerWithContext('OrganizationTypeService');
 
+const filterConditionMap: Record<string, string> = {
+  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
+  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
+  deleted: `(t."deleted_at" IS NOT NULL)`,
+};
+
 export class OrganizationTypeService {
   private orgTypeRepo = AppDataSource.getRepository(OrganizationType);
   buildOrganizationType(type: OrganizationType): OrganizationTypeSchema {
@@ -60,11 +66,19 @@ export class OrganizationTypeService {
       repo: this.orgTypeRepo,
       pagination,
       modifyQueryBuilder: qb => {
-        const { search } = pagination;
+        const { search, filters } = pagination;
         if (search) {
           qb.where('t.name ILIKE :search OR t.description ILIKE :search', {
             search: `%${search.trim()}%`,
           });
+        }
+        // 态筛选（支持多选 OR 组合）
+        if (filters?.length) {
+          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
+
+          if (validConditions.length > 0) {
+            qb.andWhere(`(${validConditions.join(' OR ')})`);
+          }
         }
         return qb.withDeleted();
       },

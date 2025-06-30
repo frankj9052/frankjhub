@@ -41,7 +41,7 @@ export async function getOrganizationTypeById(
     const res = await axios.get(`${baseURL}/api/organization-type/${parsed.id}`, {
       withCredentials: true,
     });
-    return { status: 'success', data: res.data };
+    return { status: 'success', data: res.data.data };
   } catch (err) {
     console.log(err);
     const message = axios.isAxiosError(err)
@@ -74,7 +74,7 @@ export async function updateOrganizationType(
 ): Promise<ActionResult<string>> {
   try {
     const parsed = organizationTypeUpdateSchema.parse(data);
-    await axios.patch(`${baseURL}/api/organization-type/${parsed.id}`, parsed, {
+    await axios.patch(`${baseURL}/api/organization-type/update`, parsed, {
       withCredentials: true,
     });
     return { status: 'success', data: 'Organization type updated successfully!' };

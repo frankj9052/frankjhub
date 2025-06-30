@@ -10,6 +10,7 @@ export const organizationTypeUpdateSchema = z
       .pick({
         name: true,
         description: true,
+        isActive: true,
       })
       .partial().shape
   );
