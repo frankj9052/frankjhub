@@ -12,6 +12,7 @@ import {
   softDeleteOrganizationTypeController,
   restoreOrganizationTypeController,
   hardDeleteOrganizationTypeController,
+  getOrgTypeOptionsController,
 } from './organizationType.controller';
 
 import {
@@ -35,6 +36,12 @@ router.get(
   requirePermission(buildPermissionName('organizationType', ['read'])),
   validateRequest({ query: organizationTypePaginationSchema }),
   getAllOrganizationTypesController
+);
+
+router.get(
+  '/organization-type/options',
+  requirePermission(buildPermissionName('organizationType', ['read'])),
+  getOrgTypeOptionsController
 );
 
 router.get(

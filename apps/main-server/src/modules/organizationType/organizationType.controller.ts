@@ -119,3 +119,16 @@ export const hardDeleteOrganizationTypeController: RequestHandler = async (
     next(error);
   }
 };
+
+export const getOrgTypeOptionsController: RequestHandler = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await organizationTypeService.getAllOrgTypeOptions();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};

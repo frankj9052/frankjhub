@@ -9,6 +9,7 @@ import {
   OrganizationTypePaginationParams,
   OrganizationTypeSchema,
   OrganizationTypeUpdateSchema,
+  OrgTypeOptionsSchema,
   SuccessResponse,
 } from '@frankjhub/shared-schema';
 
@@ -177,5 +178,19 @@ export class OrganizationTypeService {
       status: 'success',
       message: `OrganizationType ${id} permanently deleted`,
     };
+  }
+
+  async getAllOrgTypeOptions(): Promise<OrgTypeOptionsSchema> {
+    const orgTypes = await this.orgTypeRepo.find({
+      select: ['id', 'name'],
+      where: {
+        isActive: true,
+      },
+      order: {
+        name: 'ASC',
+      },
+    });
+
+    return orgTypes;
   }
 }
