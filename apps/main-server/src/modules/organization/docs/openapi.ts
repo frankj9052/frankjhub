@@ -1,29 +1,31 @@
 import { registry } from '../../../config/openapiRegistry';
 import {
-  organizationTypeCreateSchema,
-  organizationTypeUpdateSchema,
-  organizationTypeSchema,
-  organizationTypePaginationSchema,
-  organizationTypePaginatedResponseSchema,
+  organizationCreateSchema,
+  organizationUpdateSchema,
+  organizationWithOrgTypeNameSchema,
+  organizationPaginatedResponseSchema,
+  organizationPaginationSchema,
   userIdParamsSchema,
   createSuccessResponseSchema,
-  organizationTypeAllDataExample,
-  organizationTypePaginatedResponseDataExample,
+  organizationWithOrgTypeDataExample,
+  organizationPaginatedResponseDataExample,
 } from '@frankjhub/shared-schema';
 
+// ----------------- SCHEMA REGISTRATIONS -----------------
+
 registry.register(
-  'OrganizationType',
-  organizationTypeSchema.openapi({
-    description: 'An organization type object',
-    example: organizationTypeAllDataExample,
+  'Organization',
+  organizationWithOrgTypeNameSchema.openapi({
+    description: 'An organization object with org type name',
+    example: organizationWithOrgTypeDataExample,
   })
 );
 
 registry.register(
-  'OrganizationTypePaginatedResponse',
-  organizationTypePaginatedResponseSchema.openapi({
-    description: 'Paginated list of organization types',
-    example: organizationTypePaginatedResponseDataExample,
+  'OrganizationPaginatedResponse',
+  organizationPaginatedResponseSchema.openapi({
+    description: 'Paginated list of organizations',
+    example: organizationPaginatedResponseDataExample,
   })
 );
 
@@ -33,7 +35,7 @@ registry.register(
     description: 'Generic success response',
     example: {
       status: 'success',
-      message: 'OrganizationType updated successfully',
+      message: 'Organization updated successfully',
     },
   })
 );
@@ -42,18 +44,19 @@ registry.register(
 
 registry.registerPath({
   method: 'post',
-  path: '/organization-type',
-  tags: ['OrganizationType'],
-  summary: 'Create a new organization type',
+  path: '/organization',
+  tags: ['Organization'],
+  summary: 'Create a new organization',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeCreateSchema.openapi({
+          schema: organizationCreateSchema.openapi({
             example: {
-              name: 'Clinic',
-              description: 'A general clinic',
+              name: 'North York Clinic',
+              description: 'A Chinese medicine clinic in Toronto',
+              orgTypeId: 'org-type-uuid-123',
             },
           }),
         },
@@ -62,10 +65,10 @@ registry.registerPath({
   },
   responses: {
     201: {
-      description: 'Organization type created successfully',
+      description: 'Organization created successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationType' },
+          schema: { $ref: '#/components/schemas/Organization' },
         },
       },
     },
@@ -76,17 +79,18 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/organization-type/list',
-  tags: ['OrganizationType'],
-  summary: 'Get all organization types (paginated)',
-  description: 'Returns a paginated list of all organization types.',
+  path: '/organization/list',
+  tags: ['Organization'],
+  summary: 'Get all organizations (paginated)',
+  description: 'Returns a paginated list of all organizations.',
   security: [{ bearerAuth: [] }],
   request: {
-    query: organizationTypePaginationSchema.openapi({
+    query: organizationPaginationSchema.openapi({
       example: {
-        limit: 20,
+        limit: 10,
         offset: 0,
-        search: 'clinic',
+        search: 'North',
+        filters: ['active'],
       },
     }),
   },
@@ -95,7 +99,7 @@ registry.registerPath({
       description: 'List returned',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationTypePaginatedResponse' },
+          schema: { $ref: '#/components/schemas/OrganizationPaginatedResponse' },
         },
       },
     },
@@ -105,9 +109,9 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/organization-type/{id}',
-  tags: ['OrganizationType'],
-  summary: 'Get organization type by ID',
+  path: '/organization/{id}',
+  tags: ['Organization'],
+  summary: 'Get organization by ID',
   security: [{ bearerAuth: [] }],
   parameters: [
     {
@@ -118,15 +122,15 @@ registry.registerPath({
         type: 'string',
         format: 'uuid',
       },
-      description: 'Organization type ID',
+      description: 'Organization ID',
     },
   ],
   responses: {
     200: {
-      description: 'Organization type found',
+      description: 'Organization found',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationType' },
+          schema: { $ref: '#/components/schemas/Organization' },
         },
       },
     },
@@ -137,19 +141,20 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/update',
-  tags: ['OrganizationType'],
-  summary: 'Update organization type',
+  path: '/organization/update',
+  tags: ['Organization'],
+  summary: 'Update organization',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeUpdateSchema.openapi({
+          schema: organizationUpdateSchema.openapi({
             example: {
-              id: 'org-type-uuid-123',
-              name: 'Hospital',
-              description: 'Updated description',
+              id: 'org-uuid-123',
+              name: 'Downtown Chinese Clinic',
+              description: 'Updated clinic name and description',
+              orgTypeId: 'org-type-uuid-123',
             },
           }),
         },
@@ -172,16 +177,16 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/soft-delete',
-  tags: ['OrganizationType'],
-  summary: 'Soft delete organization type',
+  path: '/organization/soft-delete',
+  tags: ['Organization'],
+  summary: 'Soft delete organization',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
           schema: userIdParamsSchema.openapi({
-            example: { id: 'org-type-uuid-123' },
+            example: { id: 'org-uuid-123' },
           }),
         },
       },
@@ -203,16 +208,16 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/restore',
-  tags: ['OrganizationType'],
-  summary: 'Restore soft-deleted organization type',
+  path: '/organization/restore',
+  tags: ['Organization'],
+  summary: 'Restore soft-deleted organization',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
           schema: userIdParamsSchema.openapi({
-            example: { id: 'org-type-uuid-123' },
+            example: { id: 'org-uuid-123' },
           }),
         },
       },
@@ -234,13 +239,13 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'delete',
-  path: '/organization-type/hard-delete',
-  tags: ['OrganizationType'],
-  summary: 'Hard delete organization type',
+  path: '/organization/hard-delete',
+  tags: ['Organization'],
+  summary: 'Hard delete organization',
   security: [{ bearerAuth: [] }],
   request: {
     query: userIdParamsSchema.openapi({
-      example: { id: 'org-type-uuid-123' },
+      example: { id: 'org-uuid-123' },
     }),
   },
   responses: {

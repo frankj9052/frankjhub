@@ -10,8 +10,8 @@ export class Organization extends BaseEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   description?: string;
 
-  @ManyToOne(() => OrganizationType, { nullable: false })
-  orgType?: OrganizationType;
+  @ManyToOne(() => OrganizationType, orgType => orgType.organizations, { nullable: false })
+  orgType!: OrganizationType;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
