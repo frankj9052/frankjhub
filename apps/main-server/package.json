@@ -62,6 +62,23 @@
           }
         }
       },
+      "serve:prod": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "production",
+        "options": {
+          "buildTarget": "@frankjhub/main-server:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@frankjhub/main-server:build:development"
+          },
+          "production": {
+            "buildTarget": "@frankjhub/main-server:build:production"
+          }
+        }
+      },
       "test": {
         "options": {
           "passWithNoTests": true

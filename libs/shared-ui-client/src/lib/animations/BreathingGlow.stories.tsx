@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BreathingGlow } from './BreathingGlow';
 
 const meta = {
-  title: 'Shared-UI-Client/Aminations/BreathingGlow',
+  title: 'Shared-UI-Client/Animations/BreathingGlow',
   component: BreathingGlow,
   tags: ['autodocs'],
   parameters: {

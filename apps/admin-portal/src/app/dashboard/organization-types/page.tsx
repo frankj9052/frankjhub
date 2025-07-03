@@ -1,6 +1,6 @@
 import { OrganizationTypeTable } from './OrganizationTypeTable';
 
-export default function OrganizationPages() {
+export default function OrganizationTypePages() {
   return (
     <div className="h-full py-4 px-8">
       <OrganizationTypeTable />

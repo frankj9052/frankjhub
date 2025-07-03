@@ -6,3 +6,5 @@ export * from './CardParallax';
 
 // 数字上升动画
 export * from './NumberRiser';
+
+export * from './AnimatedSwitcher';

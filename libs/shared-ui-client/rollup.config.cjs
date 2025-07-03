@@ -20,7 +20,7 @@ module.exports = withNx(
     format: ['esm', 'cjs'],
     assets: [
       { input: 'libs/shared-ui-client', output: '.', glob: 'README.md' },
-      { input: 'libs/shared-ui-client', output: '.', glob: 'package.json' },
+      { input: 'libs/shared-ui-client/packageBuild', output: '.', glob: 'package.json' },
     ],
   },
   {

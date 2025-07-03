@@ -20,7 +20,19 @@ const exclude = {
   // 顶层排除目录
   topLevelDirs: ['dist', 'node_modules', '.git', '.cache', '.next', 'logs', '.nx', 'tmp'],
   // 精细排除的路径（相对于targetDir）
-  exactPaths: ['.husky/_', 'apps/main-server/dist'], // 完整排除.husky/_下的所有文件
+  exactPaths: [
+    '.husky/_',
+    // 'apps/main-server/dist',
+    'apps/admin-portal/.next',
+    'libs/shared-schema/dist',
+    'libs/shared-schema/node_modules',
+    'libs/shared-ui-shadcn/node_modules',
+    'libs/server-common/node_modules',
+    'libs/shared-utils/dist',
+    'libs/shared-utils/node_modules',
+    'libs/storybook-host/node_modules',
+    'libs/storybook-host/storybook-static',
+  ], // 完整排除.husky/_下的所有文件
 };
 
 function shouldExclude(fullPath: string): boolean {

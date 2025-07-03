@@ -131,7 +131,7 @@ export const OrganizationTypeTable = () => {
       <Table
         isCompact
         removeWrapper
-        aria-label="async paginated users data"
+        aria-label="async paginated organization type data"
         selectionMode="single"
         color="secondary"
         topContent={<TopContent />}

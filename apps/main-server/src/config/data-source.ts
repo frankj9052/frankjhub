@@ -12,7 +12,9 @@ type ExtendedOptions = DataSourceOptions & {
 
 const toPosix = (p: string) => p.replace(/\\/g, '/');
 const isProd = env.NODE_ENV === 'production';
-const rootDir = path.resolve(__dirname, '../..');
+const rootDir = isProd
+  ? path.resolve(__dirname, '../../../../..') // dist/apps/main-server/
+  : path.resolve(__dirname, '../..');
 
 // 日志检查 rootDir 正确性
 const cloudUrlOptions = env.DATABASE_URL
@@ -57,7 +59,13 @@ const baseOptions = {
     connectionTimeoutMillis: env.PG_CONN_TIMEOUT_MS,
   },
 };
-
+// console.log('🌍 NODE_ENV:', env.NODE_ENV);
+// console.log('📁 rootDir:', rootDir);
+// console.log('📦 isProd:', isProd);
+// console.log('📄 Entities path:', baseOptions.entities);
+// console.log('📄 Migrations path:', baseOptions.migrations);
+// console.log('🔗 DB URL:', env.DATABASE_URL || `${env.DB_HOST}:${env.DB_PORT}/${env.DB_NAME}`);
+// console.log('🔐 SSL Enabled:', env.DATABASE_SSL === 'true');
 const dataSourceOptions: ExtendedOptions = {
   ...(baseOptions as PostgresConnectionOptions),
   ...(cloudUrlOptions as PostgresConnectionOptions),

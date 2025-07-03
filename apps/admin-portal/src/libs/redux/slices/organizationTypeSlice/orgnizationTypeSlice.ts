@@ -226,21 +226,21 @@ export const organizationTypeSlice = createSlice({
   },
 });
 
-export const {
-  setLimit,
-  setOffset,
-  setOrder,
-  setOrderBy,
-  setStatusFilter,
-  cleanLimit,
-  cleanOffset,
-  cleanOrder,
-  cleanOrderBy,
-  setVisibleColumn,
-  setSearchValue,
-  cleanSearchValue,
-  cleanStatusFilter,
-  cleanTarget,
-} = organizationTypeSlice.actions;
+// export const {
+//   setLimit,
+//   setOffset,
+//   setOrder,
+//   setOrderBy,
+//   setStatusFilter,
+//   cleanLimit,
+//   cleanOffset,
+//   cleanOrder,
+//   cleanOrderBy,
+//   setVisibleColumn,
+//   setSearchValue,
+//   cleanSearchValue,
+//   cleanStatusFilter,
+//   cleanTarget,
+// } = organizationTypeSlice.actions;
 
 export default organizationTypeSlice.reducer;

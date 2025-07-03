@@ -1,0 +1,16 @@
+{
+  "name": "@frankjhub/shared-ui-client",
+  "version": "0.0.7",
+  "main": "./index.esm.js",
+  "module": "./index.esm.js",
+  "types": "./index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "require": "./index.cjs.js",
+      "types": "./index.esm.d.ts",
+      "import": "./index.esm.js",
+      "default": "./index.cjs.js"
+    }
+  }
+}

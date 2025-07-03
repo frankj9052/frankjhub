@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NumberRiser } from './NumberRiser';
 
 const meta = {
-  title: 'Shared-UI-Client/Aminations/NumberRiser',
+  title: 'Shared-UI-Client/Animations/NumberRiser',
   component: NumberRiser,
   tags: ['autodocs'],
   parameters: {
