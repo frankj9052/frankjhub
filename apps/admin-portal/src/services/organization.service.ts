@@ -6,9 +6,9 @@ import {
   OrganizationCreateSchema,
   OrganizationPaginatedResponse,
   OrganizationPaginationParams,
-  OrganizationSchema,
   organizationUpdateSchema,
   OrganizationUpdateSchema,
+  OrganizationWithOrgTypeNameSchema,
 } from '@frankjhub/shared-schema';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -31,7 +31,9 @@ export async function getAllOrganizations(
   }
 }
 
-export async function getOrganizationById(id: string): Promise<ActionResult<OrganizationSchema>> {
+export async function getOrganizationById(
+  id: string
+): Promise<ActionResult<OrganizationWithOrgTypeNameSchema>> {
   try {
     const parsed = idParamsSchema.parse({ id });
     const res = await axios.get(`${baseURL}/api/organization/${parsed.id}`, {

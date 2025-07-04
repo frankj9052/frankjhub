@@ -16,13 +16,9 @@ import {
 } from '@frankjhub/shared-schema';
 
 import {
-  createOrganizationTypeAsync,
   getAllOrganizationTypesAsync,
   getOrganizationTypeByIdAsync,
-  hardDeleteOrganizationTypeAsync,
-  restoreOrganizationTypeAsync,
-  softDeleteOrganizationTypeAsync,
-  updateOrganizationTypeAsync,
+  getOrganizationTypeOptionsAsync,
 } from './thunk';
 
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
@@ -63,7 +59,10 @@ export interface OrganizationTypeSliceState {
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
   target?: OrganizationTypeSchema;
-  message?: string | null;
+  options: {
+    id: string;
+    name: string;
+  }[];
 }
 
 const initialState: OrganizationTypeSliceState = {
@@ -87,7 +86,7 @@ const initialState: OrganizationTypeSliceState = {
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
   target: undefined,
-  message: null,
+  options: [],
 };
 
 export const organizationTypeSlice = createSlice({
@@ -133,9 +132,6 @@ export const organizationTypeSlice = createSlice({
     cleanStatusFilter: state => {
       state.pagination.filters = initialStatusFilter;
     },
-    cleanTarget: state => {
-      state.target = undefined;
-    },
   },
   extraReducers: builder => {
     builder
@@ -159,88 +155,17 @@ export const organizationTypeSlice = createSlice({
         state.target = action.payload;
         state.status = 'idle';
       })
-      .addCase(createOrganizationTypeAsync.pending, state => {
+      .addCase(getOrganizationTypeOptionsAsync.pending, state => {
         state.status = 'loading';
-        state.message = null;
       })
-      .addCase(createOrganizationTypeAsync.rejected, (state, action) => {
+      .addCase(getOrganizationTypeOptionsAsync.rejected, state => {
         state.status = 'failed';
-        state.message = action.payload;
       })
-      .addCase(createOrganizationTypeAsync.fulfilled, (state, action) => {
+      .addCase(getOrganizationTypeOptionsAsync.fulfilled, (state, action) => {
+        state.options = action.payload;
         state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(updateOrganizationTypeAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(updateOrganizationTypeAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload;
-      })
-      .addCase(updateOrganizationTypeAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(softDeleteOrganizationTypeAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(softDeleteOrganizationTypeAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload;
-      })
-      .addCase(softDeleteOrganizationTypeAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(restoreOrganizationTypeAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(restoreOrganizationTypeAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload;
-      })
-      .addCase(restoreOrganizationTypeAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(hardDeleteOrganizationTypeAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(hardDeleteOrganizationTypeAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload;
-      })
-      .addCase(hardDeleteOrganizationTypeAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
       });
   },
 });
-
-// export const {
-//   setLimit,
-//   setOffset,
-//   setOrder,
-//   setOrderBy,
-//   setStatusFilter,
-//   cleanLimit,
-//   cleanOffset,
-//   cleanOrder,
-//   cleanOrderBy,
-//   setVisibleColumn,
-//   setSearchValue,
-//   cleanSearchValue,
-//   cleanStatusFilter,
-//   cleanTarget,
-// } = organizationTypeSlice.actions;
 
 export default organizationTypeSlice.reducer;

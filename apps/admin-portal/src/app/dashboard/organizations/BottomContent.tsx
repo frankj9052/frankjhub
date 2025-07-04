@@ -1,10 +1,15 @@
-import { organizationTypeSlice, useDispatch, useSelector } from '@/libs/redux';
+import { organizationSlice, useDispatch, useSelector } from '@/libs/redux';
 import { Pagination } from '@heroui/react';
 
 export const BottomContent = () => {
   const dispatch = useDispatch();
-  const all = useSelector(state => state.organizationType.all);
+  const all = useSelector(state => state.organization.all);
   const { pageSize, currentPage, pageCount } = all;
+
+  const handlePageChange = (page: number) => {
+    const offset = (page - 1) * pageSize;
+    dispatch(organizationSlice.actions.setOffset(offset));
+  };
   return (
     <div className="py-2 px-2 flex justify-center items-center">
       <Pagination
@@ -16,10 +21,7 @@ export const BottomContent = () => {
         page={currentPage}
         total={pageCount}
         variant="light"
-        onChange={page => {
-          const offset = (page - 1) * pageSize;
-          dispatch(organizationTypeSlice.actions.setOffset(offset));
-        }}
+        onChange={handlePageChange}
       />
     </div>
   );

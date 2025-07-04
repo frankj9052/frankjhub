@@ -9,6 +9,7 @@ import {
   OrganizationTypeSchema,
   organizationTypeUpdateSchema,
   OrganizationTypeUpdateSchema,
+  OrgTypeOptionsSchema,
 } from '@frankjhub/shared-schema';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -29,6 +30,20 @@ export async function getAllOrganizationTypes(
     const message = axios.isAxiosError(err)
       ? err.response?.data?.details || err.message
       : 'Failed to fetch organization types';
+    return { status: 'error', error: message };
+  }
+}
+
+export async function getOrganizationTypesOptions(): Promise<ActionResult<OrgTypeOptionsSchema>> {
+  try {
+    const res = await axios.get(`${baseURL}/api/organization-type/options`, {
+      withCredentials: true,
+    });
+    return { status: 'success', data: res.data };
+  } catch (err) {
+    const message = axios.isAxiosError(err)
+      ? err.response?.data?.details || err.message
+      : 'Failed to fetch organization type options';
     return { status: 'error', error: message };
   }
 }

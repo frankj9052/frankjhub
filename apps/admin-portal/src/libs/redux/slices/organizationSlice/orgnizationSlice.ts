@@ -12,23 +12,16 @@ import {
   organizationWithOrgTypeDataExample,
   OrganizationFilterEnum,
   OrganizationOrderByField,
+  OrganizationWithOrgTypeNameSchema,
 } from '@frankjhub/shared-schema';
 
-import {
-  createOrganizationAsync,
-  getAllOrganizationsAsync,
-  getOrganizationByIdAsync,
-  hardDeleteOrganizationAsync,
-  restoreOrganizationAsync,
-  softDeleteOrganizationAsync,
-  updateOrganizationAsync,
-} from './thunk';
+import { getAllOrganizationsAsync, getOrganizationByIdAsync } from './thunk';
 
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 
 const INITIAL_VISIBLE_COLUMNS: string[] = [
   'name',
-  'orgType',
+  'orgTypeName',
   'isActive',
   'createdAt',
   'updatedAt',
@@ -62,11 +55,7 @@ export interface OrganizationSliceState {
   }[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
-  target?: {
-    id: string;
-    name: string;
-  };
-  message?: string | null;
+  target?: OrganizationWithOrgTypeNameSchema;
 }
 
 const initialState: OrganizationSliceState = {
@@ -90,7 +79,6 @@ const initialState: OrganizationSliceState = {
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
   target: undefined,
-  message: null,
 };
 
 export const organizationSlice = createSlice({
@@ -112,11 +100,8 @@ export const organizationSlice = createSlice({
     setStatusFilter: (state, action: PayloadAction<string[]>) => {
       state.pagination.filters = action.payload;
     },
-    setTarget: (state, action: PayloadAction<{ name: string; id: string }>) => {
+    setTarget: (state, action: PayloadAction<OrganizationWithOrgTypeNameSchema>) => {
       state.target = action.payload;
-    },
-    setMessage: (state, action: PayloadAction<string>) => {
-      state.message = action.payload;
     },
     cleanLimit: state => {
       state.pagination.limit = 10;
@@ -145,9 +130,6 @@ export const organizationSlice = createSlice({
     cleanTarget: state => {
       state.target = undefined;
     },
-    cleanMessage: state => {
-      state.message = undefined;
-    },
   },
   extraReducers: builder => {
     builder
@@ -171,90 +153,8 @@ export const organizationSlice = createSlice({
       .addCase(getOrganizationByIdAsync.fulfilled, (state, action) => {
         state.target = action.payload;
         state.status = 'idle';
-      })
-
-      .addCase(createOrganizationAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(createOrganizationAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload as string;
-      })
-      .addCase(createOrganizationAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(updateOrganizationAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(updateOrganizationAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload as string;
-      })
-      .addCase(updateOrganizationAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(softDeleteOrganizationAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(softDeleteOrganizationAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload as string;
-      })
-      .addCase(softDeleteOrganizationAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(restoreOrganizationAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(restoreOrganizationAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload as string;
-      })
-      .addCase(restoreOrganizationAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
-      })
-
-      .addCase(hardDeleteOrganizationAsync.pending, state => {
-        state.status = 'loading';
-        state.message = null;
-      })
-      .addCase(hardDeleteOrganizationAsync.rejected, (state, action) => {
-        state.status = 'failed';
-        state.message = action.payload as string;
-      })
-      .addCase(hardDeleteOrganizationAsync.fulfilled, (state, action) => {
-        state.status = 'idle';
-        state.message = action.payload;
       });
   },
 });
-
-export const {
-  setLimit,
-  setOffset,
-  setOrder,
-  setOrderBy,
-  setStatusFilter,
-  cleanLimit,
-  cleanOffset,
-  cleanOrder,
-  cleanOrderBy,
-  setVisibleColumn,
-  setSearchValue,
-  cleanSearchValue,
-  cleanStatusFilter,
-  cleanTarget,
-} = organizationSlice.actions;
 
 export default organizationSlice.reducer;

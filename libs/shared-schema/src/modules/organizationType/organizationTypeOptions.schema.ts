@@ -7,5 +7,5 @@ export const orgTypeOptionSchema = z.object({
 
 export const orgTypeOptionsSchema = z.array(orgTypeOptionSchema);
 
-export type OrgTypeOptionSchema = zInfer<typeof orgTypeOptionsSchema>;
+export type OrgTypeOptionSchema = zInfer<typeof orgTypeOptionSchema>;
 export type OrgTypeOptionsSchema = zInfer<typeof orgTypeOptionsSchema>;

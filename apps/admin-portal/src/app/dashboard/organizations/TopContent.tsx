@@ -1,5 +1,5 @@
-import { CreateOrganizationTypeForm } from '@/components/forms/CreateOrganizationTypeForm';
-import { organizationTypeSlice, useDispatch, useSelector } from '@/libs/redux';
+import { CreateOrganizationForm } from '@/components/forms/CreateOrganizationForm';
+import { organizationSlice, useDispatch, useSelector } from '@/libs/redux';
 import { useDebouncedCallback } from '@frankjhub/shared-hooks';
 import { FrankModal } from '@frankjhub/shared-ui-hero-client';
 import {
@@ -11,7 +11,7 @@ import {
   Input,
   SharedSelection,
 } from '@heroui/react';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { IoSearchOutline } from 'react-icons/io5';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 
@@ -19,26 +19,42 @@ export const TopContent = () => {
   const dispatch = useDispatch();
   const visibleColumns = useSelector(state => state.organization.visibleColumns);
   const columns = useSelector(state => state.organization.columns);
-  const pagination = useSelector(state => state.organizationType.pagination);
-  const paginatedUsers = useSelector(state => state.organizationType.all);
-  const statusOptions = useSelector(state => state.organizationType.statusOptions);
+  const pagination = useSelector(state => state.organization.pagination);
+  const all = useSelector(state => state.organization.all);
+  const statusOptions = useSelector(state => state.organization.statusOptions);
   const [searchValue, setSearchValue] = useState('');
-  const { limit, filters } = pagination;
-  const { total } = paginatedUsers;
   const [openModal, setOpenModal] = useState(false);
+  const { limit, filters } = pagination;
+  const { total } = all;
 
   const debouncedSearchChange = useDebouncedCallback((value?: string) => {
     if (value) {
-      dispatch(organizationTypeSlice.actions.setSearchValue(value));
-      dispatch(organizationTypeSlice.actions.cleanOffset());
+      dispatch(organizationSlice.actions.setSearchValue(value));
+      dispatch(organizationSlice.actions.cleanOffset());
     } else {
-      dispatch(organizationTypeSlice.actions.cleanSearchValue());
+      dispatch(organizationSlice.actions.cleanSearchValue());
     }
   }, 500);
 
   useEffect(() => {
     debouncedSearchChange(searchValue);
   }, [dispatch, searchValue, debouncedSearchChange]);
+
+  const handleStatusSelectionChange = (selection: SharedSelection) => {
+    const selectionArray = Array.from(selection);
+    dispatch(organizationSlice.actions.setStatusFilter(selectionArray as string[]));
+  };
+  const handleColumnSelectionChange = (keys: SharedSelection) => {
+    const selectionArray = Array.from(keys);
+    dispatch(organizationSlice.actions.setVisibleColumn(selectionArray));
+  };
+  const handleCreateNewButtonClick = () => {
+    setOpenModal(true);
+  };
+  const handlePageSizeChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    dispatch(organizationSlice.actions.setLimit(Number(e.target.value)));
+    dispatch(organizationSlice.actions.cleanOffset());
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -77,12 +93,7 @@ export const TopContent = () => {
                 closeOnSelect={false}
                 selectedKeys={new Set(filters)}
                 selectionMode="multiple"
-                onSelectionChange={selection => {
-                  const selectionArray = Array.from(selection);
-                  dispatch(
-                    organizationTypeSlice.actions.setStatusFilter(selectionArray as string[])
-                  );
-                }}
+                onSelectionChange={handleStatusSelectionChange}
               >
                 {statusOptions.map(status => (
                   <DropdownItem key={status.uid}>{status.name}</DropdownItem>
@@ -105,10 +116,7 @@ export const TopContent = () => {
                 closeOnSelect={false}
                 selectedKeys={new Set(visibleColumns) as SharedSelection}
                 selectionMode="multiple"
-                onSelectionChange={keys => {
-                  const selectionArray = Array.from(keys);
-                  dispatch(organizationTypeSlice.actions.setVisibleColumn(selectionArray));
-                }}
+                onSelectionChange={handleColumnSelectionChange}
               >
                 {columns.map(column => (
                   <DropdownItem key={column.uid} className="capitalize">
@@ -120,26 +128,17 @@ export const TopContent = () => {
           </div>
         </div>
         <div className="w-full flex justify-end">
-          <Button
-            variant="solid"
-            color="secondary"
-            onPress={() => {
-              setOpenModal(true);
-            }}
-          >
+          <Button variant="solid" color="secondary" onPress={handleCreateNewButtonClick}>
             Create New
           </Button>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {total} users</span>
+          <span className="text-default-400 text-small">Total {total} records</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
               className="bg-transparent outline-none text-default-400 text-small"
-              onChange={e => {
-                dispatch(organizationTypeSlice.actions.setLimit(Number(e.target.value)));
-                dispatch(organizationTypeSlice.actions.cleanOffset());
-              }}
+              onChange={handlePageSizeChange}
               value={String(limit)}
             >
               <option value="5">5</option>
@@ -155,7 +154,7 @@ export const TopContent = () => {
           setOpenModal(false);
         }}
         backdrop="opaque"
-        body={<CreateOrganizationTypeForm onClose={() => setOpenModal(false)} />}
+        body={<CreateOrganizationForm onClose={() => setOpenModal(false)} />}
         hideHeaderAndFooter={true}
       />
     </div>
