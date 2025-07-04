@@ -2,11 +2,35 @@ import { OffsetPaginatedResponse } from '@frankjhub/shared-schema';
 import { FindOptionsWhere, ObjectLiteral, Repository, SelectQueryBuilder } from 'typeorm';
 
 /**
- * 通用分页查询函数（动态支持不同模块的 pagination schema 类型）
+ * 通用分页查询函数（支持分页、排序、搜索、过滤和字段映射）
  *
- * @param repo - 实体仓库
- * @param where - 查询条件
- * @param pagination - 来自动态 zod schema 的解析结果
+ * @template T - 实体类型（Entity）
+ * @template P - 分页参数类型（通常由 zod schema 推导）
+ *
+ * @param repo - TypeORM 实体仓库
+ * @param where - 可选的 where 条件（可用于静态过滤）
+ * @param pagination - 分页参数，包括 limit、offset、order、orderBy、search、filters 等
+ * @param modifyQueryBuilder - 可选的函数，用于在查询构建中插入自定义逻辑（如联表、额外过滤等）
+ * @param fieldMap - 可选的字段映射表，用于将前端传入的虚拟字段（如 'orgTypeName'）映射为实际的数据库字段（如 'orgType.name'）
+ *
+ * @returns OffsetPaginatedResponse<T> - 包含分页后的数据、总条数、分页信息，以及可选的搜索和过滤字段
+ *
+ * @example
+ * const result = await paginateWithOffset({
+ *   repo: organizationRepo,
+ *   pagination: {
+ *     limit: 10,
+ *     offset: 0,
+ *     order: 'ASC',
+ *     orderBy: 'orgTypeName',
+ *     search: 'clinic',
+ *     filters: ['active'],
+ *   },
+ *   fieldMap: {
+ *     orgTypeName: 'orgType.name',
+ *   },
+ *   modifyQueryBuilder: qb => qb.leftJoin('t.orgType', 'orgType'),
+ * });
  */
 export async function paginateWithOffset<
   T extends ObjectLiteral,
@@ -14,20 +38,23 @@ export async function paginateWithOffset<
     limit: number;
     offset: number;
     order: 'ASC' | 'DESC';
-    orderBy: string & keyof T;
+    orderBy: keyof T | (string & {});
   } & Record<string, any>
 >({
   repo,
   where,
   pagination,
   modifyQueryBuilder,
+  fieldMap,
 }: {
   repo: Repository<T>;
   where?: FindOptionsWhere<T> | FindOptionsWhere<T>[];
   pagination: P;
   modifyQueryBuilder?: (qb: SelectQueryBuilder<T>) => SelectQueryBuilder<T>;
+  fieldMap?: Record<string, string>;
 }): Promise<OffsetPaginatedResponse<T>> {
   const { limit, offset, order, orderBy } = pagination;
+  const realOrderBy = fieldMap?.[orderBy as string] ?? `t.${String(orderBy)}`;
 
   // 容错处理
   const safeLimit = Math.min(Math.max(limit ?? 20, 1), 100);
@@ -38,7 +65,7 @@ export async function paginateWithOffset<
     .createQueryBuilder('t')
     .take(safeLimit)
     .skip(safeOffset)
-    .orderBy(`t.${orderBy}`, order);
+    .orderBy(realOrderBy, order);
 
   if (where) {
     qb = qb.where(where);

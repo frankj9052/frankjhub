@@ -77,6 +77,9 @@ export class OrganizationService {
     const result = await paginateWithOffset({
       repo: this.orgRepo,
       pagination,
+      fieldMap: {
+        orgTypeName: 'orgType.name',
+      },
       modifyQueryBuilder: qb => {
         const { search, filters } = pagination;
         if (search) {

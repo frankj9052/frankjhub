@@ -1,6 +1,6 @@
 export const OrganizationOrderByFieldsEnum = {
   NAME: 'name',
-  ORG_TYPE: 'orgType',
+  ORG_TYPE_NAME: 'orgTypeName',
   CREATED_AT: 'createdAt',
   UPDATED_AT: 'updatedAt',
 } as const;
