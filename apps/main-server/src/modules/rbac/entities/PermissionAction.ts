@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { Permission } from './Permission';
-import { Action } from './Action';
 import { BaseEntity } from '../../common/entities/BaseEntity';
+import { Action } from '../../action/entities/Action';
 
 @Entity()
 export class PermissionAction extends BaseEntity {

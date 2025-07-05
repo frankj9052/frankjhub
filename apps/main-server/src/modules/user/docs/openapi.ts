@@ -7,7 +7,7 @@ import {
   userAllData,
   userBasicData,
   createSuccessResponseSchema,
-  userIdParamsSchema,
+  idParamsSchema,
   userAdminUpdateSchema,
   adminUpdateUserExample,
 } from '@frankjhub/shared-schema';
@@ -197,7 +197,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: userIdParamsSchema.openapi({
+          schema: idParamsSchema.openapi({
             example: { id: 'user-uuid-123' },
           }),
         },
@@ -230,7 +230,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: userIdParamsSchema.openapi({
+          schema: idParamsSchema.openapi({
             example: { id: 'user-uuid-123' },
           }),
         },
@@ -263,7 +263,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: userIdParamsSchema.openapi({
+          schema: idParamsSchema.openapi({
             example: { id: 'user-uuid-123' },
           }),
         },

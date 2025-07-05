@@ -4,7 +4,7 @@ import {
   UserAdminUpdateSchema,
   userAllProfilePaginationSchema,
   UserAllProfileResponse,
-  userIdParamsSchema,
+  idParamsSchema,
   UserPaginatedResponse,
 } from '@frankjhub/shared-schema';
 import axios from 'axios';
@@ -60,7 +60,7 @@ export async function getUserAllProfileById({
   id: string;
 }): Promise<ActionResult<UserAllProfileResponse>> {
   try {
-    const parsed = userIdParamsSchema.parse({ id });
+    const parsed = idParamsSchema.parse({ id });
     const res = await axios.get(`${baseURL}/api/user/${parsed.id}`, {
       withCredentials: true,
     });
@@ -76,7 +76,7 @@ export async function getUserAllProfileById({
 
 export async function softDeleteUser(id: string): Promise<ActionResult<string>> {
   try {
-    const parsed = userIdParamsSchema.parse({ id });
+    const parsed = idParamsSchema.parse({ id });
     await axios.patch(
       `${baseURL}/api/user/soft-delete`,
       {
@@ -98,7 +98,7 @@ export async function softDeleteUser(id: string): Promise<ActionResult<string>> 
 
 export async function restoreDeletedUser(id: string): Promise<ActionResult<string>> {
   try {
-    const parsed = userIdParamsSchema.parse({ id });
+    const parsed = idParamsSchema.parse({ id });
     await axios.patch(
       `${baseURL}/api/user/restore`,
       {
@@ -120,7 +120,7 @@ export async function restoreDeletedUser(id: string): Promise<ActionResult<strin
 
 export async function hardDeleteUser(id: string): Promise<ActionResult<string>> {
   try {
-    const parsed = userIdParamsSchema.parse({ id });
+    const parsed = idParamsSchema.parse({ id });
     await axios.delete(`${baseURL}/api/user/hard-delete`, {
       withCredentials: true,
       params: {

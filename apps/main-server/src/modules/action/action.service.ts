@@ -3,6 +3,7 @@ import {
   ActionDto,
   ActionListRequest,
   ActionListResponse,
+  ActionOptionListResponse,
   ActionSingleResponse,
   ActionUpdateRequest,
 } from '@frankjhub/shared-schema';
@@ -94,7 +95,6 @@ export class ActionService {
   async getActionById(id: string): Promise<ActionSingleResponse> {
     const action = await this.actionRepo.findOne({
       where: { id },
-      relations: ['orgType'],
       withDeleted: true,
     });
     if (!action) {
@@ -197,6 +197,23 @@ export class ActionService {
       status: 'success',
       message: `Action ${id} permanently deleted`,
       data: this.buildAction(action),
+    };
+  }
+
+  async getActionOptions(): Promise<ActionOptionListResponse> {
+    const actions = await this.actionRepo.find({
+      where: { isActive: true },
+      select: ['id', 'name'],
+      order: { name: 'ASC' },
+    });
+
+    return {
+      status: 'success',
+      message: 'Fetched action options successfully',
+      data: actions.map(action => ({
+        id: action.id,
+        name: action.name,
+      })),
     };
   }
 }

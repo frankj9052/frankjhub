@@ -54,10 +54,6 @@ export const userAllProfileResponseSchema = z.object({
   data: userAllProfileSchema,
 });
 
-export const userIdParamsSchema = z.object({
-  id: z.string().uuid('Invalid user ID format'),
-});
-
 export const userEditSchema = userAllProfileSchema
   .pick({
     userName: true,

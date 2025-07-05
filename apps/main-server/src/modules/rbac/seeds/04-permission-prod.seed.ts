@@ -1,12 +1,12 @@
 import { DataSource, In, Repository } from 'typeorm';
 import { Permission } from '../entities/Permission';
 import { Resource } from '../entities/Resource';
-import { Action } from '../entities/Action';
 import { PermissionAction } from '../entities/PermissionAction';
 import { SYSTEM_ACTIONS } from '../../common/constants/system-actions';
 import { SYSTEM_RESOURCES } from '../../common/constants/system-resources';
 import { SYSTEM_PERMISSIONS } from '../../common/constants/system-permissions';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
+import { Action } from '../../action/entities/Action';
 
 /**
  * Seeder: PermissionProdSeed

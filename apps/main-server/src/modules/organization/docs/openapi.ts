@@ -5,7 +5,7 @@ import {
   organizationWithOrgTypeNameSchema,
   organizationPaginatedResponseSchema,
   organizationPaginationSchema,
-  userIdParamsSchema,
+  idParamsSchema,
   createSuccessResponseSchema,
   organizationWithOrgTypeDataExample,
   organizationPaginatedResponseDataExample,
@@ -197,7 +197,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: userIdParamsSchema.openapi({
+          schema: idParamsSchema.openapi({
             example: { id: 'org-uuid-123' },
           }),
         },
@@ -228,7 +228,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: userIdParamsSchema.openapi({
+          schema: idParamsSchema.openapi({
             example: { id: 'org-uuid-123' },
           }),
         },
@@ -256,7 +256,7 @@ registry.registerPath({
   summary: 'Hard delete organization',
   security: [{ bearerAuth: [] }],
   request: {
-    query: userIdParamsSchema.openapi({
+    query: idParamsSchema.openapi({
       example: { id: 'org-uuid-123' },
     }),
   },

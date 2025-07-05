@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { OrganizationService } from './organization.service';
 import {
+  idParamsSchema,
   organizationCreateSchema,
   organizationPaginationSchema,
   organizationUpdateSchema,
-  userIdParamsSchema,
 } from '@frankjhub/shared-schema';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 
@@ -47,7 +47,7 @@ export const getOrganizationByIdController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = userIdParamsSchema.parse(req.params);
+    const { id } = idParamsSchema.parse(req.params);
     const result = await organizationService.getOrganizationById(id);
     res.status(200).json({ status: 'success', data: result });
   } catch (error) {
@@ -78,7 +78,7 @@ export const softDeleteOrganizationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = userIdParamsSchema.parse(req.body);
+    const { id } = idParamsSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 
@@ -95,7 +95,7 @@ export const restoreOrganizationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = userIdParamsSchema.parse(req.body);
+    const { id } = idParamsSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 
@@ -112,7 +112,7 @@ export const hardDeleteOrganizationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = userIdParamsSchema.parse(req.query);
+    const { id } = idParamsSchema.parse(req.query);
     const result = await organizationService.hardDeleteOrganization(id);
     res.status(200).json(result);
   } catch (error) {

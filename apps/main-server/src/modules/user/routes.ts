@@ -16,7 +16,7 @@ import { validateRequest } from '../common/middlewares/validateRequest';
 import {
   userAdminUpdateSchema,
   userAllProfilePaginationSchema,
-  userIdParamsSchema,
+  idParamsSchema,
 } from '@frankjhub/shared-schema';
 
 const router = Router();
@@ -31,28 +31,28 @@ router.get(
 router.get(
   '/user/:id',
   requirePermission(buildPermissionName('user', ['read'])),
-  validateRequest({ params: userIdParamsSchema }),
+  validateRequest({ params: idParamsSchema }),
   getUserAllProfileByIdController
 );
 
 router.patch(
   '/user/soft-delete',
   requirePermission(buildPermissionName('user', ['delete'])),
-  validateRequest({ body: userIdParamsSchema }),
+  validateRequest({ body: idParamsSchema }),
   softDeleteUserController
 );
 
 router.patch(
   '/user/restore',
   requirePermission(buildPermissionName('user', ['delete'])),
-  validateRequest({ body: userIdParamsSchema }),
+  validateRequest({ body: idParamsSchema }),
   restoreSoftDeletedUserController
 );
 
 router.delete(
   '/user/hard-delete',
   requirePermission(buildPermissionName('user', ['delete'])),
-  validateRequest({ query: userIdParamsSchema }),
+  validateRequest({ query: idParamsSchema }),
   hardDeleteUserController
 );
 

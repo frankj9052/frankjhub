@@ -5,7 +5,7 @@ import {
   UserProfileResponse,
   userAdminUpdateSchema,
   userAllProfilePaginationSchema,
-  userIdParamsSchema,
+  idParamsSchema,
 } from '@frankjhub/shared-schema';
 
 const userService = new UserService();
@@ -69,7 +69,7 @@ export const softDeleteUserController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = userIdParamsSchema.parse(req.body);
+    const parsed = idParamsSchema.parse(req.body);
     const userName = req.currentUser?.userName;
     if (!userName) {
       throw new UnauthorizedError('User identity not found in request');
@@ -87,7 +87,7 @@ export const restoreSoftDeletedUserController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = userIdParamsSchema.parse(req.body);
+    const parsed = idParamsSchema.parse(req.body);
     const userName = req.currentUser?.userName;
     if (!userName) {
       throw new UnauthorizedError('User identity not found in request');
@@ -105,7 +105,7 @@ export const hardDeleteUserController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = userIdParamsSchema.parse(req.query);
+    const parsed = idParamsSchema.parse(req.query);
     const userName = req.currentUser?.userName;
     if (!userName) {
       throw new UnauthorizedError('User identity not found in request');

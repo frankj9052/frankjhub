@@ -1,39 +1,43 @@
 import { registry } from '../../../config/openapiRegistry';
 import {
-  organizationTypeCreateSchema,
-  organizationTypeUpdateSchema,
-  organizationTypeSchema,
-  organizationTypePaginationSchema,
-  organizationTypePaginatedResponseSchema,
+  actionCreateRequestSchema,
+  actionUpdateRequestSchema,
+  actionListRequestSchema,
   idParamsSchema,
-  createSuccessResponseSchema,
-  organizationTypeAllDataExample,
-  organizationTypePaginatedResponseDataExample,
+  actionOptionListResponseSchema,
+  actionSchema,
+  actionDataExample,
+  actionListResponseSchema,
+  actionListResponseExample,
+  actionSingleResponseSchema,
 } from '@frankjhub/shared-schema';
 
+// ----------------- SCHEMA REGISTRATIONS -----------------
+
 registry.register(
-  'OrganizationType',
-  organizationTypeSchema.openapi({
-    description: 'An organization type object',
-    example: organizationTypeAllDataExample,
+  'Action',
+  actionSchema.openapi({
+    description: 'An action object with metadata',
+    example: actionDataExample,
   })
 );
 
 registry.register(
-  'OrganizationTypePaginatedResponse',
-  organizationTypePaginatedResponseSchema.openapi({
-    description: 'Paginated list of organization types',
-    example: organizationTypePaginatedResponseDataExample,
+  'ActionListResponse',
+  actionListResponseSchema.openapi({
+    description: 'Paginated list of actions',
+    example: actionListResponseExample,
   })
 );
 
 registry.register(
-  'SuccessResponse',
-  createSuccessResponseSchema().openapi({
+  'ActionSingleResponse',
+  actionSingleResponseSchema.openapi({
     description: 'Generic success response',
     example: {
       status: 'success',
-      message: 'OrganizationType updated successfully',
+      message: 'Action updated successfully',
+      data: actionDataExample,
     },
   })
 );
@@ -42,18 +46,18 @@ registry.register(
 
 registry.registerPath({
   method: 'post',
-  path: '/organization-type',
-  tags: ['OrganizationType'],
-  summary: 'Create a new organization type',
+  path: '/action',
+  tags: ['Action'],
+  summary: 'Create a new action',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeCreateSchema.openapi({
+          schema: actionCreateRequestSchema.openapi({
             example: {
-              name: 'Clinic',
-              description: 'A general clinic',
+              name: 'read',
+              description: 'Allows reading the resource',
             },
           }),
         },
@@ -62,10 +66,10 @@ registry.registerPath({
   },
   responses: {
     201: {
-      description: 'Organization type created successfully',
+      description: 'Action created successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationType' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
@@ -76,17 +80,18 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/organization-type/list',
-  tags: ['OrganizationType'],
-  summary: 'Get all organization types (paginated)',
-  description: 'Returns a paginated list of all organization types.',
+  path: '/action/list',
+  tags: ['Action'],
+  summary: 'Get all actions (paginated)',
+  description: 'Returns a paginated list of all actions.',
   security: [{ bearerAuth: [] }],
   request: {
-    query: organizationTypePaginationSchema.openapi({
+    query: actionListRequestSchema.openapi({
       example: {
-        limit: 20,
+        limit: 10,
         offset: 0,
-        search: 'clinic',
+        search: 'read',
+        filters: ['active'],
       },
     }),
   },
@@ -95,7 +100,7 @@ registry.registerPath({
       description: 'List returned',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationTypePaginatedResponse' },
+          schema: { $ref: '#/components/schemas/ActionListResponse' },
         },
       },
     },
@@ -105,9 +110,9 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/organization-type/{id}',
-  tags: ['OrganizationType'],
-  summary: 'Get organization type by ID',
+  path: '/action/{id}',
+  tags: ['Action'],
+  summary: 'Get action by ID',
   security: [{ bearerAuth: [] }],
   parameters: [
     {
@@ -118,15 +123,15 @@ registry.registerPath({
         type: 'string',
         format: 'uuid',
       },
-      description: 'Organization type ID',
+      description: 'Action ID',
     },
   ],
   responses: {
     200: {
-      description: 'Organization type found',
+      description: 'Action found',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationType' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
@@ -137,18 +142,18 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/update',
-  tags: ['OrganizationType'],
-  summary: 'Update organization type',
+  path: '/action/update',
+  tags: ['Action'],
+  summary: 'Update action',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeUpdateSchema.openapi({
+          schema: actionUpdateRequestSchema.openapi({
             example: {
-              id: 'org-type-uuid-123',
-              name: 'Hospital',
+              id: 'action-uuid-123',
+              name: 'read',
               description: 'Updated description',
             },
           }),
@@ -161,7 +166,7 @@ registry.registerPath({
       description: 'Updated successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
@@ -172,16 +177,16 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/soft-delete',
-  tags: ['OrganizationType'],
-  summary: 'Soft delete organization type',
+  path: '/action/soft-delete',
+  tags: ['Action'],
+  summary: 'Soft delete action',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
           schema: idParamsSchema.openapi({
-            example: { id: 'org-type-uuid-123' },
+            example: { id: 'action-uuid-123' },
           }),
         },
       },
@@ -192,7 +197,7 @@ registry.registerPath({
       description: 'Soft deleted successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
@@ -203,16 +208,16 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'patch',
-  path: '/organization-type/restore',
-  tags: ['OrganizationType'],
-  summary: 'Restore soft-deleted organization type',
+  path: '/action/restore',
+  tags: ['Action'],
+  summary: 'Restore soft-deleted action',
   security: [{ bearerAuth: [] }],
   request: {
     body: {
       content: {
         'application/json': {
           schema: idParamsSchema.openapi({
-            example: { id: 'org-type-uuid-123' },
+            example: { id: 'action-uuid-123' },
           }),
         },
       },
@@ -223,7 +228,7 @@ registry.registerPath({
       description: 'Restored successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
@@ -234,13 +239,13 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'delete',
-  path: '/organization-type/hard-delete',
-  tags: ['OrganizationType'],
-  summary: 'Hard delete organization type',
+  path: '/action/hard-delete',
+  tags: ['Action'],
+  summary: 'Hard delete action',
   security: [{ bearerAuth: [] }],
   request: {
     query: idParamsSchema.openapi({
-      example: { id: 'org-type-uuid-123' },
+      example: { id: 'action-uuid-123' },
     }),
   },
   responses: {
@@ -248,11 +253,40 @@ registry.registerPath({
       description: 'Deleted permanently',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
         },
       },
     },
     404: { description: 'Not found' },
+    401: { description: 'Unauthorized' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/action/options',
+  tags: ['Action'],
+  summary: 'Get all action options (id and name only)',
+  description:
+    'Returns a simplified list of actions for dropdown selection when assigning permissions.',
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: 'List of action options',
+      content: {
+        'application/json': {
+          schema: actionOptionListResponseSchema.openapi({
+            example: {
+              status: 'success',
+              data: [
+                { id: 'action-uuid-123', name: 'read' },
+                { id: 'action-uuid-456', name: 'update' },
+              ],
+            },
+          }),
+        },
+      },
+    },
     401: { description: 'Unauthorized' },
   },
 });

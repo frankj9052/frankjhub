@@ -19,7 +19,7 @@ import {
   organizationTypeCreateSchema,
   organizationTypeUpdateSchema,
   organizationTypePaginationSchema,
-  userIdParamsSchema,
+  idParamsSchema,
 } from '@frankjhub/shared-schema';
 
 const router = Router();
@@ -47,7 +47,7 @@ router.get(
 router.get(
   '/organization-type/:id',
   requirePermission(buildPermissionName('organizationType', ['read'])),
-  validateRequest({ params: userIdParamsSchema }),
+  validateRequest({ params: idParamsSchema }),
   getOrganizationTypeByIdController
 );
 
@@ -61,21 +61,21 @@ router.patch(
 router.patch(
   '/organization-type/soft-delete',
   requirePermission(buildPermissionName('organizationType', ['delete'])),
-  validateRequest({ body: userIdParamsSchema }),
+  validateRequest({ body: idParamsSchema }),
   softDeleteOrganizationTypeController
 );
 
 router.patch(
   '/organization-type/restore',
   requirePermission(buildPermissionName('organizationType', ['delete'])),
-  validateRequest({ body: userIdParamsSchema }),
+  validateRequest({ body: idParamsSchema }),
   restoreOrganizationTypeController
 );
 
 router.delete(
   '/organization-type/hard-delete',
   requirePermission(buildPermissionName('organizationType', ['delete'])),
-  validateRequest({ query: userIdParamsSchema }),
+  validateRequest({ query: idParamsSchema }),
   hardDeleteOrganizationTypeController
 );
 

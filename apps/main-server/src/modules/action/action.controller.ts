@@ -1,95 +1,78 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
-import { OrganizationTypeService } from './organizationType.service';
+import { ActionService } from './action.service';
 import {
-  organizationTypeCreateSchema,
-  organizationTypePaginationSchema,
-  organizationTypeUpdateSchema,
+  actionCreateRequestSchema,
+  actionListRequestSchema,
+  actionUpdateRequestSchema,
   idParamsSchema,
 } from '@frankjhub/shared-schema';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 
-const organizationTypeService = new OrganizationTypeService();
+const actionService = new ActionService();
 
-export const createOrganizationTypeController: RequestHandler = async (
+export const createActionController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationTypeCreateSchema.parse(req.body);
+    const parsed = actionCreateRequestSchema.parse(req.body);
     const createdBy = req.currentUser?.userName;
     if (!createdBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await organizationTypeService.createOrganizationType(parsed, createdBy);
-    res.status(201).json({ status: 'success', data: result });
+    const result = await actionService.createAction(parsed, createdBy);
+    res.status(201).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const getAllOrganizationTypesController: RequestHandler = async (
+export const getAllActionsController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationTypePaginationSchema.parse(req.query);
-    const result = await organizationTypeService.getAllOrganizationTypes(parsed);
+    const parsed = actionListRequestSchema.parse(req.query);
+    const result = await actionService.getActionList(parsed);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const getOrganizationTypeByIdController: RequestHandler = async (
+export const getActionByIdController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = idParamsSchema.parse(req.params);
-    const result = await organizationTypeService.getOrganizationTypeById(id);
-    res.status(200).json({ status: 'success', data: result });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const updateOrganizationTypeController: RequestHandler = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const parsed = organizationTypeUpdateSchema.parse(req.body);
-    const performedBy = req.currentUser?.userName;
-    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
-
-    const result = await organizationTypeService.updateOrganizationType(parsed, performedBy);
+    const result = await actionService.getActionById(id);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const softDeleteOrganizationTypeController: RequestHandler = async (
+export const updateActionController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { id } = idParamsSchema.parse(req.body);
+    const parsed = actionUpdateRequestSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await organizationTypeService.softDeleteOrganizationType(id, performedBy);
+    const result = await actionService.updateAction(parsed, performedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const restoreOrganizationTypeController: RequestHandler = async (
+export const softDeleteActionController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -99,34 +82,51 @@ export const restoreOrganizationTypeController: RequestHandler = async (
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await organizationTypeService.restoreOrganizationType(id, performedBy);
+    const result = await actionService.softDeleteAction(id, performedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const hardDeleteOrganizationTypeController: RequestHandler = async (
+export const restoreActionController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = idParamsSchema.parse(req.body);
+    const performedBy = req.currentUser?.userName;
+    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
+
+    const result = await actionService.restoreAction(id, performedBy);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const hardDeleteActionController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = idParamsSchema.parse(req.query);
-    const result = await organizationTypeService.hardDeleteOrganizationType(id);
+    const result = await actionService.hardDeleteAction(id);
     res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 };
 
-export const getOrgTypeOptionsController: RequestHandler = async (
-  _req: Request,
+export const getActionOptionsController: RequestHandler = async (
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const result = await organizationTypeService.getAllOrgTypeOptions();
+    const result = await actionService.getActionOptions();
     res.status(200).json(result);
   } catch (error) {
     next(error);
