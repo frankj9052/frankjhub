@@ -21,7 +21,7 @@ module.exports = withNx(
     assets: [
       { input: 'libs/shared-ui-client', output: '.', glob: 'README.md' },
       { input: 'libs/shared-ui-client/packageBuild', output: '.', glob: 'package.json' },
-    ],
+    ],    
   },
   {
     // Provide additional rollup configuration here. See: https://rollupjs.org/configuration-options
@@ -36,5 +36,5 @@ module.exports = withNx(
       }),
     ],
     context: 'globalThis',
-  }
+  },
 );

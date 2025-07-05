@@ -4,6 +4,7 @@
       "@nx/react/babel",
       {
         "runtime": "automatic",
+        "development": false,
         "useBuiltIns": "usage"
       }
     ]
