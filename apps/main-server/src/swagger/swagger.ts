@@ -5,6 +5,7 @@ import { env } from '../config/env';
 import { Express } from 'express';
 import { registry } from '../config/openapiRegistry';
 import { createLoggerWithContext } from '../modules/common/libs/logger';
+import { baseErrorExample, baseErrorResponseSchema } from '@frankjhub/shared-schema';
 
 extendZodWithOpenApi(z);
 
@@ -18,21 +19,9 @@ registry.registerComponent('securitySchemes', 'bearerAuth', {
 });
 
 registry.registerComponent('schemas', 'ErrorResponse', {
-  type: 'object',
-  properties: {
-    timestamp: { type: 'string', format: 'date-time' },
-    status: { type: 'integer', example: 404 },
-    code: { type: 'string', example: 'RESOURCE_NOT_FOUND' },
-    message: { type: 'string', example: 'User friendly message' },
-    requestId: { type: 'string', example: '2b764cdc-5c01-4a9a-b802-2a5d93f52d09' },
-  },
-  example: {
-    timestamp: '2025-05-12T08:00:00Z',
-    status: 404,
-    code: 'RESOURCE_NOT_FOUND',
-    message: 'User friendly message',
-    requestId: '2b764cdc-5c01-4a9a-b802-2a5d93f52d09',
-  },
+  ...baseErrorResponseSchema.openapi({
+    example: baseErrorExample,
+  }),
 });
 
 registry.registerComponent('responses', 'NotFound', {

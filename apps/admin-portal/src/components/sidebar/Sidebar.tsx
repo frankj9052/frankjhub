@@ -43,6 +43,26 @@ const sidebarData: SidebarDataType[] = [
       },
     ],
   },
+  {
+    category: 'Permission',
+    list: [
+      {
+        icon: <div>3</div>,
+        label: 'Actions',
+        src: '/dashboard/actions',
+      },
+      {
+        icon: <div>1</div>,
+        label: 'Resources',
+        src: '/dashboard/resources',
+      },
+      {
+        icon: <div>1</div>,
+        label: 'Permissions',
+        src: '/dashboard/permissions',
+      },
+    ],
+  },
 ];
 
 type Props = {

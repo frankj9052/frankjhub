@@ -1,4 +1,5 @@
 import {
+  actionSlice,
   currentUserSlice,
   organizationSlice,
   organizationTypeSlice,
@@ -12,4 +13,5 @@ export const reducer = {
   users: usersSlice.reducer,
   organizationType: organizationTypeSlice.reducer,
   organization: organizationSlice.reducer,
+  action: actionSlice.reducer,
 };

@@ -133,7 +133,7 @@ export class ActionService {
     const savedAction = await this.actionRepo.save(action);
     const result: ActionSingleResponse = {
       status: 'success',
-      message: `Action ${id} updated by ${performedBy}`,
+      message: `Action ${savedAction.name} updated by ${performedBy}`,
       data: this.buildAction(savedAction),
     };
     return result;
@@ -152,7 +152,7 @@ export class ActionService {
 
     const result: ActionSingleResponse = {
       status: 'success',
-      message: `Action ${id} soft deleted by ${performedBy}`,
+      message: `Action ${action.name} deleted by ${performedBy}`,
       data: this.buildAction(savedAction),
     };
     return result;
@@ -167,7 +167,7 @@ export class ActionService {
     if (!action.deletedAt) {
       return {
         status: 'success',
-        message: `Action ${id} is not deleted`,
+        message: `Action ${action.name} is not deleted`,
         data: this.buildAction(action),
       };
     }
@@ -180,7 +180,7 @@ export class ActionService {
 
     return {
       status: 'success',
-      message: `Action ${id} restored by ${performedBy}`,
+      message: `Action ${savedAction.name} restored by ${performedBy}`,
       data: this.buildAction(savedAction),
     };
   }
@@ -195,7 +195,7 @@ export class ActionService {
 
     return {
       status: 'success',
-      message: `Action ${id} permanently deleted`,
+      message: `Action ${action.name} permanently deleted`,
       data: this.buildAction(action),
     };
   }

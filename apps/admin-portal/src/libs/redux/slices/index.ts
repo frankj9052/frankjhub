@@ -7,3 +7,5 @@ export * from './usersSlice';
 export * from './organizationSlice';
 
 export * from './organizationTypeSlice';
+
+export * from './actionSlice';

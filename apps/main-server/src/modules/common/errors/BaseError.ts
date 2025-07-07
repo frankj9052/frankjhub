@@ -1,3 +1,4 @@
+import { BaseErrorResponse } from '@frankjhub/shared-schema';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -48,7 +49,7 @@ export abstract class BaseError extends Error {
   /**
    * 安全序列化错误内容，防止 JSON.stringify 崩溃
    */
-  toJSON() {
+  toJSON(): BaseErrorResponse {
     const { requestId } = this as this & WithRequestId;
 
     // 处理 cause 字段（避免循环引用或不可序列化结构）
