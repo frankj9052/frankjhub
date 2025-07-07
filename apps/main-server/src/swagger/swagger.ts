@@ -6,6 +6,8 @@ import { Express } from 'express';
 import { registry } from '../config/openapiRegistry';
 import { createLoggerWithContext } from '../modules/common/libs/logger';
 import { baseErrorExample, baseErrorResponseSchema } from '@frankjhub/shared-schema';
+import { registerErrorResponsesFromFiles } from '../modules/common/utils/registerErrorResponseFromFiles';
+import path from 'path';
 
 extendZodWithOpenApi(z);
 
@@ -18,25 +20,19 @@ registry.registerComponent('securitySchemes', 'bearerAuth', {
   bearerFormat: 'JWT',
 });
 
-registry.registerComponent('schemas', 'ErrorResponse', {
-  ...baseErrorResponseSchema.openapi({
+// 直接使用 registry.register() 注册带有 example 的 ErrorResponse schema
+registry.register(
+  'ErrorResponse',
+  baseErrorResponseSchema.openapi({
+    description: 'Standard error response object',
     example: baseErrorExample,
-  }),
-});
-
-registry.registerComponent('responses', 'NotFound', {
-  description: 'Resource not found',
-  content: {
-    'application/json': {
-      schema: {
-        $ref: '#/components/schemas/ErrorResponse',
-      },
-    },
-  },
-});
+  })
+);
 
 // 👇 修改为导出函数（延迟执行）
 export function generateSwaggerDocs(app: Express) {
+  // 自动注册所有 Error 类定义的 OpenAPI responses（排除 BaseError）
+  registerErrorResponsesFromFiles(path.resolve(__dirname, '../modules/common/errors'));
   const generator = new OpenApiGeneratorV3(registry.definitions);
   const openapiDocument = generator.generateDocument({
     openapi: '3.0.0',

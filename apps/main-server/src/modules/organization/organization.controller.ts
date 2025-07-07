@@ -41,6 +41,19 @@ export const getAllOrganizationsController: RequestHandler = async (
   }
 };
 
+export const getOrganizationOptionListController: RequestHandler = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await organizationService.getOrganizationOptionList();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getOrganizationByIdController: RequestHandler = async (
   req: Request,
   res: Response,

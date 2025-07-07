@@ -5,6 +5,7 @@ import { createLoggerWithContext } from '../common/libs/logger';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import {
   OrganizationCreateSchema,
+  OrganizationOptionListResponse,
   OrganizationPaginatedResponse,
   OrganizationPaginationParams,
   OrganizationUpdateSchema,
@@ -101,6 +102,22 @@ export class OrganizationService {
       data: result.data.map(org => this.buildOrganizationWithOrgTypeName(org)),
     };
     return response;
+  }
+
+  async getOrganizationOptionList(): Promise<OrganizationOptionListResponse> {
+    const organizations = await this.orgRepo.find({
+      where: { isActive: true },
+      select: ['id', 'name'],
+      order: { name: 'ASC' },
+    });
+    return {
+      status: 'success',
+      message: 'Fetched organization option list successfully',
+      data: organizations.map(org => ({
+        id: org.id,
+        name: org.name,
+      })),
+    };
   }
 
   async getOrganizationById(id: string): Promise<OrganizationWithOrgTypeNameSchema> {

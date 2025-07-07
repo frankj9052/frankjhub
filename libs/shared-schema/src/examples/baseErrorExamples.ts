@@ -1,4 +1,6 @@
-export const baseErrorExample = {
+import { BaseErrorResponse } from "../modules/common/baseErrorResponse.schema";
+
+export const baseErrorExample:BaseErrorResponse = {
   timestamp: new Date().toISOString(),
   status: 400,
   code: 'INVALID_INPUT',

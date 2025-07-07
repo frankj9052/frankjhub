@@ -1,5 +1,5 @@
 import { ActionDto } from "../entity";
-import { ActionListResponse } from "../response";
+import { ActionListPageData, ActionListResponse } from "../response";
 
 export const actionDataExample: ActionDto = {
   id: 'a3e1b2c4-7d56-42f9-a938-9a5c6b1a2f3d',
@@ -14,7 +14,7 @@ export const actionDataExample: ActionDto = {
   deletedBy: null,
 }
 
-export const actionListResponseExample: ActionListResponse = {
+export const actionListPageDataExample: ActionListPageData = {
 data: [
     {
       id: 'b1e2a3f4-5c6d-7e8f-9012-3456789abcde',
@@ -47,4 +47,10 @@ data: [
   pageSize: 10,
   search: 'appointment',
   filters: ['active', 'deleted'],
+}
+
+export const actionListResponseExample: ActionListResponse = {
+  status: 'success',
+  message: 'Get action list successful',
+  data: actionListPageDataExample
 }

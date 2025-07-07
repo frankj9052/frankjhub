@@ -9,7 +9,8 @@ import {
   createSuccessResponseSchema,
   organizationWithOrgTypeDataExample,
   organizationPaginatedResponseDataExample,
-  orgTypeOptionSchema,
+  organizationOptionSchema,
+  organizationOptionListResponseSchema,
 } from '@frankjhub/shared-schema';
 
 // ----------------- SCHEMA REGISTRATIONS -----------------
@@ -42,12 +43,27 @@ registry.register(
 );
 
 registry.register(
-  'OrgTypeOption',
-  orgTypeOptionSchema.openapi({
-    description: 'A lightweight organization type object for dropdown lists',
+  'OrganizationOption',
+  organizationOptionSchema.openapi({
+    description: 'A lightweight organization object for dropdown lists',
     example: {
-      id: 'org-type-uuid-123',
-      name: 'Clinic',
+      id: 'org-uuid-123',
+      name: 'Toronto Clinic',
+    },
+  })
+);
+
+registry.register(
+  'OrganizationOptionListResponse',
+  organizationOptionListResponseSchema.openapi({
+    description: 'List of organizations for dropdown selection',
+    example: {
+      status: 'success',
+      message: 'Fetched organization option list successfully',
+      data: [
+        { id: 'org-uuid-123', name: 'Toronto Clinic' },
+        { id: 'org-uuid-456', name: 'Vancouver Wellness Center' },
+      ],
     },
   })
 );
@@ -276,40 +292,17 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/organization-type/options',
-  tags: ['OrganizationType'],
-  summary: 'Get all organization type options (id and name only)',
-  description:
-    'Returns a simplified list of organization types for dropdown selection when creating an organization.',
+  path: '/organization/options',
+  tags: ['Organization'],
+  summary: 'Get all organization options (id and name only)',
+  description: 'Returns a simplified list of active organizations for dropdown selection.',
   security: [{ bearerAuth: [] }],
   responses: {
     200: {
-      description: 'List of organization type options',
+      description: 'List of organization options',
       content: {
         'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              status: {
-                type: 'string',
-                example: 'success',
-              },
-              data: {
-                type: 'array',
-                items: { $ref: '#/components/schemas/OrgTypeOption' },
-                example: [
-                  {
-                    id: 'org-type-uuid-123',
-                    name: 'Clinic',
-                  },
-                  {
-                    id: 'org-type-uuid-456',
-                    name: 'Hospital',
-                  },
-                ],
-              },
-            },
-          },
+          schema: { $ref: '#/components/schemas/OrganizationOptionListResponse' },
         },
       },
     },

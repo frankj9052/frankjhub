@@ -5,45 +5,15 @@ import {
   actionListRequestSchema,
   idParamsSchema,
   actionOptionListResponseSchema,
-  actionSchema,
   actionDataExample,
   actionListResponseSchema,
   actionListResponseExample,
   actionSingleResponseSchema,
+  buildErrorResponses,
 } from '@frankjhub/shared-schema';
 
-// ----------------- SCHEMA REGISTRATIONS -----------------
-
-registry.register(
-  'Action',
-  actionSchema.openapi({
-    description: 'An action object with metadata',
-    example: actionDataExample,
-  })
-);
-
-registry.register(
-  'ActionListResponse',
-  actionListResponseSchema.openapi({
-    description: 'Paginated list of actions',
-    example: actionListResponseExample,
-  })
-);
-
-registry.register(
-  'ActionSingleResponse',
-  actionSingleResponseSchema.openapi({
-    description: 'Generic success response',
-    example: {
-      status: 'success',
-      message: 'Action updated successfully',
-      data: actionDataExample,
-    },
-  })
-);
-
 // ----------------- PATH REGISTRATIONS -----------------
-
+// create
 registry.registerPath({
   method: 'post',
   path: '/action',
@@ -69,15 +39,24 @@ registry.registerPath({
       description: 'Action created successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action create successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    401: { description: 'Unauthorized' },
-    400: { description: 'Validation error' },
+    ...buildErrorResponses({
+      400: 'ValidationError',
+      401: 'UnauthorizedError',
+    }),
   },
 });
 
+// list
 registry.registerPath({
   method: 'get',
   path: '/action/list',
@@ -100,14 +79,19 @@ registry.registerPath({
       description: 'List returned',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionListResponse' },
+          schema: actionListResponseSchema.openapi({
+            example: actionListResponseExample,
+          }),
         },
       },
     },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+    }),
   },
 });
 
+// get by id
 registry.registerPath({
   method: 'get',
   path: '/action/{id}',
@@ -131,15 +115,24 @@ registry.registerPath({
       description: 'Action found',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action get successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'UnauthorizedError',
+    }),
   },
 });
 
+// update
 registry.registerPath({
   method: 'patch',
   path: '/action/update',
@@ -166,15 +159,24 @@ registry.registerPath({
       description: 'Updated successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action update successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'UnauthorizedError',
+    }),
   },
 });
 
+// soft-delete
 registry.registerPath({
   method: 'patch',
   path: '/action/soft-delete',
@@ -197,15 +199,24 @@ registry.registerPath({
       description: 'Soft deleted successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action delete successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'UnauthorizedError',
+    }),
   },
 });
 
+// restore
 registry.registerPath({
   method: 'patch',
   path: '/action/restore',
@@ -228,15 +239,24 @@ registry.registerPath({
       description: 'Restored successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action restore successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'UnauthorizedError',
+    }),
   },
 });
 
+// hard-delete
 registry.registerPath({
   method: 'delete',
   path: '/action/hard-delete',
@@ -253,15 +273,24 @@ registry.registerPath({
       description: 'Deleted permanently',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/ActionSingleResponse' },
+          schema: actionSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Action permanent delete successful',
+              data: actionDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'UnauthorizedError',
+    }),
   },
 });
 
+// option-list
 registry.registerPath({
   method: 'get',
   path: '/action/options',
@@ -287,6 +316,8 @@ registry.registerPath({
         },
       },
     },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+    }),
   },
 });

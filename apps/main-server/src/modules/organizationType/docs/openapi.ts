@@ -9,6 +9,7 @@ import {
   createSuccessResponseSchema,
   organizationTypeAllDataExample,
   organizationTypePaginatedResponseDataExample,
+  orgTypeOptionSchema,
 } from '@frankjhub/shared-schema';
 
 registry.register(
@@ -34,6 +35,17 @@ registry.register(
     example: {
       status: 'success',
       message: 'OrganizationType updated successfully',
+    },
+  })
+);
+
+registry.register(
+  'OrgTypeOption',
+  orgTypeOptionSchema.openapi({
+    description: 'A lightweight organization type object for dropdown lists',
+    example: {
+      id: 'org-type-uuid-123',
+      name: 'Clinic',
     },
   })
 );
@@ -253,6 +265,49 @@ registry.registerPath({
       },
     },
     404: { description: 'Not found' },
+    401: { description: 'Unauthorized' },
+  },
+});
+
+registry.registerPath({
+  method: 'get',
+  path: '/organization-type/options',
+  tags: ['OrganizationType'],
+  summary: 'Get all organization type options (id and name only)',
+  description:
+    'Returns a simplified list of organization types for dropdown selection when creating an organization.',
+  security: [{ bearerAuth: [] }],
+  responses: {
+    200: {
+      description: 'List of organization type options',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              status: {
+                type: 'string',
+                example: 'success',
+              },
+              data: {
+                type: 'array',
+                items: { $ref: '#/components/schemas/OrgTypeOption' },
+                example: [
+                  {
+                    id: 'org-type-uuid-123',
+                    name: 'Clinic',
+                  },
+                  {
+                    id: 'org-type-uuid-456',
+                    name: 'Hospital',
+                  },
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
     401: { description: 'Unauthorized' },
   },
 });

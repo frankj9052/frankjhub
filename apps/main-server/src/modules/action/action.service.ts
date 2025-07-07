@@ -85,9 +85,13 @@ export class ActionService {
         return qb.withDeleted();
       },
     });
-    const response = {
-      ...result,
-      data: result.data.map(action => this.buildAction(action)),
+    const response: ActionListResponse = {
+      status: 'success',
+      message: 'Get action list successful',
+      data: {
+        ...result,
+        data: result.data.map(action => this.buildAction(action)),
+      },
     };
     return response;
   }
