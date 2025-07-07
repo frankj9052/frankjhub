@@ -1,6 +1,7 @@
-import { OrganizationTypePaginatedResponse, OrganizationTypeSchema } from "../modules";
+import { OrganizationTypeDto } from "../entity"
+import { OrganizationTypeListPageData, OrganizationTypeListResponse } from "../response"
 
-export const organizationTypeAllDataExample: OrganizationTypeSchema = {
+export const organizationTypeAllDataExample: OrganizationTypeDto = {
   id: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
   name: 'Primary Care Clinic',
   description: 'A healthcare facility focused on general medical services.',
@@ -13,7 +14,7 @@ export const organizationTypeAllDataExample: OrganizationTypeSchema = {
   deletedBy: null,
 }
 
-export const organizationTypePaginatedResponseDataExample: OrganizationTypePaginatedResponse = {
+export const organizationTypePageDataExample: OrganizationTypeListPageData = {
         data: [
         {
           id: 'org-type-uuid-123',
@@ -32,4 +33,12 @@ export const organizationTypePaginatedResponseDataExample: OrganizationTypePagin
       pageCount: 1,
       currentPage: 1,
       pageSize: 10,
+      search: 'appointment',
+      filters: ['active', 'deleted'],
+}
+
+export const organizationTypeListResponseExample: OrganizationTypeListResponse = {
+    status: 'success',
+    message: 'Get orgniazation type list successful',
+    data: organizationTypePageDataExample
 }

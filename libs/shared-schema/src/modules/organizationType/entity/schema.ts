@@ -1,4 +1,4 @@
-import { z, zInfer } from '../../libs/z';
+import { z, zInfer } from '../../../libs/z';
 
 export const organizationTypeSchema = z.object({
   id: z.string().uuid(),
@@ -13,4 +13,4 @@ export const organizationTypeSchema = z.object({
   deletedBy: z.string().nullable(),
 });
 
-export type OrganizationTypeSchema = zInfer<typeof organizationTypeSchema>;
+export type OrganizationTypeDto = zInfer<typeof organizationTypeSchema>;
