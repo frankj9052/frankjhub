@@ -13,8 +13,8 @@ export const organizationTypeOptionListResponseSchema = createSuccessResponseSch
   organizationTypeOptionsSchema
 );
 
-export type OrganizationTypeOptionSchema = zInfer<typeof organizationTypeOptionSchema>;
-export type OrganizationTypeOptionsSchema = zInfer<typeof organizationTypeOptionsSchema>;
+export type OrganizationTypeOption = zInfer<typeof organizationTypeOptionSchema>;
+export type OrganizationTypeOptions = zInfer<typeof organizationTypeOptionsSchema>;
 export type OrganizationTypeOptionListResponse = zInfer<
   typeof organizationTypeOptionListResponseSchema
 >;

@@ -11,6 +11,6 @@ export const actionOptionsSchema = z.array(actionOptionSchema);
 
 export const actionOptionListResponseSchema = createSuccessResponseSchema(actionOptionsSchema);
 
-export type ActionOptionSchema = zInfer<typeof actionOptionSchema>;
-export type ActionOptionsSchema = zInfer<typeof actionOptionsSchema>;
+export type ActionOption = zInfer<typeof actionOptionSchema>;
+export type ActionOptions = zInfer<typeof actionOptionsSchema>;
 export type ActionOptionListResponse = zInfer<typeof actionOptionListResponseSchema>;

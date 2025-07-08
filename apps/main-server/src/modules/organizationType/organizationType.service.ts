@@ -4,13 +4,15 @@ import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import {
-  OrganizationTypeCreateSchema,
-  OrganizationTypePaginatedResponse,
-  OrganizationTypePaginationParams,
-  OrganizationTypeSchema,
-  OrganizationTypeUpdateSchema,
-  OrgTypeOptionsSchema,
-  SuccessResponse,
+  OrganizationTypeCreateRequest,
+  OrganizationTypeDto,
+  OrganizationTypeListPageData,
+  OrganizationTypeListRequest,
+  OrganizationTypeListResponse,
+  OrganizationTypeOption,
+  OrganizationTypeOptionListResponse,
+  organizationTypeSingleResponse,
+  OrganizationTypeUpdateRequest,
 } from '@frankjhub/shared-schema';
 
 const logger = createLoggerWithContext('OrganizationTypeService');
@@ -23,24 +25,30 @@ const filterConditionMap: Record<string, string> = {
 
 export class OrganizationTypeService {
   private orgTypeRepo = AppDataSource.getRepository(OrganizationType);
-  buildOrganizationType(type: OrganizationType): OrganizationTypeSchema {
+  buildOrganizationType(orgType: OrganizationType): OrganizationTypeDto {
     return {
-      id: type.id,
-      name: type.name,
-      description: type.description ?? null,
-      isActive: type.isActive,
-      createdAt: type.createdAt.toISOString(),
-      updatedAt: type.updatedAt.toISOString(),
-      deletedAt: type.deletedAt?.toISOString() ?? null,
-      createdBy: type.createdBy ?? null,
-      updatedBy: type.updatedBy ?? null,
-      deletedBy: type.deletedBy ?? null,
+      id: orgType.id,
+      name: orgType.name,
+      description: orgType.description ?? null,
+      isActive: orgType.isActive,
+      createdAt: orgType.createdAt.toISOString(),
+      updatedAt: orgType.updatedAt.toISOString(),
+      deletedAt: orgType.deletedAt?.toISOString() ?? null,
+      createdBy: orgType.createdBy ?? null,
+      updatedBy: orgType.updatedBy ?? null,
+      deletedBy: orgType.deletedBy ?? null,
+    };
+  }
+  buildOrganizationTypeOption(orgType: OrganizationType): OrganizationTypeOption {
+    return {
+      id: orgType.id,
+      name: orgType.name,
     };
   }
   async createOrganizationType(
-    data: OrganizationTypeCreateSchema,
+    data: OrganizationTypeCreateRequest,
     createdBy: string
-  ): Promise<OrganizationType> {
+  ): Promise<organizationTypeSingleResponse> {
     const { name, description } = data;
     const log = logger.child({ method: 'createOrganizationType', name });
 
@@ -54,15 +62,19 @@ export class OrganizationTypeService {
       description: description ?? undefined,
       createdBy,
     });
-    await this.orgTypeRepo.save(orgType);
-
+    const savedOrgType = await this.orgTypeRepo.save(orgType);
     log.info(`Created organization type "${name}"`);
-    return orgType;
+    const response: organizationTypeSingleResponse = {
+      status: 'success',
+      message: `Created organization type "${name}"`,
+      data: this.buildOrganizationType(savedOrgType),
+    };
+    return response;
   }
 
   async getAllOrganizationTypes(
-    pagination: OrganizationTypePaginationParams
-  ): Promise<OrganizationTypePaginatedResponse> {
+    pagination: OrganizationTypeListRequest
+  ): Promise<OrganizationTypeListResponse> {
     const result = await paginateWithOffset({
       repo: this.orgTypeRepo,
       pagination,
@@ -84,25 +96,34 @@ export class OrganizationTypeService {
         return qb.withDeleted();
       },
     });
-    const response = {
+    const orgTypeListPageData: OrganizationTypeListPageData = {
       ...result,
       data: result.data.map(orgType => this.buildOrganizationType(orgType)),
+    };
+    const response: OrganizationTypeListResponse = {
+      status: 'success',
+      message: 'Get organization type list succcessful',
+      data: orgTypeListPageData,
     };
     return response;
   }
 
-  async getOrganizationTypeById(id: string): Promise<OrganizationType> {
+  async getOrganizationTypeById(id: string): Promise<organizationTypeSingleResponse> {
     const orgType = await this.orgTypeRepo.findOne({ where: { id }, withDeleted: true });
     if (!orgType) {
       throw new NotFoundError(`OrganizationType ${id} not found`);
     }
-    return orgType;
+    return {
+      status: 'success',
+      message: 'Get organization type successful',
+      data: this.buildOrganizationType(orgType),
+    };
   }
 
   async updateOrganizationType(
-    update: OrganizationTypeUpdateSchema,
+    update: OrganizationTypeUpdateRequest,
     performedBy: string
-  ): Promise<SuccessResponse> {
+  ): Promise<organizationTypeSingleResponse> {
     const { id } = update;
     const orgType = await this.orgTypeRepo.findOne({ where: { id }, withDeleted: true });
     if (!orgType) {
@@ -116,32 +137,39 @@ export class OrganizationTypeService {
       }
     }
 
-    await this.orgTypeRepo.save(orgType);
+    const savedOrgType = await this.orgTypeRepo.save(orgType);
 
     return {
       status: 'success',
-      message: `OrganizationType ${id} updated by ${performedBy}`,
+      message: `OrganizationType ${savedOrgType.name} updated by ${performedBy}`,
+      data: this.buildOrganizationType(savedOrgType),
     };
   }
 
-  async softDeleteOrganizationType(id: string, performedBy: string): Promise<SuccessResponse> {
+  async softDeleteOrganizationType(
+    id: string,
+    performedBy: string
+  ): Promise<organizationTypeSingleResponse> {
     const orgType = await this.orgTypeRepo.findOne({ where: { id } });
     if (!orgType) {
       throw new NotFoundError(`OrganizationType ${id} not found`);
     }
 
-    await this.orgTypeRepo.update(id, {
-      deletedAt: new Date().toISOString(),
-      deletedBy: performedBy,
-    });
+    orgType.deletedAt = new Date();
+    orgType.deletedBy = performedBy;
 
+    const savedOrgType = await this.orgTypeRepo.save(orgType);
     return {
       status: 'success',
-      message: `OrganizationType ${id} soft deleted by ${performedBy}`,
+      message: `OrganizationType ${savedOrgType.name} is deleted by ${performedBy}`,
+      data: this.buildOrganizationType(savedOrgType),
     };
   }
 
-  async restoreOrganizationType(id: string, performedBy: string): Promise<SuccessResponse> {
+  async restoreOrganizationType(
+    id: string,
+    performedBy: string
+  ): Promise<organizationTypeSingleResponse> {
     const orgType = await this.orgTypeRepo.findOne({ where: { id }, withDeleted: true });
     if (!orgType) {
       throw new NotFoundError(`OrganizationType ${id} not found`);
@@ -150,23 +178,26 @@ export class OrganizationTypeService {
     if (!orgType.deletedAt) {
       return {
         status: 'success',
-        message: `OrganizationType ${id} is not deleted`,
+        message: `OrganizationType ${orgType.name} is not deleted`,
+        data: this.buildOrganizationType(orgType),
       };
     }
 
-    await this.orgTypeRepo.update(id, {
-      deletedAt: null,
-      deletedBy: null,
-      updatedBy: performedBy,
-    });
+    orgType.deletedAt = null;
+    orgType.deletedBy = null;
+    orgType.updatedBy = performedBy;
+    orgType.updatedAt = new Date();
+
+    const savedOrgType = await this.orgTypeRepo.save(orgType);
 
     return {
       status: 'success',
-      message: `OrganizationType ${id} restored by ${performedBy}`,
+      message: `OrganizationType ${savedOrgType.name} restored by ${performedBy}`,
+      data: this.buildOrganizationType(savedOrgType),
     };
   }
 
-  async hardDeleteOrganizationType(id: string): Promise<SuccessResponse> {
+  async hardDeleteOrganizationType(id: string): Promise<organizationTypeSingleResponse> {
     const orgType = await this.orgTypeRepo.findOne({ where: { id }, withDeleted: true });
     if (!orgType) {
       throw new NotFoundError(`OrganizationType ${id} not found`);
@@ -176,11 +207,12 @@ export class OrganizationTypeService {
 
     return {
       status: 'success',
-      message: `OrganizationType ${id} permanently deleted`,
+      message: `OrganizationType ${orgType.name} is permanently deleted`,
+      data: this.buildOrganizationType(orgType),
     };
   }
 
-  async getAllOrgTypeOptions(): Promise<OrgTypeOptionsSchema> {
+  async getAllOrgTypeOptions(): Promise<OrganizationTypeOptionListResponse> {
     const orgTypes = await this.orgTypeRepo.find({
       select: ['id', 'name'],
       where: {
@@ -191,6 +223,10 @@ export class OrganizationTypeService {
       },
     });
 
-    return orgTypes;
+    return {
+      status: 'success',
+      message: 'Get organization type options successful',
+      data: orgTypes.map(orgType => this.buildOrganizationTypeOption(orgType)),
+    };
   }
 }

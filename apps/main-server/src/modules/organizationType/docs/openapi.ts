@@ -1,57 +1,19 @@
 import { registry } from '../../../config/openapiRegistry';
 import {
-  organizationTypeCreateSchema,
-  organizationTypeUpdateSchema,
-  organizationTypeSchema,
-  organizationTypePaginationSchema,
-  organizationTypePaginatedResponseSchema,
+  buildErrorResponses,
   idParamsSchema,
-  createSuccessResponseSchema,
-  organizationTypeAllDataExample,
-  organizationTypePaginatedResponseDataExample,
-  orgTypeOptionSchema,
+  organizationTypeCreateRequestSchema,
+  organizationTypeDataExample,
+  organizationTypeListRequestSchema,
+  organizationTypeListResponseExample,
+  organizationTypeListResponseSchema,
+  organizationTypeOptionListResponseSchema,
+  organizationTypeSingleResponseSchema,
+  organizationTypeUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
-registry.register(
-  'OrganizationType',
-  organizationTypeSchema.openapi({
-    description: 'An organization type object',
-    example: organizationTypeAllDataExample,
-  })
-);
-
-registry.register(
-  'OrganizationTypePaginatedResponse',
-  organizationTypePaginatedResponseSchema.openapi({
-    description: 'Paginated list of organization types',
-    example: organizationTypePaginatedResponseDataExample,
-  })
-);
-
-registry.register(
-  'SuccessResponse',
-  createSuccessResponseSchema().openapi({
-    description: 'Generic success response',
-    example: {
-      status: 'success',
-      message: 'OrganizationType updated successfully',
-    },
-  })
-);
-
-registry.register(
-  'OrgTypeOption',
-  orgTypeOptionSchema.openapi({
-    description: 'A lightweight organization type object for dropdown lists',
-    example: {
-      id: 'org-type-uuid-123',
-      name: 'Clinic',
-    },
-  })
-);
-
 // ----------------- PATH REGISTRATIONS -----------------
-
+// create
 registry.registerPath({
   method: 'post',
   path: '/organization-type',
@@ -62,7 +24,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeCreateSchema.openapi({
+          schema: organizationTypeCreateRequestSchema.openapi({
             example: {
               name: 'Clinic',
               description: 'A general clinic',
@@ -81,11 +43,14 @@ registry.registerPath({
         },
       },
     },
-    401: { description: 'Unauthorized' },
-    400: { description: 'Validation error' },
+    ...buildErrorResponses({
+      400: 'ValidationError',
+      401: 'UnauthorizedError',
+    }),
   },
 });
 
+// get list
 registry.registerPath({
   method: 'get',
   path: '/organization-type/list',
@@ -94,11 +59,12 @@ registry.registerPath({
   description: 'Returns a paginated list of all organization types.',
   security: [{ bearerAuth: [] }],
   request: {
-    query: organizationTypePaginationSchema.openapi({
+    query: organizationTypeListRequestSchema.openapi({
       example: {
         limit: 20,
         offset: 0,
         search: 'clinic',
+        filters: ['name'],
       },
     }),
   },
@@ -107,14 +73,19 @@ registry.registerPath({
       description: 'List returned',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationTypePaginatedResponse' },
+          schema: organizationTypeListResponseSchema.openapi({
+            example: organizationTypeListResponseExample,
+          }),
         },
       },
     },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+    }),
   },
 });
 
+// get orgType by id
 registry.registerPath({
   method: 'get',
   path: '/organization-type/{id}',
@@ -138,15 +109,24 @@ registry.registerPath({
       description: 'Organization type found',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/OrganizationType' },
+          schema: organizationTypeSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'get successful',
+              data: organizationTypeDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'NotFoundError',
+    }),
   },
 });
 
+// update
 registry.registerPath({
   method: 'patch',
   path: '/organization-type/update',
@@ -157,7 +137,7 @@ registry.registerPath({
     body: {
       content: {
         'application/json': {
-          schema: organizationTypeUpdateSchema.openapi({
+          schema: organizationTypeUpdateRequestSchema.openapi({
             example: {
               id: 'org-type-uuid-123',
               name: 'Hospital',
@@ -173,15 +153,24 @@ registry.registerPath({
       description: 'Updated successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: organizationTypeSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'update successful',
+              data: organizationTypeDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'NotFoundError',
+    }),
   },
 });
 
+// soft delete
 registry.registerPath({
   method: 'patch',
   path: '/organization-type/soft-delete',
@@ -204,15 +193,24 @@ registry.registerPath({
       description: 'Soft deleted successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: organizationTypeSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'delete successful',
+              data: organizationTypeDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'NotFoundError',
+    }),
   },
 });
 
+// restore
 registry.registerPath({
   method: 'patch',
   path: '/organization-type/restore',
@@ -235,15 +233,24 @@ registry.registerPath({
       description: 'Restored successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: organizationTypeSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'restore successful',
+              data: organizationTypeDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'NotFoundError',
+    }),
   },
 });
 
+// hard delete
 registry.registerPath({
   method: 'delete',
   path: '/organization-type/hard-delete',
@@ -257,18 +264,27 @@ registry.registerPath({
   },
   responses: {
     200: {
-      description: 'Deleted permanently',
+      description: 'hard delete successfully',
       content: {
         'application/json': {
-          schema: { $ref: '#/components/schemas/SuccessResponse' },
+          schema: organizationTypeSingleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'permanent delete successful',
+              data: organizationTypeDataExample,
+            },
+          }),
         },
       },
     },
-    404: { description: 'Not found' },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      404: 'NotFoundError',
+    }),
   },
 });
 
+// get orgType option list
 registry.registerPath({
   method: 'get',
   path: '/organization-type/options',
@@ -282,32 +298,27 @@ registry.registerPath({
       description: 'List of organization type options',
       content: {
         'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              status: {
-                type: 'string',
-                example: 'success',
-              },
-              data: {
-                type: 'array',
-                items: { $ref: '#/components/schemas/OrgTypeOption' },
-                example: [
-                  {
-                    id: 'org-type-uuid-123',
-                    name: 'Clinic',
-                  },
-                  {
-                    id: 'org-type-uuid-456',
-                    name: 'Hospital',
-                  },
-                ],
-              },
+          schema: organizationTypeOptionListResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Get organization type option list successful',
+              data: [
+                {
+                  id: 'org-type-uuid-123',
+                  name: 'Clinic',
+                },
+                {
+                  id: 'org-type-uuid-456',
+                  name: 'Hospital',
+                },
+              ],
             },
-          },
+          }),
         },
       },
     },
-    401: { description: 'Unauthorized' },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+    }),
   },
 });

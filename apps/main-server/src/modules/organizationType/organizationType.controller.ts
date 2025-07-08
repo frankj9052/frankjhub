@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { OrganizationTypeService } from './organizationType.service';
 import {
-  organizationTypeCreateSchema,
-  organizationTypePaginationSchema,
-  organizationTypeUpdateSchema,
   idParamsSchema,
+  organizationTypeCreateRequestSchema,
+  organizationTypeListRequestSchema,
+  organizationTypeUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 
@@ -16,7 +16,7 @@ export const createOrganizationTypeController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationTypeCreateSchema.parse(req.body);
+    const parsed = organizationTypeCreateRequestSchema.parse(req.body);
     const createdBy = req.currentUser?.userName;
     if (!createdBy) throw new UnauthorizedError('User identity not found in request');
 
@@ -33,7 +33,7 @@ export const getAllOrganizationTypesController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationTypePaginationSchema.parse(req.query);
+    const parsed = organizationTypeListRequestSchema.parse(req.query);
     const result = await organizationTypeService.getAllOrganizationTypes(parsed);
     res.status(200).json(result);
   } catch (error) {
@@ -61,7 +61,7 @@ export const updateOrganizationTypeController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationTypeUpdateSchema.parse(req.body);
+    const parsed = organizationTypeUpdateRequestSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 

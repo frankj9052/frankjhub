@@ -1,7 +1,7 @@
 import { OrganizationTypeDto } from "../entity"
 import { OrganizationTypeListPageData, OrganizationTypeListResponse } from "../response"
 
-export const organizationTypeAllDataExample: OrganizationTypeDto = {
+export const organizationTypeDataExample: OrganizationTypeDto = {
   id: 'a1b2c3d4-e5f6-7890-abcd-1234567890ab',
   name: 'Primary Care Clinic',
   description: 'A healthcare facility focused on general medical services.',
