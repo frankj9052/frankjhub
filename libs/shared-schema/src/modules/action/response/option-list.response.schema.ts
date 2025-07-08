@@ -7,10 +7,10 @@ export const actionOptionSchema = actionSchema.pick({
   name: true,
 });
 
-export const actionOptionsSchema = z.array(actionOptionSchema);
+export const actionOptionListSchema = z.array(actionOptionSchema);
 
-export const actionOptionListResponseSchema = createSuccessResponseSchema(actionOptionsSchema);
+export const actionOptionListResponseSchema = createSuccessResponseSchema(actionOptionListSchema);
 
 export type ActionOption = zInfer<typeof actionOptionSchema>;
-export type ActionOptions = zInfer<typeof actionOptionsSchema>;
+export type ActionOptionList = zInfer<typeof actionOptionListSchema>;
 export type ActionOptionListResponse = zInfer<typeof actionOptionListResponseSchema>;

@@ -7,14 +7,14 @@ export const organizationTypeOptionSchema = organizationTypeSchema.pick({
   name: true,
 });
 
-export const organizationTypeOptionsSchema = z.array(organizationTypeOptionSchema);
+export const organizationTypeOptionListSchema = z.array(organizationTypeOptionSchema);
 
 export const organizationTypeOptionListResponseSchema = createSuccessResponseSchema(
-  organizationTypeOptionsSchema
+  organizationTypeOptionListSchema
 );
 
 export type OrganizationTypeOption = zInfer<typeof organizationTypeOptionSchema>;
-export type OrganizationTypeOptions = zInfer<typeof organizationTypeOptionsSchema>;
+export type OrganizationTypeOptionList = zInfer<typeof organizationTypeOptionListSchema>;
 export type OrganizationTypeOptionListResponse = zInfer<
   typeof organizationTypeOptionListResponseSchema
 >;

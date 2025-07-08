@@ -1,7 +1,7 @@
-import { z, zInfer } from '../../libs/z';
-import { organizationSchema } from './organization.schema';
+import { z, zInfer } from '../../../libs/z';
+import { organizationSchema } from '../entity/schema';
 
-export const organizationUpdateSchema = z
+export const organizationUpdateRequestSchema = z
   .object({
     id: organizationSchema.shape.id,
   })
@@ -16,4 +16,4 @@ export const organizationUpdateSchema = z
       .partial().shape
   );
 
-export type OrganizationUpdateSchema = zInfer<typeof organizationUpdateSchema>;
+export type OrganizationUpdateRequest = zInfer<typeof organizationUpdateRequestSchema>;

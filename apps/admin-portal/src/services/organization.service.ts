@@ -2,20 +2,15 @@ import axios from 'axios';
 import { ActionResult } from '@/types';
 import {
   idParamsSchema,
-  organizationCreateSchema,
-  OrganizationCreateSchema,
-  OrganizationPaginatedResponse,
-  OrganizationPaginationParams,
-  organizationUpdateSchema,
-  OrganizationUpdateSchema,
-  OrganizationWithOrgTypeNameSchema,
+  OrganizationListRequest,
+  OrganizationListResponse,
 } from '@frankjhub/shared-schema';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export async function getAllOrganizations(
-  pagination: OrganizationPaginationParams
-): Promise<ActionResult<OrganizationPaginatedResponse>> {
+  pagination: OrganizationListRequest
+): Promise<ActionResult<OrganizationListResponse>> {
   try {
     const res = await axios.get(`${baseURL}/api/organization/list`, {
       withCredentials: true,

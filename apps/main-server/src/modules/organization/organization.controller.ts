@@ -2,9 +2,9 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { OrganizationService } from './organization.service';
 import {
   idParamsSchema,
-  organizationCreateSchema,
-  organizationPaginationSchema,
-  organizationUpdateSchema,
+  organizationCreateRequestSchema,
+  organizationListRequestSchema,
+  organizationUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 
@@ -16,7 +16,7 @@ export const createOrganizationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationCreateSchema.parse(req.body);
+    const parsed = organizationCreateRequestSchema.parse(req.body);
     const createdBy = req.currentUser?.userName;
     if (!createdBy) throw new UnauthorizedError('User identity not found in request');
 
@@ -33,7 +33,7 @@ export const getAllOrganizationsController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationPaginationSchema.parse(req.query);
+    const parsed = organizationListRequestSchema.parse(req.query);
     const result = await organizationService.getAllOrganizations(parsed);
     res.status(200).json(result);
   } catch (error) {
@@ -74,7 +74,7 @@ export const updateOrganizationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = organizationUpdateSchema.parse(req.body);
+    const parsed = organizationUpdateRequestSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 

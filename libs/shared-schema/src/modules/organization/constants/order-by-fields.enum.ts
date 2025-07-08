@@ -1,4 +1,4 @@
-export const OrganizationOrderByFieldsEnum = {
+export const ORGANIZATION_ORDER_BY_FIELDS = {
   NAME: 'name',
   ORG_TYPE_NAME: 'orgTypeName',
   CREATED_AT: 'createdAt',
@@ -6,4 +6,4 @@ export const OrganizationOrderByFieldsEnum = {
 } as const;
 
 export type OrganizationOrderByField =
-  (typeof OrganizationOrderByFieldsEnum)[keyof typeof OrganizationOrderByFieldsEnum];
+  (typeof ORGANIZATION_ORDER_BY_FIELDS)[keyof typeof ORGANIZATION_ORDER_BY_FIELDS];

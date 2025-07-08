@@ -1,10 +1,12 @@
-import { createSuccessResponseSchema } from '../../factories';
-import { z, zInfer } from '../../libs/z';
-import { organizationSchema } from './organization.schema';
+import { createSuccessResponseSchema } from '../../../factories';
+import { z, zInfer } from '../../../libs/z';
+import { organizationSchema } from '../entity/schema';
 
 export const organizationOptionSchema = organizationSchema.pick({
   id: true,
   name: true,
+  orgTypeId: true,
+  orgTypeName: true,
 });
 
 export const organizationOptionListSchema = z.array(organizationOptionSchema);

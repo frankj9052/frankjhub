@@ -18,7 +18,7 @@ import {
 import {
   idParamsSchema,
   organizationTypeCreateRequestSchema,
-  organizationTypeListResponseSchema,
+  organizationTypeListRequestSchema,
   organizationTypeUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
@@ -34,7 +34,7 @@ router.post(
 router.get(
   '/organization-type/list',
   requirePermission(buildPermissionName('organizationType', ['read'])),
-  validateRequest({ query: organizationTypeListResponseSchema }),
+  validateRequest({ query: organizationTypeListRequestSchema }),
   getAllOrganizationTypesController
 );
 

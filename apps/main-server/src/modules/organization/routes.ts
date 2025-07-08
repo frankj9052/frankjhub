@@ -16,10 +16,10 @@ import {
 } from './organization.controller';
 
 import {
-  organizationCreateSchema,
-  organizationUpdateSchema,
-  organizationPaginationSchema,
   idParamsSchema,
+  organizationCreateRequestSchema,
+  organizationListRequestSchema,
+  organizationUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
 const router = Router();
@@ -27,14 +27,14 @@ const router = Router();
 router.post(
   '/organization',
   requirePermission(buildPermissionName('organization', ['create'])),
-  validateRequest({ body: organizationCreateSchema }),
+  validateRequest({ body: organizationCreateRequestSchema }),
   createOrganizationController
 );
 
 router.get(
   '/organization/list',
   requirePermission(buildPermissionName('organization', ['read'])),
-  validateRequest({ query: organizationPaginationSchema }),
+  validateRequest({ query: organizationListRequestSchema }),
   getAllOrganizationsController
 );
 
@@ -54,7 +54,7 @@ router.get(
 router.patch(
   '/organization/update',
   requirePermission(buildPermissionName('organization', ['update'])),
-  validateRequest({ body: organizationUpdateSchema }),
+  validateRequest({ body: organizationUpdateRequestSchema }),
   updateOrganizationController
 );
 

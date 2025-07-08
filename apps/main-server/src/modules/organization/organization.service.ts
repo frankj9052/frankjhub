@@ -4,13 +4,14 @@ import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import {
-  OrganizationCreateSchema,
+  OrganizationCreateRequest,
+  OrganizationDto,
+  OrganizationListRequest,
+  OrganizationListResponse,
+  OrganizationOption,
   OrganizationOptionListResponse,
-  OrganizationPaginatedResponse,
-  OrganizationPaginationParams,
-  OrganizationUpdateSchema,
-  OrganizationWithOrgTypeNameSchema,
-  SuccessResponse,
+  OrganizationSingleResponse,
+  OrganizationUpdateRequest,
 } from '@frankjhub/shared-schema';
 import { OrganizationType } from '../organizationType/entities/OrganizationType';
 import { BadRequestError } from '../common/errors/BadRequestError';
@@ -27,7 +28,7 @@ export class OrganizationService {
   private orgRepo = AppDataSource.getRepository(Organization);
   private orgTypeRepo = AppDataSource.getRepository(OrganizationType);
 
-  buildOrganizationWithOrgTypeName(org: Organization): OrganizationWithOrgTypeNameSchema {
+  buildOrganization(org: Organization): OrganizationDto {
     return {
       id: org.id,
       name: org.name,
@@ -44,10 +45,19 @@ export class OrganizationService {
     };
   }
 
+  buildOrganizationOption(org: Organization): OrganizationOption {
+    return {
+      id: org.id,
+      name: org.name,
+      orgTypeId: org.orgType.id,
+      orgTypeName: org.orgType.name,
+    };
+  }
+
   async createOrganization(
-    data: OrganizationCreateSchema,
+    data: OrganizationCreateRequest,
     createdBy: string
-  ): Promise<Organization> {
+  ): Promise<OrganizationSingleResponse> {
     const { name, description, orgTypeId } = data;
     const log = logger.child({ method: 'createOrganization', name });
 
@@ -66,15 +76,30 @@ export class OrganizationService {
       orgType: { id: orgTypeId },
       createdBy,
     });
-    await this.orgRepo.save(organization);
+    const savedOrg = await this.orgRepo.save(organization);
+
+    const fullOrg = await this.orgRepo.findOne({
+      where: { id: savedOrg.id },
+      relations: {
+        orgType: true,
+      },
+    });
+
+    if (!fullOrg) {
+      throw new NotFoundError('created org not found');
+    }
 
     log.info(`Created organization "${name}"`);
-    return organization;
+    return {
+      status: 'success',
+      message: `Created organization "${name}"`,
+      data: this.buildOrganization(fullOrg),
+    };
   }
 
   async getAllOrganizations(
-    pagination: OrganizationPaginationParams
-  ): Promise<OrganizationPaginatedResponse> {
+    pagination: OrganizationListRequest
+  ): Promise<OrganizationListResponse> {
     const result = await paginateWithOffset({
       repo: this.orgRepo,
       pagination,
@@ -97,30 +122,36 @@ export class OrganizationService {
         return qb.withDeleted().leftJoinAndSelect('t.orgType', 'orgType');
       },
     });
-    const response = {
+    const pageData = {
       ...result,
-      data: result.data.map(org => this.buildOrganizationWithOrgTypeName(org)),
+      data: result.data.map(org => this.buildOrganization(org)),
+    };
+
+    const response: OrganizationListResponse = {
+      status: 'success',
+      message: 'Get organization list successful',
+      data: pageData,
     };
     return response;
   }
 
   async getOrganizationOptionList(): Promise<OrganizationOptionListResponse> {
-    const organizations = await this.orgRepo.find({
-      where: { isActive: true },
-      select: ['id', 'name'],
-      order: { name: 'ASC' },
-    });
+    const organizations = await this.orgRepo
+      .createQueryBuilder('org')
+      .leftJoinAndSelect('org.orgType', 'orgType')
+      .where('org.isActive = :active', { active: true })
+      .select(['org.id', 'org.name', 'orgType.id', 'orgType.name'])
+      .orderBy('org.name', 'ASC')
+      .getMany();
+
     return {
       status: 'success',
       message: 'Fetched organization option list successfully',
-      data: organizations.map(org => ({
-        id: org.id,
-        name: org.name,
-      })),
+      data: organizations.map(org => this.buildOrganizationOption(org)),
     };
   }
 
-  async getOrganizationById(id: string): Promise<OrganizationWithOrgTypeNameSchema> {
+  async getOrganizationById(id: string): Promise<OrganizationSingleResponse> {
     const org = await this.orgRepo.findOne({
       where: { id },
       relations: ['orgType'],
@@ -129,15 +160,23 @@ export class OrganizationService {
     if (!org) {
       throw new NotFoundError(`Organization ${id} not found`);
     }
-    return this.buildOrganizationWithOrgTypeName(org);
+    return {
+      status: 'success',
+      message: 'Get organization successful',
+      data: this.buildOrganization(org),
+    };
   }
 
   async updateOrganization(
-    update: OrganizationUpdateSchema,
+    update: OrganizationUpdateRequest,
     performedBy: string
-  ): Promise<SuccessResponse> {
+  ): Promise<OrganizationSingleResponse> {
     const { id } = update;
-    const org = await this.orgRepo.findOne({ where: { id }, withDeleted: true });
+    const org = await this.orgRepo.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: { orgType: true },
+    });
     if (!org) {
       throw new NotFoundError(`Organization ${id} not found`);
     }
@@ -154,33 +193,53 @@ export class OrganizationService {
     }
 
     org.updatedBy = performedBy;
-    await this.orgRepo.save(org);
+    org.updatedAt = new Date();
+    const savedOrg = await this.orgRepo.save(org);
+
+    const fullOrg = await this.orgRepo.findOne({
+      where: { id: savedOrg.id },
+      relations: {
+        orgType: true,
+      },
+    });
+
+    if (!fullOrg) {
+      throw new NotFoundError('Updated org not found');
+    }
 
     return {
       status: 'success',
-      message: `Organization ${id} updated by ${performedBy}`,
+      message: `Organization ${fullOrg.name} updated by ${performedBy}`,
+      data: this.buildOrganization(fullOrg),
     };
   }
 
-  async softDeleteOrganization(id: string, performedBy: string): Promise<SuccessResponse> {
-    const org = await this.orgRepo.findOne({ where: { id } });
+  async softDeleteOrganization(
+    id: string,
+    performedBy: string
+  ): Promise<OrganizationSingleResponse> {
+    const org = await this.orgRepo.findOne({ where: { id }, relations: { orgType: true } });
     if (!org) {
       throw new NotFoundError(`Organization ${id} not found`);
     }
 
-    await this.orgRepo.update(id, {
-      deletedAt: new Date().toISOString(),
-      deletedBy: performedBy,
-    });
+    org.deletedAt = new Date();
+    org.deletedBy = performedBy;
+    await this.orgRepo.save(org);
 
     return {
       status: 'success',
-      message: `Organization ${id} soft deleted by ${performedBy}`,
+      message: `Organization ${org.name} soft deleted by ${performedBy}`,
+      data: this.buildOrganization(org),
     };
   }
 
-  async restoreOrganization(id: string, performedBy: string): Promise<SuccessResponse> {
-    const org = await this.orgRepo.findOne({ where: { id }, withDeleted: true });
+  async restoreOrganization(id: string, performedBy: string): Promise<OrganizationSingleResponse> {
+    const org = await this.orgRepo.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: { orgType: true },
+    });
     if (!org) {
       throw new NotFoundError(`Organization ${id} not found`);
     }
@@ -188,24 +247,31 @@ export class OrganizationService {
     if (!org.deletedAt) {
       return {
         status: 'success',
-        message: `Organization ${id} is not deleted`,
+        message: `Organization ${org.name} is not deleted`,
+        data: this.buildOrganization(org),
       };
     }
 
-    await this.orgRepo.update(id, {
-      deletedAt: null,
-      deletedBy: null,
-      updatedBy: performedBy,
-    });
+    org.deletedAt = null;
+    org.deletedBy = null;
+    org.updatedAt = new Date();
+    org.updatedBy = performedBy;
+
+    await this.orgRepo.save(org);
 
     return {
       status: 'success',
-      message: `Organization ${id} restored by ${performedBy}`,
+      message: `Organization ${org.name} restored by ${performedBy}`,
+      data: this.buildOrganization(org),
     };
   }
 
-  async hardDeleteOrganization(id: string): Promise<SuccessResponse> {
-    const org = await this.orgRepo.findOne({ where: { id }, withDeleted: true });
+  async hardDeleteOrganization(id: string): Promise<OrganizationSingleResponse> {
+    const org = await this.orgRepo.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: { orgType: true },
+    });
     if (!org) {
       throw new NotFoundError(`Organization ${id} not found`);
     }
@@ -214,7 +280,8 @@ export class OrganizationService {
 
     return {
       status: 'success',
-      message: `Organization ${id} permanently deleted`,
+      message: `Organization ${org.name} permanently deleted`,
+      data: this.buildOrganization(org),
     };
   }
 }
