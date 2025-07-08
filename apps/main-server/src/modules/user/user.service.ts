@@ -3,17 +3,15 @@ import AppDataSource from '../../config/data-source';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import {
-  UserProfilePayload,
-  UserAllProfilePayload,
-  UserPaginatedResponse,
-  UserPaginationParams,
-  UserAllProfileResponse,
-  UserAdminUpdateSchema,
-  SuccessResponse,
+  UserDto,
+  UserListPageData,
+  UserListRequest,
+  UserListResponse,
+  UserSingleResponse,
+  UserUpdateRequest,
 } from '@frankjhub/shared-schema';
 import { User } from './entities/User';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
-import { UserOrganizationRole } from '../organization/entities/UserOrganizationRole';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -27,32 +25,8 @@ const userFilterConditionMap: Record<string, string> = {
 
 export class UserService {
   private userRepo = AppDataSource.getRepository(User);
-  private userOrgRoleRepo = AppDataSource.getRepository(UserOrganizationRole);
-  async getCurrentUserInfo(id: string, email: string): Promise<UserProfilePayload> {
-    const log = logger.child({ method: 'getCurrentUserDetail', email });
-    const user = await this.userRepo.findOne({ where: { id } });
-    if (!user) {
-      log.warn(`User id ${id} not exist`);
-      throw new NotFoundError(`User with id ${id} not found`);
-    }
 
-    return this.buildUserProfile(user);
-  }
-  buildUserProfile(user: User): UserProfilePayload {
-    return {
-      userName: user.userName,
-      email: user.email ?? null,
-      lastName: user.lastName,
-      firstName: user.firstName,
-      middleName: user.middleName ?? null,
-      gender: user.gender,
-      dateOfBirth: user.dateOfBirth.toISOString(),
-      honorific: user.honorific,
-      oauthProvider: user.oauthProvider ?? null,
-      avatarImage: user.avatarImage,
-    };
-  }
-  buildUserAllProfile(user: User): UserAllProfilePayload {
+  buildUser(user: User): UserDto {
     return {
       id: user.id,
       userName: user.userName,
@@ -91,10 +65,7 @@ export class UserService {
     };
   }
 
-  async getUsersAllProfile(
-    email: string,
-    pagination: UserPaginationParams
-  ): Promise<UserPaginatedResponse> {
+  async getUserList(email: string, pagination: UserListRequest): Promise<UserListResponse> {
     const paginatedUsers = await paginateWithOffset({
       repo: this.userRepo,
       where: { email: Not(email) },
@@ -123,15 +94,20 @@ export class UserService {
         return qb.withDeleted();
       },
     });
-    const response: UserPaginatedResponse = {
+    const userListPageData: UserListPageData = {
       ...paginatedUsers,
-      data: paginatedUsers.data.map(user => this.buildUserAllProfile(user)),
-    } as UserPaginatedResponse;
-    return response;
+      data: paginatedUsers.data.map(user => this.buildUser(user)),
+    };
+
+    return {
+      status: 'success',
+      message: 'Get user list successful',
+      data: userListPageData,
+    };
   }
 
-  async getUserAllProfileById(id: string): Promise<UserAllProfileResponse> {
-    const log = logger.child({ method: 'getUserAllProfileById', id });
+  async getUserById(id: string): Promise<UserSingleResponse> {
+    const log = logger.child({ method: 'getUserById', id });
     const user = await this.userRepo.findOne({
       where: {
         id,
@@ -142,30 +118,38 @@ export class UserService {
       log.warn(`User id ${id} not exist`);
       throw new NotFoundError(`User with id ${id} not found`);
     }
-    const response: UserAllProfileResponse = {
-      data: this.buildUserAllProfile(user),
+    return {
       status: 'success',
+      message: 'Get user successful',
+      data: this.buildUser(user),
     };
-    return response;
   }
 
-  async softDeleteUser(id: string, performedBy: string): Promise<SuccessResponse> {
-    const log = logger.child({ method: 'softDeleteUserById', id });
-    await this.userRepo.update(
-      { id },
-      {
-        deletedAt: new Date().toISOString(),
-        deletedBy: performedBy,
-      }
-    );
+  async softDeleteUser(id: string, performedBy: string): Promise<UserSingleResponse> {
+    const log = logger.child({ method: 'softDeleteUser', id });
+    const user = await this.userRepo.findOne({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    user.deletedAt = new Date();
+    user.deletedBy = performedBy;
+    user.updatedAt = new Date();
+    user.updatedBy = performedBy;
+
+    await this.userRepo.save(user);
     log.info(`User soft-deleted by ${performedBy}`);
     return {
       status: 'success',
-      message: `User soft-deleted by ${performedBy}`,
+      message: `User ${user.userName} is deleted by ${performedBy}`,
+      data: this.buildUser(user),
     };
   }
 
-  async restoreSoftDeletedUser(id: string, performedBy: string): Promise<SuccessResponse> {
+  async restoreSoftDeletedUser(id: string, performedBy: string): Promise<UserSingleResponse> {
     const log = logger.child({ method: 'restoreSoftDeletedUser', id, performedBy });
 
     const user = await this.userRepo.findOne({
@@ -182,43 +166,46 @@ export class UserService {
       log.info(`User ${id} is not deleted, no need to restore`);
       return {
         status: 'success',
-        message: `User ${id} is not deleted, no need to restore`,
+        message: `User ${user.userName} is not deleted, no need to restore`,
+        data: this.buildUser(user),
       };
     }
 
-    await this.userRepo.update(
-      { id },
-      {
-        deletedAt: null,
-        deletedBy: null,
-      }
-    );
+    user.deletedAt = null;
+    user.deletedBy = null;
+    user.updatedAt = new Date();
+    user.updatedBy = performedBy;
+
+    await this.userRepo.save(user);
+
     log.info(`User ${id} restored by ${performedBy}`);
     return {
       status: 'success',
-      message: `User ${id} restored by ${performedBy}`,
+      message: `User ${user.userName} restored by ${performedBy}`,
+      data: this.buildUser(user),
     };
   }
 
-  async hardDeleteUser(id: string, performedBy: string): Promise<SuccessResponse> {
+  async hardDeleteUser(id: string, performedBy: string): Promise<UserSingleResponse> {
     const log = logger.child({ method: 'hardDeleteUser', id, performedBy });
     try {
       const user = await this.userRepo.findOne({
         where: { id },
-        relations: ['userOrganizationRoles'],
+        relations: {
+          userOrganizationRoles: true,
+        },
         withDeleted: true,
       });
       if (!user) {
         log.warn(`User ${id} not found for hard deletion.`);
         throw new NotFoundError('User id not found');
       }
-      // 因为user中没有写关系，手动加关联
-      const userOrganizationRoles = await this.userOrgRoleRepo.findBy({ user: { id } });
-      (user as any).userOrganizationRoles = userOrganizationRoles;
+
       await this.userRepo.remove(user);
       return {
         status: 'success',
-        message: `User ${id} has been permanently deleted.`,
+        message: `User ${user.userName} has been permanently deleted.`,
+        data: this.buildUser(user),
       };
     } catch (error) {
       log.error(`Failed to hard delete user ${id}`);
@@ -226,12 +213,9 @@ export class UserService {
     }
   }
 
-  async updateUserByAdmin(
-    data: UserAdminUpdateSchema,
-    performedBy: string
-  ): Promise<SuccessResponse> {
+  async updateUser(data: UserUpdateRequest, performedBy: string): Promise<UserSingleResponse> {
     const { id } = data;
-    const log = logger.child({ method: 'updateUserByAdmin', id, performedBy });
+    const log = logger.child({ method: 'updateUser', id, performedBy });
     const user = await this.userRepo.findOne({ where: { id }, withDeleted: true });
     if (!user) {
       log.warn(`User ${id} not found for admin update`);
@@ -245,11 +229,15 @@ export class UserService {
       }
     }
 
+    user.updatedAt = new Date();
+    user.updatedBy = performedBy;
+
     await this.userRepo.save(user);
     log.info(`User ${id} updated by ${performedBy}`);
     return {
       status: 'success',
-      message: `User ${id} updated by ${performedBy}`,
+      message: `User ${user.userName} updated by ${performedBy}`,
+      data: this.buildUser(user),
     };
   }
 }

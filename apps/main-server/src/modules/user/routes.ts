@@ -2,37 +2,37 @@ import './docs/openapi';
 import { Router } from 'express';
 import { requireAuth } from '../auth/middlewares/requireAuth';
 import {
-  getCurrentUserProfileController,
-  getUserAllProfileByIdController,
-  getUsersAllProfileController,
+  getCurrentUserController,
+  getUserByIdController,
+  getUserListController,
   hardDeleteUserController,
   restoreSoftDeletedUserController,
   softDeleteUserController,
-  updateUserByAdminController,
+  updateUserController,
 } from './user.controller';
 import { requirePermission } from '../common/middlewares/requirePermission';
 import { buildPermissionName } from '../codecs/permissionCodec';
 import { validateRequest } from '../common/middlewares/validateRequest';
 import {
-  userAdminUpdateSchema,
-  userAllProfilePaginationSchema,
   idParamsSchema,
+  userListRequestSchema,
+  userUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
 const router = Router();
 
-router.get('/user/current-user-profile', requireAuth, getCurrentUserProfileController);
+router.get('/user/current-user', requireAuth, getCurrentUserController);
 router.get(
-  '/user/users-all-profile',
+  '/user/list',
   requirePermission(buildPermissionName('user', ['read'])),
-  validateRequest({ query: userAllProfilePaginationSchema }),
-  getUsersAllProfileController
+  validateRequest({ query: userListRequestSchema }),
+  getUserListController
 );
 router.get(
   '/user/:id',
   requirePermission(buildPermissionName('user', ['read'])),
   validateRequest({ params: idParamsSchema }),
-  getUserAllProfileByIdController
+  getUserByIdController
 );
 
 router.patch(
@@ -57,10 +57,10 @@ router.delete(
 );
 
 router.patch(
-  '/user/admin-update',
+  '/user/update',
   requirePermission(buildPermissionName('user', ['update'])),
-  validateRequest({ body: userAdminUpdateSchema }),
-  updateUserByAdminController
+  validateRequest({ body: userUpdateRequestSchema }),
+  updateUserController
 );
 
 export function register(parent: Router) {

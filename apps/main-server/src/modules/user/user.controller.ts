@@ -2,38 +2,32 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { UserService } from './user.service';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import {
-  UserProfileResponse,
-  userAdminUpdateSchema,
-  userAllProfilePaginationSchema,
   idParamsSchema,
+  userListRequestSchema,
+  userUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
 const userService = new UserService();
 
-export const getCurrentUserProfileController: RequestHandler = async (
+export const getCurrentUserController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const id = req.currentUser?.id;
-    const email = req.currentUser?.email;
 
-    if (!id || !email) {
+    if (!id) {
       throw new UnauthorizedError('User identity not found in request');
     }
-    const userProfile = await userService.getCurrentUserInfo(id, email);
-    const response: UserProfileResponse = {
-      status: 'success',
-      data: userProfile,
-    };
+    const response = await userService.getUserById(id);
     res.status(200).json(response);
   } catch (error) {
     next(error);
   }
 };
 
-export const getUsersAllProfileController: RequestHandler = async (
+export const getUserListController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,22 +35,22 @@ export const getUsersAllProfileController: RequestHandler = async (
   try {
     const email = req.currentUser?.email;
     if (!email) throw new UnauthorizedError('User identity not found in request');
-    const pagination = userAllProfilePaginationSchema.parse(req.query);
-    const response = await userService.getUsersAllProfile(email, pagination);
+    const pagination = userListRequestSchema.parse(req.query);
+    const response = await userService.getUserList(email, pagination);
     res.status(200).json(response);
   } catch (error) {
     next(error);
   }
 };
 
-export const getUserAllProfileByIdController: RequestHandler = async (
+export const getUserByIdController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params;
-    const response = await userService.getUserAllProfileById(id);
+    const response = await userService.getUserById(id);
     res.status(200).json(response);
   } catch (error) {
     next(error);
@@ -117,18 +111,18 @@ export const hardDeleteUserController: RequestHandler = async (
   }
 };
 
-export const updateUserByAdminController: RequestHandler = async (
+export const updateUserController: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const parsed = userAdminUpdateSchema.parse(req.body);
+    const parsed = userUpdateRequestSchema.parse(req.body);
     const userName = req.currentUser?.userName;
     if (!userName) {
       throw new UnauthorizedError('User identity not found in request');
     }
-    const response = await userService.updateUserByAdmin(parsed, userName);
+    const response = await userService.updateUser(parsed, userName);
     res.status(200).json(response);
   } catch (error) {
     next(error);
