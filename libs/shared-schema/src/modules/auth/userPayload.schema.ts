@@ -9,7 +9,7 @@ const orgRoleSchema = z.object({
   permissionStrings: z.array(z.string()),
 });
 
-const userPayloadSchema = z.object({
+export const userPayloadSchema = z.object({
   id: z.string().uuid(),
   userName: z.string(),
   email: z.string().email().optional(),
@@ -18,11 +18,6 @@ const userPayloadSchema = z.object({
   isActive: z.boolean().optional(),
   sessionVersion: z.string().uuid(),
   orgRoles: z.array(orgRoleSchema),
-});
-
-export const currentUserSchema = z.object({
-  status: z.literal('success'),
-  data: userPayloadSchema,
 });
 
 export type UserPayload = zInfer<typeof userPayloadSchema>;

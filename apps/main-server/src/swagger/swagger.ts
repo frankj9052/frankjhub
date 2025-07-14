@@ -5,7 +5,7 @@ import { env } from '../config/env';
 import { Express } from 'express';
 import { registry } from '../config/openapiRegistry';
 import { createLoggerWithContext } from '../modules/common/libs/logger';
-import { baseErrorExample, baseErrorResponseSchema } from '@frankjhub/shared-schema';
+import { baseErrorResponseSchema, baseErrorExample } from '@frankjhub/shared-schema';
 import { registerErrorResponsesFromFiles } from '../modules/common/utils/registerErrorResponseFromFiles';
 import path from 'path';
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { AuthService } from './auth.service';
+import { loginRequestSchema, UserPayload } from '@frankjhub/shared-schema';
 
 const authService = new AuthService();
 
@@ -9,8 +10,10 @@ export const loginController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { email, password } = req.body;
-    const userPayload = await authService.login(email, password);
+    // const { email, password } = req.body;
+    const parsed = loginRequestSchema.parse(req.body);
+    const result = await authService.login(parsed);
+    const userPayload: UserPayload = result.data;
 
     // 保存用户信息到 session
     req.session.user = {
@@ -24,10 +27,7 @@ export const loginController: RequestHandler = async (
     // currentUser 立即挂载用于响应/中间件使用
     req.currentUser = userPayload;
 
-    res.status(200).json({
-      status: 'success',
-      data: userPayload,
-    });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

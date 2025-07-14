@@ -1,7 +1,8 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
 import { buildPermissionName } from '../../codecs/permissionCodec';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Resource } from '../../resource/entities/Resource';
+import { PermissionAction } from './PermissionAction';
 
 @Entity()
 @Index(['name'], { unique: true })
@@ -22,6 +23,9 @@ export class Permission extends BaseEntity {
 
   @ManyToOne(() => Resource, { nullable: false })
   resource!: Resource;
+
+  @OneToMany(() => PermissionAction, pa => pa.permission, { nullable: false, onDelete: 'CASCADE' })
+  permissionActions!: PermissionAction[];
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;

@@ -1,9 +1,19 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { RoleSource } from '../../common/enums/roleSource.enum';
 import { OrganizationType } from '../../organizationType/entities/OrganizationType';
+import { RolePermission } from './RolePermission';
 
 @Entity()
 @Index(['name', 'roleSource', 'organizationType', 'organization'], { unique: true })
@@ -36,6 +46,9 @@ export class Role extends BaseEntity {
   @ManyToOne(() => Organization, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
   organization?: Organization;
+
+  @OneToMany(() => RolePermission, rp => rp.role, { nullable: true, onDelete: 'CASCADE' })
+  rolePermissions!: RolePermission[];
 
   @BeforeInsert()
   @BeforeUpdate()

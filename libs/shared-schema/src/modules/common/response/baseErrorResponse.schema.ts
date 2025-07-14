@@ -1,4 +1,4 @@
-import { z, zInfer } from '../../libs/z';
+import { z, zInfer } from '../../../libs/z';
 
 export const baseErrorResponseSchema = z.object({
   timestamp: z.string().datetime(), // ISO8601 时间戳

@@ -1,30 +1,11 @@
-import z from 'zod';
 import { registry } from '../../../config/openapiRegistry';
-import { loginSchema, currentUserSchema, userPayloadExample } from '@frankjhub/shared-schema';
-
-// LoginRequest
-registry.register(
-  'LoginRequest',
-  loginSchema.openapi({
-    description: 'Login request body containing user credentials',
-    example: {
-      email: 'test@example.com',
-      password: 'password123',
-    },
-  })
-);
-
-// CurrentUserResponse
-registry.register(
-  'CurrentUserResponse',
-  currentUserSchema.openapi({
-    description: 'Response schema containing the current authenticated user information',
-    example: {
-      status: 'success',
-      data: userPayloadExample,
-    },
-  })
-);
+import {
+  userPayloadExample,
+  loginRequestSchema,
+  loginResponseSchema,
+  buildErrorResponses,
+  baseResponseSchema,
+} from '@frankjhub/shared-schema';
 
 // ✅ Register API path: /auth/login
 registry.registerPath({
@@ -37,9 +18,12 @@ registry.registerPath({
       description: 'Email and password required for login',
       content: {
         'application/json': {
-          schema: {
-            $ref: '#/components/schemas/LoginRequest',
-          },
+          schema: loginRequestSchema.openapi({
+            example: {
+              email: 'jurong@noqclinic.com',
+              password: 'fake_password',
+            },
+          }),
         },
       },
     },
@@ -49,18 +33,20 @@ registry.registerPath({
       description: 'Login successful',
       content: {
         'application/json': {
-          schema: {
-            $ref: '#components/schemas/CurrentUserResponse',
-          },
+          schema: loginResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Login successful',
+              data: userPayloadExample,
+            },
+          }),
         },
       },
     },
-    401: {
-      description: 'Authentication failed (invalid credentials)',
-    },
-    422: {
-      description: 'Validation failed (invalid request body)',
-    },
+    ...buildErrorResponses({
+      401: 'NotAuthorizedError',
+      422: 'BadRequestError',
+    }),
   },
 });
 
@@ -75,15 +61,19 @@ registry.registerPath({
       description: 'User is authenticated. Returns session-bound user information.',
       content: {
         'application/json': {
-          schema: {
-            $ref: '#components/schemas/CurrentUserResponse',
-          },
+          schema: loginResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Login successful',
+              data: userPayloadExample,
+            },
+          }),
         },
       },
     },
-    401: {
-      description: 'Authentication required. User is not logged in or session is invalid.',
-    },
+    ...buildErrorResponses({
+      401: 'NotAuthorizedError',
+    }),
   },
 });
 
@@ -98,23 +88,17 @@ registry.registerPath({
       description: 'Logout successful',
       content: {
         'application/json': {
-          schema: z.object({
-            status: z.literal('success'),
-            message: z.literal('Logout successful'),
+          schema: baseResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Logout successful',
+            },
           }),
         },
       },
     },
-    500: {
-      description: 'Logout failed (server error)',
-      content: {
-        'application/json': {
-          schema: z.object({
-            status: z.literal('error'),
-            message: z.literal('Logout failed'),
-          }),
-        },
-      },
-    },
+    ...buildErrorResponses({
+      500: 'InternalServerError',
+    }),
   },
 });
