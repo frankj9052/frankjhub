@@ -1,8 +1,9 @@
+import { ErrorDetails } from '@frankjhub/shared-schema';
 import { BaseError } from './BaseError';
 import { StatusCodes } from 'http-status-codes';
 
 export class InvocationError extends BaseError {
-  constructor(methodName?: string, details?: unknown) {
+  constructor(methodName?: string, details?: ErrorDetails) {
     const extraDetails = methodName
       ? { method: methodName, ...(typeof details === 'object' && details !== null ? details : {}) }
       : details;

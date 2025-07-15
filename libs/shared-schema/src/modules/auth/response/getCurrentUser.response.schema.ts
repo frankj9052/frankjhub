@@ -3,5 +3,5 @@ import {
   sessionResponseSchema,
 } from '../../../modules/common/response/sessionResponse.schema';
 
-export { sessionResponseSchema as loginResponseSchema };
-export type LoginResponse = SessionResponse;
+export { sessionResponseSchema as getCurrentUserResponseSchema };
+export type GetCurrentUserResponse = SessionResponse;

@@ -10,7 +10,6 @@ export const loginController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    // const { email, password } = req.body;
     const parsed = loginRequestSchema.parse(req.body);
     const result = await authService.login(parsed);
     const userPayload: UserPayload = result.data;
@@ -33,15 +32,29 @@ export const loginController: RequestHandler = async (
   }
 };
 
-export const logoutController: RequestHandler = (req: Request, res: Response) => {
-  req.session.destroy(err => {
-    if (err) res.status(500).json({ status: 'error', message: 'Logout failed' });
-
+export const logoutController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await authService.logout(req);
     res.clearCookie('connect.sid');
-    res.status(200).json({ status: 'success', message: 'Logout successful' });
-  });
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const currentUserController: RequestHandler = (req: Request, res: Response) => {
-  res.status(200).json({ status: 'success', data: req.currentUser });
+export const currentUserController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const result = await authService.getCurrentUser(req);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
 };

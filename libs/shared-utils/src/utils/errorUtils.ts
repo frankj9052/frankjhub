@@ -1,7 +1,7 @@
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form';
 import type { ZodIssue } from 'zod';
 import axios from 'axios';
-import { baseErrorResponseSchema } from '@frankjhub/shared-schema';
+import { BaseErrorResponse, baseErrorResponseSchema } from '@frankjhub/shared-schema';
 
 export function handleFormServerErrors<TFieldValues extends FieldValues>(
   errorResponse: { error: string | ZodIssue[] },
@@ -15,6 +15,26 @@ export function handleFormServerErrors<TFieldValues extends FieldValues>(
   } else {
     setError('root.serverError', { message: errorResponse.error });
   }
+}
+
+/**
+ * 尝试解析服务器返回的错误对象为 BaseErrorResponse
+ */
+export function parseError(error: unknown): BaseErrorResponse {
+  if (
+    axios.isAxiosError(error) &&
+    error.response?.data &&
+    typeof error.response.data === 'object'
+  ) {
+    const parsed = baseErrorResponseSchema.safeParse(error.response.data);
+    if (parsed.success) return parsed.data;
+  }
+  return {
+    status: 500,
+    code: 'UNHANDLED_CLIENT_ERROR',
+    message: error instanceof Error ? error.message : 'Unknown error',
+    timestamp: new Date().toISOString(),
+  };
 }
 
 /**

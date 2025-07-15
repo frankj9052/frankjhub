@@ -5,7 +5,15 @@ import { User } from '../user/entities/User';
 import AppDataSource from '../../config/data-source';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { UserOrganizationRole } from '../organization/entities/UserOrganizationRole';
-import { LoginRequest, LoginResponse, UserPayload } from '@frankjhub/shared-schema';
+import {
+  BaseResponse,
+  GetCurrentUserResponse,
+  LoginRequest,
+  LoginResponse,
+  UserPayload,
+} from '@frankjhub/shared-schema';
+import { Request } from 'express';
+import { InternalServerError } from '../common/errors/InternalServerError';
 
 const logger = createLoggerWithContext('AuthService');
 
@@ -98,5 +106,36 @@ export class AuthService {
       throw new NotAuthorizedError('User not found', { userId });
     }
     return this.buildUserPayload(user);
+  }
+
+  async logout(req: Request): Promise<BaseResponse> {
+    const log = logger.child({ method: 'logout', userId: req.session?.user?.id });
+
+    await new Promise<void>((resolve, reject) => {
+      req.session.destroy(err => {
+        if (err) {
+          log.error('Session destroy failed', { error: err });
+          return reject(new InternalServerError('Logout failed'));
+        }
+        resolve();
+      });
+    });
+
+    return {
+      status: 'success',
+      message: 'Logout successful',
+    };
+  }
+
+  async getCurrentUser(req: Request): Promise<GetCurrentUserResponse> {
+    const user = req.currentUser;
+    if (!user) {
+      throw new NotAuthorizedError('User not authenticated');
+    }
+    return {
+      status: 'success',
+      message: 'get current user successful',
+      data: user,
+    };
   }
 }

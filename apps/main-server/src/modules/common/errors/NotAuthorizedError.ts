@@ -1,9 +1,10 @@
 // NotAuthorizedError.ts
+import { ErrorDetails } from '@frankjhub/shared-schema';
 import { BaseError } from './BaseError';
 import { StatusCodes } from 'http-status-codes';
 
 export class NotAuthorizedError extends BaseError {
-  constructor(action?: string, details?: unknown) {
+  constructor(action?: string, details?: ErrorDetails) {
     const extraDetails = action
       ? { action, ...(typeof details === 'object' && details !== null ? details : {}) }
       : details;

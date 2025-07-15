@@ -1,4 +1,4 @@
-import { BaseErrorResponse } from '@frankjhub/shared-schema';
+import { BaseErrorResponse, ErrorDetails } from '@frankjhub/shared-schema';
 import { StatusCodes } from 'http-status-codes';
 
 /**
@@ -8,7 +8,7 @@ export interface ErrorOptions {
   code: string; // 业务唯一 error-code
   status?: number; // HTTP 状态码，默认 500
   message: string; // 对外的错误信息（可支持 i18n）
-  details?: unknown; // 附加调试信息（如 zod 报错详情）
+  details?: ErrorDetails; // 附加调试信息（如 zod 报错详情）
   cause?: unknown; // 原始异常（支持 ES2022 Error cause）
 }
 
@@ -25,7 +25,7 @@ interface WithRequestId {
 export abstract class BaseError extends Error {
   public readonly code: string;
   public readonly status: number;
-  public readonly details: unknown;
+  public readonly details: ErrorDetails | undefined;
   public readonly isOperational = true;
   public readonly timestamp = new Date().toISOString();
 

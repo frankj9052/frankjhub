@@ -1,9 +1,10 @@
 // UnauthorizedError.ts
+import { ErrorDetails } from '@frankjhub/shared-schema';
 import { BaseError } from './BaseError';
 import { StatusCodes } from 'http-status-codes';
 
 export class UnauthorizedError extends BaseError {
-  constructor(details?: unknown) {
+  constructor(details?: ErrorDetails) {
     super({
       code: 'UNAUTHORIZED',
       status: StatusCodes.UNAUTHORIZED, // 401 表示未认证

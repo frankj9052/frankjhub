@@ -1,42 +1,24 @@
+import { get } from '@/libs/axios/client';
 import { ActionResult } from '@/types';
 import {
-  userAdminUpdateSchema,
-  UserAdminUpdateSchema,
-  userAllProfilePaginationSchema,
-  UserAllProfileResponse,
+  ApiResponse,
   idParamsSchema,
-  UserPaginatedResponse,
+  UserListRequest,
+  UserListResponse,
+  UserSingleResponse,
 } from '@frankjhub/shared-schema';
 import axios from 'axios';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-export async function getUserProfileClient(): Promise<ActionResult<any>> {
-  try {
-    const result = await axios.get(`${baseURL}/api/user/current-user-profile`, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: result.data };
-  } catch (error) {
-    const message = axios.isAxiosError(error)
-      ? error.response?.data?.details || error.message
-      : 'Unknown login error';
-    return { status: 'error', error: message };
-  }
+export async function getUserProfileClient(): Promise<ApiResponse<UserSingleResponse>> {
+  const response = await get<UserSingleResponse>('/api/user/current-user-profile');
+  return response;
 }
 
-interface Props {
-  pagination: {
-    limit?: string | number;
-    offset?: string | number;
-    order?: string;
-    orderBy?: string;
-  };
-}
-
-export async function getUsersAllProfile({
-  pagination,
-}: Props): Promise<ActionResult<UserPaginatedResponse>> {
+export async function getUsersAllProfile(
+  pagination: UserListRequest
+): Promise<ApiResponse<UserListResponse>> {
   try {
     const parsed = userAllProfilePaginationSchema.parse(pagination);
 

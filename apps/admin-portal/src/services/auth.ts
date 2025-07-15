@@ -1,57 +1,45 @@
-import { LoginSchema } from '@/libs/schemas/loginSchema';
-import { ActionResult } from '@/types';
-import axios from 'axios';
+import { get, post } from '@/libs/axios/client';
+import {
+  ApiResponse,
+  BaseResponse,
+  GetCurrentUserResponse,
+  LoginRequest,
+  loginRequestSchema,
+  LoginResponse,
+} from '@frankjhub/shared-schema';
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
-interface OrgRole {
-  orgId: string;
-  orgName: string;
-  orgType: string;
-  roleCode: string;
-  roleName: string;
-  permissionStrings: string[];
-}
-
-export async function loginClient(data: LoginSchema): Promise<ActionResult<any>> {
-  try {
-    const result = await axios.post(`${baseURL}/api/auth/login`, data, {
-      withCredentials: true,
-    });
-    const hasPermission = result.data.data.orgRoles.some(
-      (orgRole: OrgRole) => orgRole.orgType === 'platform'
-    );
+export async function loginClient(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
+  const parsedInput = loginRequestSchema.safeParse(data);
+  if (!parsedInput.success) {
+    return {
+      status: 400,
+      code: 'VALIDATION_ERROR',
+      message: 'Invalid login request',
+      details: parsedInput.error.issues,
+      timestamp: new Date().toISOString(),
+    };
+  }
+  const response = await post<LoginResponse>(`/api/auth/login`, parsedInput.data);
+  if (response.status === 'success') {
+    const hasPermission = response.data.orgRoles.some(orgRole => orgRole.orgType === 'platform');
     if (!hasPermission) {
-      throw new Error('Email or password is incorrect');
+      return {
+        status: 403,
+        code: 'NO_PLATFORM_PERMISSION',
+        message: 'Email or password is incorrect',
+        timestamp: new Date().toISOString(),
+      };
     }
-    return { status: 'success', data: result.data };
-  } catch (error) {
-    const message = axios.isAxiosError(error)
-      ? error.response?.data?.details || error.message
-      : error instanceof Error
-      ? error.message
-      : 'Unknown login error';
-    return { status: 'error', error: message };
   }
+  return response;
 }
 
-export async function getSessionClient() {
-  try {
-    const res = await axios.get(`${baseURL}/api/auth/current-user`, {
-      withCredentials: true,
-    });
-    return res.data;
-  } catch {
-    return null;
-  }
+export async function getSessionClient(): Promise<ApiResponse<GetCurrentUserResponse>> {
+  const response = await get<GetCurrentUserResponse>(`/api/auth/current-user`);
+  return response;
 }
 
-export async function logoutClient() {
-  try {
-    await axios.get(`${baseURL}/api/auth/logout`, {
-      withCredentials: true,
-    });
-    return { status: 'success' };
-  } catch {
-    return { status: 'error', error: 'Logout failed' };
-  }
+export async function logoutClient(): Promise<ApiResponse<BaseResponse>> {
+  const response = await get<BaseResponse>(`/api/auth/logout`);
+  return response;
 }
