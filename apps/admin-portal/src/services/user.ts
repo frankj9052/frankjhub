@@ -4,6 +4,7 @@ import {
   ApiResponse,
   idParamsSchema,
   UserListRequest,
+  userListRequestSchema,
   UserListResponse,
   UserSingleResponse,
 } from '@frankjhub/shared-schema';
@@ -19,6 +20,19 @@ export async function getUserProfileClient(): Promise<ApiResponse<UserSingleResp
 export async function getUsersAllProfile(
   pagination: UserListRequest
 ): Promise<ApiResponse<UserListResponse>> {
+  const parsedInput = userListRequestSchema.safeParse(pagination);
+  const response = await get<UserListResponse>(`/api/user/list`, {
+    params: parsed,
+  });
+  if (!parsedInput.success) {
+    return {
+      status: 400,
+      code: 'VALIDATION_ERROR',
+      message: 'Invalid get user list request',
+      details: parsedInput.error.issues,
+      timestamp: new Date().toISOString(),
+    };
+  }
   try {
     const parsed = userAllProfilePaginationSchema.parse(pagination);
 

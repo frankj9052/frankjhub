@@ -15,7 +15,8 @@
     }
   },
   "dependencies": {
-    "zod": "^3.25.42"
+    "zod": "^3.25.42",
+    "@asteasolutions/zod-to-openapi": "7.3.2"
   },
   "nx": {
     "sourceRoot": "libs/shared-schema"
