@@ -10,5 +10,12 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": []
+  "references": [
+    {
+      "path": "../shared-schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../server-common/tsconfig.lib.json"
+    }
+  ]
 }

@@ -1,5 +1,5 @@
 import { FieldValues, Path, UseFormSetError } from 'react-hook-form';
-import type { ZodIssue } from 'zod';
+import type { ZodError, ZodIssue } from 'zod';
 import axios from 'axios';
 import { BaseErrorResponse, baseErrorResponseSchema } from '@frankjhub/shared-schema';
 
@@ -85,4 +85,13 @@ export function getErrorMessage(error: unknown, fallbackMessage = 'Unexpected er
 
   // fallback
   return fallbackMessage;
+}
+
+export function convertZodIssuesToErrorDetails(error: ZodError): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const path = issue.path.join('.') || 'root';
+    result[path] = issue.message;
+  }
+  return result;
 }

@@ -22,7 +22,7 @@ export async function getUsersAllProfile(
 ): Promise<ApiResponse<UserListResponse>> {
   const parsedInput = userListRequestSchema.safeParse(pagination);
   const response = await get<UserListResponse>(`/api/user/list`, {
-    params: parsed,
+    params: parsedInput,
   });
   if (!parsedInput.success) {
     return {
