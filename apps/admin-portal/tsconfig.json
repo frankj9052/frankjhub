@@ -47,16 +47,19 @@
   ],
   "references": [
     {
+      "path": "../../libs/shared-errors"
+    },
+    {
       "path": "../../libs/shared-ui-client"
+    },
+    {
+      "path": "../../libs/shared-hooks"
     },
     {
       "path": "../../libs/shared-ui-hero-client"
     },
     {
       "path": "../../libs/shared-utils"
-    },
-    {
-      "path": "../../libs/shared-hooks"
     },
     {
       "path": "../../libs/shared-schema"
