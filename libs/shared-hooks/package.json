@@ -1,7 +1,6 @@
 {
   "name": "@frankjhub/shared-hooks",
   "version": "0.0.1",
-  "type": "module",
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.esm.d.ts",

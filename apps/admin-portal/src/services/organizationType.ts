@@ -1,16 +1,5 @@
 import axios from 'axios';
-import { ActionResult } from '@/types';
-import {
-  idParamsSchema,
-  organizationTypeCreateSchema,
-  OrganizationTypeCreateSchema,
-  OrganizationTypePaginatedResponse,
-  OrganizationTypePaginationParams,
-  OrganizationTypeSchema,
-  organizationTypeUpdateSchema,
-  OrganizationTypeUpdateSchema,
-  OrgTypeOptionsSchema,
-} from '@frankjhub/shared-schema';
+import { idParamsSchema } from '@frankjhub/shared-schema';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 

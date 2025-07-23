@@ -15,3 +15,6 @@ export * from './useTimer';
 
 // 获取窗口尺寸
 export * from './useWindowSize';
+
+// markdown提取文字和格式内容
+export * from './useMarkdown';
