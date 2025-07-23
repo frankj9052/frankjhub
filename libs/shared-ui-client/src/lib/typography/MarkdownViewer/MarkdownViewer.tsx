@@ -1,4 +1,5 @@
 import { useMarkdown } from '@frankjhub/shared-hooks';
+import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
 
 /**
@@ -22,14 +23,14 @@ import ReactMarkdown from 'react-markdown';
  *
  * 渲染时，组件使用 `prose` 类以 Tailwind Typography 风格美化 markdown。
  */
-export default function MarkdownViewer({ url }: { url: string }) {
+export function MarkdownViewer({ url, className }: { url: string; className?: string }) {
   const { content, loading, error } = useMarkdown(url);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading markdown</div>;
 
   return (
-    <div className="prose max-w-none">
+    <div className={clsx('prose max-w-none', className)}>
       <ReactMarkdown>{content}</ReactMarkdown>
     </div>
   );

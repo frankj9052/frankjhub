@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import MarkdownViewer from './MarkdownViewer';
+import { MarkdownViewer } from './MarkdownViewer';
 
 const meta = {
   title: 'Shared-UI-Client/Typography/MarkdownViewer/MarkdownViewer',

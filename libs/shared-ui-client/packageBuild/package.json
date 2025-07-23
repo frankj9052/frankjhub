@@ -1,6 +1,6 @@
 {
   "name": "@frankjhub/shared-ui-client",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",
