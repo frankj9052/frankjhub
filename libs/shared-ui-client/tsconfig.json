@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-hooks"
+    },
+    {
       "path": "../shared-ui-core"
     },
     {

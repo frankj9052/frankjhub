@@ -1,5 +1,6 @@
 const { heroui } = require('@heroui/react');
 const { createGlobPatternsForDependencies } = require('@nx/next/tailwind');
+const typography = require('@tailwindcss/typography');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -15,5 +16,5 @@ module.exports = {
   theme: {
     extend: {},
   },
-  plugins: [heroui()],
+  plugins: [heroui(), typography],
 };
