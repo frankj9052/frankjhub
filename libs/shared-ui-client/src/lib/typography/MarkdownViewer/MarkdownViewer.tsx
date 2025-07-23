@@ -1,7 +1,9 @@
+import './github.css';
 import { useMarkdown } from '@frankjhub/shared-hooks';
 import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
-
+import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
 /**
  * MarkdownViewer 组件
  *
@@ -30,8 +32,11 @@ export function MarkdownViewer({ url, className }: { url: string; className?: st
   if (error) return <div>Error loading markdown</div>;
 
   return (
-    <div className={clsx('prose max-w-none', className)}>
-      <ReactMarkdown>{content}</ReactMarkdown>
+    <div className={clsx('prose max-w-none', className || '')}>
+      {/* // <div id="write"> */}
+      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }
