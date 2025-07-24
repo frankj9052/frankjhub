@@ -26,7 +26,7 @@ export async function getUsersAllProfile(
     return error;
   }
   const response = await get<UserListResponse>(`/api/user/list`, {
-    params: parsedInput,
+    params: parsedInput.data,
   });
   return response;
 }
@@ -51,7 +51,9 @@ export async function softDeleteUser(id: string): Promise<ApiResponse<UserSingle
     const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
     return error;
   }
-  const response = await patch<UserSingleResponse>(`/api/user/soft-delete`, { id: parsedInput });
+  const response = await patch<UserSingleResponse>(`/api/user/soft-delete`, {
+    id: parsedInput.data.id,
+  });
   return response;
 }
 
@@ -61,7 +63,9 @@ export async function restoreDeletedUser(id: string): Promise<ApiResponse<UserSi
     const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
     return error;
   }
-  const response = await patch<UserSingleResponse>(`/api/user/restore`, { id: parsedInput });
+  const response = await patch<UserSingleResponse>(`/api/user/restore`, {
+    id: parsedInput.data.id,
+  });
   return response;
 }
 

@@ -1,81 +1,79 @@
 import axios from 'axios';
-import { idParamsSchema } from '@frankjhub/shared-schema';
-
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+import {
+  ApiResponse,
+  idParamsSchema,
+  OrganizationTypeCreateRequest,
+  organizationTypeCreateRequestSchema,
+  OrganizationTypeListRequest,
+  organizationTypeListRequestSchema,
+  OrganizationTypeListResponse,
+  OrganizationTypeOptionListResponse,
+  OrganizationTypeSingleResponse,
+  OrganizationTypeUpdateRequest,
+  organizationTypeUpdateRequestSchema,
+} from '@frankjhub/shared-schema';
+import { ValidationError } from '@frankjhub/shared-errors';
+import { convertZodIssuesToErrorDetails, validateInput } from '@frankjhub/shared-utils';
+import { get, post } from '@/libs/axios/client';
 
 export async function getAllOrganizationTypes(
-  pagination: OrganizationTypePaginationParams
-): Promise<ActionResult<OrganizationTypePaginatedResponse>> {
-  try {
-    const res = await axios.get(`${baseURL}/api/organization-type/list`, {
-      withCredentials: true,
-      params: {
-        ...pagination,
-      },
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.log(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to fetch organization types';
-    return { status: 'error', error: message };
+  pagination: OrganizationTypeListRequest
+): Promise<ApiResponse<OrganizationTypeListResponse>> {
+  const parsedInput = organizationTypeListRequestSchema.safeParse(pagination);
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await get<OrganizationTypeListResponse>('/api/organization-type/list', {
+    params: parsedInput.data,
+  });
+  return response;
 }
 
-export async function getOrganizationTypesOptions(): Promise<ActionResult<OrgTypeOptionsSchema>> {
-  try {
-    const res = await axios.get(`${baseURL}/api/organization-type/options`, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to fetch organization type options';
-    return { status: 'error', error: message };
-  }
+export async function getOrganizationTypesOptions(): Promise<
+  ApiResponse<OrganizationTypeOptionListResponse>
+> {
+  const response = get<OrganizationTypeOptionListResponse>('/api/organization-type/options');
+  return response;
 }
 
 export async function getOrganizationTypeById(
   id: string
-): Promise<ActionResult<OrganizationTypeSchema>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    const res = await axios.get(`${baseURL}/api/organization-type/${parsed.id}`, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: res.data.data };
-  } catch (err) {
-    console.log(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to fetch organization type';
-    return { status: 'error', error: message };
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const parsedInput = idParamsSchema.safeParse({ id });
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await get<OrganizationTypeSingleResponse>(
+    `/api/organization-type/${parsedInput.data.id}`
+  );
+  return response;
 }
 
 export async function createOrganizationType(
-  data: OrganizationTypeCreateSchema
-): Promise<ActionResult<string>> {
-  try {
-    const parsed = organizationTypeCreateSchema.parse(data);
-    await axios.post(`${baseURL}/api/organization-type`, parsed, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: 'Organization type created successfully!' };
-  } catch (err) {
-    console.log(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to create organization type';
-    return { status: 'error', error: message };
+  data: OrganizationTypeCreateRequest
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const parsedInput = organizationTypeCreateRequestSchema.safeParse(data);
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await post<OrganizationTypeSingleResponse>(
+    '/api/organization-type',
+    parsedInput.data
+  );
+  return response;
 }
 
 export async function updateOrganizationType(
-  data: OrganizationTypeUpdateSchema
-): Promise<ActionResult<string>> {
+  data: OrganizationTypeUpdateRequest
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const validation = validateInput(organizationTypeUpdateRequestSchema, data);
+  if (!validation.success) {
+    return validation.error;
+  }
+
   try {
     const parsed = organizationTypeUpdateSchema.parse(data);
     await axios.patch(`${baseURL}/api/organization-type/update`, parsed, {

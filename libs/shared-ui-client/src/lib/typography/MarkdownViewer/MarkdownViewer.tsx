@@ -1,4 +1,3 @@
-import './github.css';
 import { useMarkdown } from '@frankjhub/shared-hooks';
 import clsx from 'clsx';
 import ReactMarkdown from 'react-markdown';
@@ -33,7 +32,6 @@ export function MarkdownViewer({ url, className }: { url: string; className?: st
 
   return (
     <div className={clsx('prose max-w-none', className || '')}>
-      {/* // <div id="write"> */}
       <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
         {content}
       </ReactMarkdown>

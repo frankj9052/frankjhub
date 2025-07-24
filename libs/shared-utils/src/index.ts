@@ -11,3 +11,4 @@ export * from './utils/chatUtils';
 export * from './utils/tableUtils';
 export * from './utils/testUtils';
 export * from './utils/errorUtils';
+export * from './utils/validationUtils';

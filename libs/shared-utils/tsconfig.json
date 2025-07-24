@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-errors"
+    },
+    {
       "path": "../shared-schema"
     },
     {

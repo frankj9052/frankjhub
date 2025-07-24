@@ -5,4 +5,4 @@ import { organizationTypeSchema } from '../entity';
 export const organizationTypeSingleResponseSchema =
   createSuccessResponseSchema(organizationTypeSchema);
 
-export type organizationTypeSingleResponse = zInfer<typeof organizationTypeSingleResponseSchema>;
+export type OrganizationTypeSingleResponse = zInfer<typeof organizationTypeSingleResponseSchema>;
