@@ -13,12 +13,10 @@ export const getActionListAsync = createAppAsyncThunk<
 >('action/list', async ({ pagination }) => {
   const result = await getActionList(pagination);
   if (result.status === 'success') {
-    return result.data;
+    return result;
+  } else {
+    throw result;
   }
-  if (result.status === 'error') {
-    throw result.error;
-  }
-  throw 'An unknown error occurred.';
 });
 
 export const getActoinOptionsAsync = createAppAsyncThunk<ActionOptionListResponse>(
@@ -26,12 +24,10 @@ export const getActoinOptionsAsync = createAppAsyncThunk<ActionOptionListRespons
   async () => {
     const result = await getActionOptions();
     if (result.status === 'success') {
-      return result.data;
+      return result;
+    } else {
+      throw result;
     }
-    if (result.status === 'error') {
-      throw result.error;
-    }
-    throw 'An unknown error occurred.';
   }
 );
 
@@ -40,11 +36,9 @@ export const getActionByIdAsync = createAppAsyncThunk<ActionSingleResponse, { id
   async ({ id }) => {
     const result = await getActionById(id);
     if (result.status === 'success') {
-      return result.data;
+      return result;
+    } else {
+      throw result;
     }
-    if (result.status === 'error') {
-      throw result.error;
-    }
-    throw 'An unknown error occurred.';
   }
 );

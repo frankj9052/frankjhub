@@ -1,39 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getSessionAsync, getUserProfileAsync } from './thunks';
-
-export interface Session {
-  id: string;
-  userName: string;
-  email: string;
-  emailVerified: boolean;
-  profileCompleted: boolean;
-  isActive: boolean;
-  orgRoles: {
-    orgId: string;
-    orgName: string;
-    orgStragegy: string;
-    roleCode: string;
-    roleName: string;
-    permissionStrings: string[];
-  }[];
-}
-
-export interface UserProfile {
-  userName: string;
-  email: string;
-  lastName: string;
-  firstName: string;
-  middleName: string;
-  gender: string;
-  dateOfBirth: string;
-  honorific: string;
-  oauthProvider: string;
-  avatarImage: string;
-}
+import { GetCurrentUserResponse, UserSingleResponse } from '@frankjhub/shared-schema';
 
 export interface CurrentUserSliceState {
-  session: Session | null;
-  userProfile: UserProfile | null;
+  session: GetCurrentUserResponse | null;
+  userProfile: UserSingleResponse | null;
   status: 'idle' | 'loading' | 'failed';
 }
 
@@ -47,7 +18,7 @@ export const currentUserSlice = createSlice({
   name: 'currentUser',
   initialState,
   reducers: {
-    setSession: (state, action: PayloadAction<Session | null>) => {
+    setSession: (state, action: PayloadAction<GetCurrentUserResponse | null>) => {
       state.session = action.payload;
     },
   },

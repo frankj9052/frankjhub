@@ -1,7 +1,7 @@
 'use client';
 import { useDispatch, usersSlice, useSelector } from '@/libs/redux';
 import { getUsersAllProfileAsync } from '@/libs/redux/slices/usersSlice/thunk';
-import { OrderEnum, UserAllProfilePayload, UserOrderByField } from '@frankjhub/shared-schema';
+import { OrderEnum, UserDto, UserOrderByField } from '@frankjhub/shared-schema';
 import {
   Button,
   Chip,
@@ -32,7 +32,7 @@ import { getDefaultTableClassNames } from '@/utils/tableClassnames';
 export default function UsersTable() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const paginatedUsers = useSelector(state => state.users.usersAllProfile);
+  const paginatedUsers = useSelector(state => state.users.usersAllProfile?.data);
   const pagination = useSelector(state => state.users.usersAllProfilePagination);
   const state = useSelector(state => state.users.status);
   const visibleColumns = useSelector(state => state.users.visibleColumns);
@@ -45,7 +45,7 @@ export default function UsersTable() {
       }
     | undefined
   >(undefined);
-  const { data } = paginatedUsers;
+  const data = paginatedUsers?.data;
   const classNames = useMemo(() => getDefaultTableClassNames(), []);
 
   const headerColumns = useMemo(() => {
@@ -56,8 +56,8 @@ export default function UsersTable() {
 
   // 渲染每个record
   const renderCell = useCallback(
-    (user: UserAllProfilePayload, columnKey: Key) => {
-      const cellValue = user[columnKey as keyof UserAllProfilePayload];
+    (user: UserDto, columnKey: Key) => {
+      const cellValue = user[columnKey as keyof UserDto];
 
       switch (columnKey) {
         case 'userName':
@@ -228,11 +228,11 @@ export default function UsersTable() {
               if (openModal) {
                 const result = await softDeleteUser(openModal.id);
                 if (result.status === 'success') {
-                  toast.success(result.data);
+                  toast.success(result.message);
                   setOpenModal(undefined);
                   dispatch(getUsersAllProfileAsync({ pagination }));
-                } else if (result.status === 'error') {
-                  toast.error(String(result.error));
+                } else {
+                  toast.error(String(result.message));
                 }
               }
             },

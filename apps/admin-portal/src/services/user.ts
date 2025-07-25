@@ -13,7 +13,7 @@ import { ValidationError } from '@frankjhub/shared-errors';
 import { convertZodIssuesToErrorDetails } from '@frankjhub/shared-utils';
 
 export async function getUserProfileClient(): Promise<ApiResponse<UserSingleResponse>> {
-  const response = await get<UserSingleResponse>('/api/user/current-user-profile');
+  const response = await get<UserSingleResponse>('/api/user/current-user');
   return response;
 }
 
@@ -91,7 +91,7 @@ export async function adminUpdateUser(
     const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
     return error;
   }
-  const response = await patch<UserSingleResponse>('/api/user/admin-update', {
+  const response = await patch<UserSingleResponse>('/api/user/update', {
     ...parsedInput.data,
   });
   return response;

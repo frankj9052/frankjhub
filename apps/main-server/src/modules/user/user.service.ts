@@ -12,6 +12,7 @@ import {
 } from '@frankjhub/shared-schema';
 import { User } from './entities/User';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
+import { normalizeDate } from '@frankjhub/shared-utils';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -37,7 +38,7 @@ export class UserService {
       middleName: user.middleName ?? null,
 
       gender: user.gender ?? null,
-      dateOfBirth: user.dateOfBirth ? user.dateOfBirth.toISOString() : null,
+      dateOfBirth: normalizeDate(user.dateOfBirth),
       honorific: user.honorific ?? null,
 
       avatarImage: user.avatarImage ?? null,

@@ -1,13 +1,13 @@
 import {
   OrderEnum,
-  userAllData,
-  UserFilterEnum,
   UserOrderByField,
-  UserOrderByFieldsEnum,
-  UserPaginatedResponse,
-  UserPaginationParams,
   LabeledEnumItem,
-  UserAllProfilePayload,
+  USER_ORDER_BY_FIELDS,
+  userDataExample,
+  USER_FILTER,
+  UserListResponse,
+  UserListRequest,
+  UserSingleResponse,
 } from '@frankjhub/shared-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { getUserAllProfileByIdAsync, getUsersAllProfileAsync } from './thunk';
@@ -25,8 +25,8 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'actions',
 ];
 
-const sortableFields = new Set(Object.values(UserOrderByFieldsEnum));
-const columns = generateColumnsFromData(userAllData, {
+const sortableFields = new Set(Object.values(USER_ORDER_BY_FIELDS));
+const columns = generateColumnsFromData(userDataExample, {
   sortableFields,
   extraColumns: [
     {
@@ -37,12 +37,12 @@ const columns = generateColumnsFromData(userAllData, {
   ],
   exclude: ['email', 'avatarImage', 'refreshToken', 'sessionVersion'],
 });
-const filters = getLabeledEnumList(UserFilterEnum);
+const filters = getLabeledEnumList(USER_FILTER);
 const initialStatusFilter = filters.map(item => item.uid);
 
 export interface UsersSliceState {
-  usersAllProfile: UserPaginatedResponse;
-  usersAllProfilePagination: UserPaginationParams;
+  usersAllProfile: UserListResponse | undefined;
+  usersAllProfilePagination: UserListRequest;
   status: 'idle' | 'loading' | 'failed';
   columns: {
     name: string;
@@ -51,22 +51,16 @@ export interface UsersSliceState {
   }[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
-  targetUser?: UserAllProfilePayload;
+  targetUser?: UserSingleResponse;
 }
 
 const initialState: UsersSliceState = {
-  usersAllProfile: {
-    data: [],
-    total: 0,
-    pageCount: 0,
-    pageSize: 0,
-    currentPage: 0,
-  },
+  usersAllProfile: undefined,
   usersAllProfilePagination: {
     limit: 10,
     offset: 0,
     order: OrderEnum.DESC,
-    orderBy: UserOrderByFieldsEnum.USER_NAME,
+    orderBy: USER_ORDER_BY_FIELDS.USER_NAME,
     search: '',
     filters: initialStatusFilter,
   },
@@ -106,7 +100,7 @@ export const usersSlice = createSlice({
       state.usersAllProfilePagination.order = OrderEnum.DESC;
     },
     cleanOrderBy: state => {
-      state.usersAllProfilePagination.orderBy = UserOrderByFieldsEnum.USER_NAME;
+      state.usersAllProfilePagination.orderBy = USER_ORDER_BY_FIELDS.USER_NAME;
     },
     setVisibleColumn: (state, action: PayloadAction<Key[] | 'all'>) => {
       state.visibleColumns = action.payload;

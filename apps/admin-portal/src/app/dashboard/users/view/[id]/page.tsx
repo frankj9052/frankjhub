@@ -13,7 +13,8 @@ import { useEffect } from 'react';
 const ViewUserPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const user = useSelector(state => state.users.targetUser);
+  const userResponse = useSelector(state => state.users.targetUser);
+  const user = userResponse?.data;
   const loading = useSelector(state => state.users.status);
   useEffect(() => {
     if (id) {

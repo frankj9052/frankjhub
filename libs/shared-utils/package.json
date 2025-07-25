@@ -20,7 +20,8 @@
     "axios": "1.9.0",
     "react-hook-form": "7.57.0",
     "zod": "3.25.42",
-    "@frankjhub/shared-schema": "0.0.1"
+    "@frankjhub/shared-schema": "0.0.1",
+    "@frankjhub/shared-errors": "0.0.1"
   },
   "nx": {
     "projectType": "library",

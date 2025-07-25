@@ -4,15 +4,16 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Key } from 'react';
 
 import {
-  OrganizationTypePaginatedResponse,
-  OrganizationTypePaginationParams,
   OrderEnum,
-  OrganizationTypeSchema,
   LabeledEnumItem,
-  OrganizationTypeOrderByFieldsEnum,
-  organizationTypeAllDataExample,
-  OrganizationTypeFilterEnum,
   OrganizationTypeOrderByField,
+  ORGANIZATION_TYPE_ORDER_BY_FIELDS,
+  organizationTypeDataExample,
+  ORGANIZATION_TYPE_FILTER,
+  OrganizationTypeListResponse,
+  OrganizationTypeListRequest,
+  OrganizationTypeSingleResponse,
+  OrganizationTypeOptionListResponse,
 } from '@frankjhub/shared-schema';
 
 import {
@@ -32,8 +33,8 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'actions',
 ];
 
-const sortableFields = new Set(Object.values(OrganizationTypeOrderByFieldsEnum));
-const columns = generateColumnsFromData(organizationTypeAllDataExample, {
+const sortableFields = new Set(Object.values(ORGANIZATION_TYPE_ORDER_BY_FIELDS));
+const columns = generateColumnsFromData(organizationTypeDataExample, {
   sortableFields,
   extraColumns: [
     {
@@ -44,12 +45,12 @@ const columns = generateColumnsFromData(organizationTypeAllDataExample, {
   ],
 });
 
-const filters = getLabeledEnumList(OrganizationTypeFilterEnum);
+const filters = getLabeledEnumList(ORGANIZATION_TYPE_FILTER);
 const initialStatusFilter = filters.map(item => item.uid);
 
 export interface OrganizationTypeSliceState {
-  all: OrganizationTypePaginatedResponse;
-  pagination: OrganizationTypePaginationParams;
+  all: OrganizationTypeListResponse | undefined;
+  pagination: OrganizationTypeListRequest;
   status: 'idle' | 'loading' | 'failed';
   columns: {
     name: string;
@@ -58,26 +59,17 @@ export interface OrganizationTypeSliceState {
   }[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
-  target?: OrganizationTypeSchema;
-  options: {
-    id: string;
-    name: string;
-  }[];
+  target?: OrganizationTypeSingleResponse;
+  options: OrganizationTypeOptionListResponse | undefined;
 }
 
 const initialState: OrganizationTypeSliceState = {
-  all: {
-    data: [],
-    total: 0,
-    pageCount: 0,
-    pageSize: 0,
-    currentPage: 0,
-  },
+  all: undefined,
   pagination: {
     limit: 10,
     offset: 0,
     order: OrderEnum.DESC,
-    orderBy: OrganizationTypeOrderByFieldsEnum.NAME,
+    orderBy: ORGANIZATION_TYPE_ORDER_BY_FIELDS.NAME,
     search: '',
     filters: initialStatusFilter,
   },
@@ -86,7 +78,7 @@ const initialState: OrganizationTypeSliceState = {
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
   target: undefined,
-  options: [],
+  options: undefined,
 };
 
 export const organizationTypeSlice = createSlice({
@@ -118,7 +110,7 @@ export const organizationTypeSlice = createSlice({
       state.pagination.order = OrderEnum.DESC;
     },
     cleanOrderBy: state => {
-      state.pagination.orderBy = OrganizationTypeOrderByFieldsEnum.NAME;
+      state.pagination.orderBy = ORGANIZATION_TYPE_ORDER_BY_FIELDS.NAME;
     },
     setVisibleColumn: (state, action: PayloadAction<Key[] | 'all'>) => {
       state.visibleColumns = action.payload;

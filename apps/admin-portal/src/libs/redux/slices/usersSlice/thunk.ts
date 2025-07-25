@@ -1,30 +1,27 @@
 import { getUserAllProfileById, getUsersAllProfile } from '@/services/user';
 import { createAppAsyncThunk } from '../../createAppAsyncThunk';
-import { UserPaginationParams } from '@frankjhub/shared-schema';
+import { UserListRequest, UserListResponse, UserSingleResponse } from '@frankjhub/shared-schema';
 
-interface Props {
-  pagination: UserPaginationParams;
-}
-export const getUsersAllProfileAsync = createAppAsyncThunk(
-  'getUsersAllProfile',
-  async ({ pagination }: Props) => {
-    const result = await getUsersAllProfile({ pagination });
-    if (result.status === 'success') {
-      return result.data;
-    } else {
-      throw null;
-    }
+export const getUsersAllProfileAsync = createAppAsyncThunk<
+  UserListResponse,
+  { pagination: UserListRequest }
+>('getUsersAllProfile', async ({ pagination }) => {
+  const result = await getUsersAllProfile(pagination);
+  if (result.status === 'success') {
+    return result;
+  } else {
+    throw result;
   }
-);
+});
 
-export const getUserAllProfileByIdAsync = createAppAsyncThunk(
+export const getUserAllProfileByIdAsync = createAppAsyncThunk<UserSingleResponse, { id: string }>(
   'getUserAllProfileById',
-  async ({ id }: { id: string }) => {
+  async ({ id }) => {
     const result = await getUserAllProfileById({ id });
     if (result.status === 'success') {
-      return result.data.data;
+      return result;
     } else {
-      throw null;
+      throw result;
     }
   }
 );

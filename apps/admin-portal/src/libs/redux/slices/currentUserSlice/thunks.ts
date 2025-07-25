@@ -1,21 +1,28 @@
 import { getSessionClient } from '@/services/auth';
 import { getUserProfileClient } from '@/services/user';
 import { createAppAsyncThunk } from '../../createAppAsyncThunk';
+import { GetCurrentUserResponse, UserSingleResponse } from '@frankjhub/shared-schema';
 
-export const getSessionAsync = createAppAsyncThunk('getCurrentUserSessionData', async () => {
-  const session = await getSessionClient();
-  if (session) {
-    return session.data;
-  } else {
-    throw null;
+export const getSessionAsync = createAppAsyncThunk<GetCurrentUserResponse>(
+  'getCurrentUserSessionData',
+  async () => {
+    const result = await getSessionClient();
+    if (result.status === 'success') {
+      return result;
+    } else {
+      throw result;
+    }
   }
-});
+);
 
-export const getUserProfileAsync = createAppAsyncThunk('getUserProfileData', async () => {
-  const userProfile = await getUserProfileClient();
-  if (userProfile.status === 'success') {
-    return userProfile.data.data;
-  } else {
-    throw null;
+export const getUserProfileAsync = createAppAsyncThunk<UserSingleResponse>(
+  'getUserProfileData',
+  async () => {
+    const result = await getUserProfileClient();
+    if (result.status === 'success') {
+      return result;
+    } else {
+      throw result;
+    }
   }
-});
+);

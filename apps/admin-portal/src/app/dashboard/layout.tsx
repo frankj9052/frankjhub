@@ -5,7 +5,7 @@ import { Sidebar } from '@/components/sidebar/Sidebar';
 
 export default async function layout({ children }: { children: ReactNode }) {
   const session = await getSessionServer();
-  if (!session) {
+  if (session.status !== 'success') {
     redirect('/login');
   }
   return (

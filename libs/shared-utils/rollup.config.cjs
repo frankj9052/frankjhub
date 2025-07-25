@@ -20,7 +20,7 @@ module.exports = withNx(
     format: ['esm', 'cjs'],
     assets: [
       { input: 'libs/shared-utils', output: '.', glob: '*.md' },
-      { input: 'libs/shared-utils', output: '.', glob: 'package.json'}
+      { input: 'libs/shared-utils/packageBuild', output: '.', glob: 'package.json'}
     ],
     external: externalDeps,
   },

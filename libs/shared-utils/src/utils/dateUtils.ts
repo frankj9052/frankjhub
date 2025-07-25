@@ -212,6 +212,13 @@ function generateTimeArray(startTime: Date, endTime: Date): Date[] {
   return timeArray;
 }
 
+function normalizeDate(date: unknown): string | null {
+  if (!date) return null;
+  if (typeof date === 'string') return date;
+  if (date instanceof Date) return date.toISOString();
+  return null;
+}
+
 export {
   isValidDate,
   dateToCalendarDate,
@@ -225,4 +232,5 @@ export {
   getTopOffset,
   getEventHeight,
   getWeekDates,
+  normalizeDate,
 };

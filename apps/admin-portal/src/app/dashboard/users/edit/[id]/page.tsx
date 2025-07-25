@@ -3,8 +3,8 @@
 import {
   Gender,
   Honorific,
-  userAdminUpdateSchema,
-  UserAdminUpdateSchema,
+  UserUpdateRequest,
+  userUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { Input, Button, Form, Select, SelectItem } from '@heroui/react';
 import { Controller, useForm } from 'react-hook-form';
@@ -25,7 +25,7 @@ export default function EditUserPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { id } = useParams();
-  const user = useSelector(state => state.users.targetUser);
+  const user = useSelector(state => state.users.targetUser?.data);
   const {
     handleSubmit,
     control,
@@ -33,8 +33,8 @@ export default function EditUserPage() {
     setError,
     getValues,
     formState: { isDirty, isSubmitting, errors },
-  } = useForm<UserAdminUpdateSchema>({
-    resolver: zodResolver(userAdminUpdateSchema),
+  } = useForm<UserUpdateRequest>({
+    resolver: zodResolver(userUpdateRequestSchema),
     mode: 'onTouched',
   });
 
@@ -82,7 +82,7 @@ export default function EditUserPage() {
     }
   }, [id, dispatch]);
 
-  const onSubmit = (data: UserAdminUpdateSchema) => {
+  const onSubmit = (data: UserUpdateRequest) => {
     setOpenModal({
       header: 'Update',
       body: `Are you sure you want to update user ${user?.userName}`,
@@ -91,10 +91,10 @@ export default function EditUserPage() {
       action: async () => {
         const result = await adminUpdateUser(data);
         if (result.status === 'success') {
-          toast.success(result.data);
+          toast.success(result.message);
           setOpenModal(undefined);
           dispatch(getUserAllProfileByIdAsync({ id: String(id) }));
-        } else if (result.status === 'error') {
+        } else {
           handleFormServerErrors(result, setError);
           setOpenModal(undefined);
         }
@@ -400,11 +400,11 @@ export default function EditUserPage() {
                   setLocalLoading(true);
                   const result = await hardDeleteUser(user.id);
                   if (result.status === 'success') {
-                    toast.success(result.data);
+                    toast.success(result.message);
                     setOpenModal(undefined);
                     router.back();
-                  } else if (result.status === 'error') {
-                    toast.error(String(result.error));
+                  } else {
+                    toast.error(String(result.message));
                   }
                   setLocalLoading(false);
                 },
@@ -429,11 +429,11 @@ export default function EditUserPage() {
                   setLocalLoading(true);
                   const result = await restoreDeletedUser(user.id);
                   if (result.status === 'success') {
-                    toast.success(result.data);
+                    toast.success(result.message);
                     setOpenModal(undefined);
                     dispatch(getUserAllProfileByIdAsync({ id: String(id) }));
-                  } else if (result.status === 'error') {
-                    toast.error(String(result.error));
+                  } else {
+                    toast.error(String(result.message));
                   }
                   setLocalLoading(false);
                 },

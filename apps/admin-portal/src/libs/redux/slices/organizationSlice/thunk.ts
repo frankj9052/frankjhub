@@ -2,31 +2,31 @@ import { getAllOrganizations, getOrganizationById } from '@/services/organizatio
 
 import { createAppAsyncThunk } from '../../createAppAsyncThunk';
 import {
-  OrganizationPaginatedResponse,
-  OrganizationPaginationParams,
-  OrganizationWithOrgTypeNameSchema,
+  OrganizationListRequest,
+  OrganizationListResponse,
+  OrganizationSingleResponse,
 } from '@frankjhub/shared-schema';
 
 export const getAllOrganizationsAsync = createAppAsyncThunk<
-  OrganizationPaginatedResponse,
-  { pagination: OrganizationPaginationParams }
+  OrganizationListResponse,
+  { pagination: OrganizationListRequest }
 >('organization/getAll', async ({ pagination }) => {
   const result = await getAllOrganizations(pagination);
   if (result.status === 'success') {
-    return result.data;
+    return result;
   } else {
-    throw null;
+    throw result;
   }
 });
 
 export const getOrganizationByIdAsync = createAppAsyncThunk<
-  OrganizationWithOrgTypeNameSchema,
+  OrganizationSingleResponse,
   { id: string }
 >('organization/getById', async ({ id }) => {
   const result = await getOrganizationById(id);
   if (result.status === 'success') {
-    return result.data;
+    return result;
   } else {
-    throw null;
+    throw result;
   }
 });

@@ -4,7 +4,9 @@ import { Pagination } from '@heroui/react';
 export const BottomContent = () => {
   const dispatch = useDispatch();
   const paginatedUsers = useSelector(state => state.users.usersAllProfile);
-  const { pageSize, currentPage, pageCount } = paginatedUsers;
+  const pageSize = paginatedUsers?.data.pageSize;
+  const currentPage = paginatedUsers?.data.currentPage;
+  const pageCount = paginatedUsers?.data.pageCount;
   return (
     <div className="py-2 px-2 flex justify-center items-center">
       <Pagination
@@ -14,10 +16,10 @@ export const BottomContent = () => {
         }}
         color="default"
         page={currentPage}
-        total={pageCount}
+        total={pageCount ?? 0}
         variant="light"
         onChange={page => {
-          const offset = (page - 1) * pageSize;
+          const offset = (page - 1) * (pageSize ?? 0);
           dispatch(usersSlice.actions.setOffset(offset));
         }}
       />

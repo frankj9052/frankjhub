@@ -23,7 +23,7 @@ export const TopContent = () => {
   const statusOptions = useSelector(state => state.users.statusOptions);
   const [searchValue, setSearchValue] = useState('');
   const { limit, filters } = pagination;
-  const { total } = paginatedUsers;
+  const total = paginatedUsers?.data.total;
 
   const debouncedSearchChange = useDebouncedCallback((value?: string) => {
     if (value) {

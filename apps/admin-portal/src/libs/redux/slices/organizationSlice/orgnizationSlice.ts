@@ -4,15 +4,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Key } from 'react';
 
 import {
-  OrganizationPaginatedResponse,
-  OrganizationPaginationParams,
   OrderEnum,
   LabeledEnumItem,
-  OrganizationOrderByFieldsEnum,
-  organizationWithOrgTypeDataExample,
-  OrganizationFilterEnum,
+  ORGANIZATION_ORDER_BY_FIELDS,
+  organizationDataExample,
+  ORGANIZATION_FILTER,
+  OrganizationListResponse,
+  OrganizationListRequest,
+  OrganizationSingleResponse,
   OrganizationOrderByField,
-  OrganizationWithOrgTypeNameSchema,
 } from '@frankjhub/shared-schema';
 
 import { getAllOrganizationsAsync, getOrganizationByIdAsync } from './thunk';
@@ -29,8 +29,8 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'actions',
 ];
 
-const sortableFields = new Set(Object.values(OrganizationOrderByFieldsEnum));
-const columns = generateColumnsFromData(organizationWithOrgTypeDataExample, {
+const sortableFields = new Set(Object.values(ORGANIZATION_ORDER_BY_FIELDS));
+const columns = generateColumnsFromData(organizationDataExample, {
   sortableFields,
   extraColumns: [
     {
@@ -41,12 +41,12 @@ const columns = generateColumnsFromData(organizationWithOrgTypeDataExample, {
   ],
 });
 
-const filters = getLabeledEnumList(OrganizationFilterEnum);
+const filters = getLabeledEnumList(ORGANIZATION_FILTER);
 const initialStatusFilter = filters.map(item => item.uid);
 
 export interface OrganizationSliceState {
-  all: OrganizationPaginatedResponse;
-  pagination: OrganizationPaginationParams;
+  all: OrganizationListResponse | undefined;
+  pagination: OrganizationListRequest;
   status: 'idle' | 'loading' | 'failed';
   columns: {
     name: string;
@@ -55,22 +55,16 @@ export interface OrganizationSliceState {
   }[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
-  target?: OrganizationWithOrgTypeNameSchema;
+  target?: OrganizationSingleResponse;
 }
 
 const initialState: OrganizationSliceState = {
-  all: {
-    data: [],
-    total: 0,
-    pageCount: 0,
-    pageSize: 0,
-    currentPage: 0,
-  },
+  all: undefined,
   pagination: {
     limit: 10,
     offset: 0,
     order: OrderEnum.DESC,
-    orderBy: OrganizationOrderByFieldsEnum.NAME,
+    orderBy: ORGANIZATION_ORDER_BY_FIELDS.NAME,
     search: '',
     filters: initialStatusFilter,
   },
@@ -100,7 +94,7 @@ export const organizationSlice = createSlice({
     setStatusFilter: (state, action: PayloadAction<string[]>) => {
       state.pagination.filters = action.payload;
     },
-    setTarget: (state, action: PayloadAction<OrganizationWithOrgTypeNameSchema>) => {
+    setTarget: (state, action: PayloadAction<OrganizationSingleResponse>) => {
       state.target = action.payload;
     },
     cleanLimit: state => {
@@ -113,7 +107,7 @@ export const organizationSlice = createSlice({
       state.pagination.order = OrderEnum.DESC;
     },
     cleanOrderBy: state => {
-      state.pagination.orderBy = OrganizationOrderByFieldsEnum.NAME;
+      state.pagination.orderBy = ORGANIZATION_ORDER_BY_FIELDS.NAME;
     },
     setVisibleColumn: (state, action: PayloadAction<Key[] | 'all'>) => {
       state.visibleColumns = action.payload;

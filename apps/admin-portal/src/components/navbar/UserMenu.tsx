@@ -28,9 +28,9 @@ export default function UserMenu() {
           as="button"
           className="transition-transform"
           color="secondary"
-          name={userProfile?.userName || 'user avatar'}
+          name={userProfile?.data?.userName || 'user avatar'}
           size="sm"
-          src={userProfile?.avatarImage}
+          src={userProfile?.data?.avatarImage || ''}
         />
       </DropdownTrigger>
       <DropdownMenu variant="flat" aria-label="User actions menu">
@@ -42,7 +42,7 @@ export default function UserMenu() {
             aria-label="username"
             key={'signIn Info'}
           >
-            Signed in as {userProfile?.userName}
+            Signed in as {userProfile?.data.userName}
           </DropdownItem>
         </DropdownSection>
 

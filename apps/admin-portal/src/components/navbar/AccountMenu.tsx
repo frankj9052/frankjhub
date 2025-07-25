@@ -15,7 +15,7 @@ export default function AccountMenu() {
   }, [dispatch]);
   return (
     <div>
-      {session ? (
+      {session && session.status === 'success' ? (
         <UserMenu />
       ) : (
         <div className="flex gap-3">

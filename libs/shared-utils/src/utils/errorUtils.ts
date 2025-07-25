@@ -3,18 +3,50 @@ import type { ZodError, ZodIssue } from 'zod';
 import axios from 'axios';
 import { BaseErrorResponse, baseErrorResponseSchema } from '@frankjhub/shared-schema';
 
+// export function handleFormServerErrors<TFieldValues extends FieldValues>(
+//   errorResponse: { error: string | ZodIssue[] },
+//   setError: UseFormSetError<TFieldValues>
+// ) {
+//   if (Array.isArray(errorResponse.error)) {
+//     errorResponse.error.forEach(e => {
+//       const fieldName = e.path.join('.') as Path<TFieldValues>;
+//       setError(fieldName, { message: e.message });
+//     });
+//   } else {
+//     setError('root.serverError', { message: errorResponse.error });
+//   }
+// } 过时版本，用下面的
+
 export function handleFormServerErrors<TFieldValues extends FieldValues>(
-  errorResponse: { error: string | ZodIssue[] },
+  errorResponse: BaseErrorResponse,
   setError: UseFormSetError<TFieldValues>
 ) {
-  if (Array.isArray(errorResponse.error)) {
-    errorResponse.error.forEach(e => {
-      const fieldName = e.path.join('.') as Path<TFieldValues>;
-      setError(fieldName, { message: e.message });
+  const details = errorResponse.details;
+  const message = errorResponse.message;
+
+  // 如果是 Zod-like 错误数组
+  if (
+    Array.isArray(details) &&
+    details.every(e => Array.isArray(e.path) && typeof e.message === 'string')
+  ) {
+    const issues = details as ZodIssue[];
+    issues.forEach(issue => {
+      const field = issue.path.join('.') as Path<TFieldValues>;
+      setError(field, { message: issue.message });
     });
-  } else {
-    setError('root.serverError', { message: errorResponse.error });
+    return;
   }
+
+  // 如果是简单字符串消息
+  if (typeof details === 'string') {
+    setError('root.serverError', { message: details });
+    return;
+  }
+
+  // fallback: 显示 message 或兜底
+  setError('root.serverError', {
+    message: message || 'An unknown error occurred.',
+  });
 }
 
 /**

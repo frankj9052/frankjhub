@@ -42,7 +42,7 @@ const filters = getLabeledEnumList(ACTION_FILTER);
 const initialStatusFilter = filters.map(item => item.uid);
 
 export interface ActionSliceState {
-  all: ActionListResponse;
+  all: ActionListResponse | undefined;
   pagination: ActionListRequest;
   status: 'idle' | 'loading' | 'failed';
   columns: TableColumn[];
@@ -54,13 +54,7 @@ export interface ActionSliceState {
 }
 
 const initialState: ActionSliceState = {
-  all: {
-    data: [],
-    total: 0,
-    pageCount: 0,
-    pageSize: 0,
-    currentPage: 0,
-  },
+  all: undefined,
   pagination: {
     limit: 10,
     offset: 0,

@@ -2,7 +2,6 @@
   "name": "@frankjhub/shared-errors",
   "version": "0.0.1",
   "private": true,
-  "type": "module",
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.esm.d.ts",
@@ -15,5 +14,11 @@
       "default": "./dist/index.esm.js"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "@frankjhub/shared-schema": "0.0.1",
+    "http-status-codes": "2.3.0"
+  },
+  "nx": {
+    "sourceRoot": "libs/shared-errors"
+  }
 }
