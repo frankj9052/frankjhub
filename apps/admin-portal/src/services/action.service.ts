@@ -1,138 +1,96 @@
-import { ActionResult } from '@/types';
+import { del, get, patch, post } from '@/libs/axios/client';
 import {
   ActionCreateRequest,
   actionCreateRequestSchema,
   ActionListRequest,
+  actionListRequestSchema,
   ActionListResponse,
   ActionOptionListResponse,
   ActionSingleResponse,
   ActionUpdateRequest,
   actionUpdateRequestSchema,
+  ApiResponse,
   idParamsSchema,
 } from '@frankjhub/shared-schema';
-import { getErrorMessage } from '@frankjhub/shared-utils';
-import axios from 'axios';
-
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+import { validateInput } from '@frankjhub/shared-utils';
 
 export async function getActionList(
   pagination: ActionListRequest
-): Promise<ActionResult<ActionListResponse>> {
-  try {
-    const res = await axios.get(`${baseURL}/api/action/list`, {
-      withCredentials: true,
-      params: pagination,
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to fetch action list');
-    return { status: 'error', error: message };
+): Promise<ApiResponse<ActionListResponse>> {
+  const validationResult = validateInput(actionListRequestSchema, pagination);
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await get<ActionListResponse>('/api/action/list', {
+    params: validationResult.data,
+  });
+  return response;
 }
 
-export async function getActionOptions(): Promise<ActionResult<ActionOptionListResponse>> {
-  try {
-    const res = await axios.get(`${baseURL}/api/action/options`, {
-      withCredentials: true,
-    });
-    return res.data;
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to fetch action options');
-    return { status: 'error', error: message };
-  }
+export async function getActionOptions(): Promise<ApiResponse<ActionOptionListResponse>> {
+  const response = await get<ActionOptionListResponse>('/api/action/options');
+  return response;
 }
 
-export async function getActionById(id: string): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    const res = await axios.get(`${baseURL}/api/action/${parsed.id}`, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to fetch action by id');
-    return { status: 'error', error: message };
+export async function getActionById(id: string): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(idParamsSchema, { id });
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await get<ActionSingleResponse>(`/api/action/${validationResult.data.id}`);
+  return response;
 }
 
-export async function softDeleteAction(id: string): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    const res = await axios.patch(
-      `${baseURL}/api/action/soft-delete`,
-      { id: parsed.id },
-      { withCredentials: true }
-    );
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to delete action');
-    return { status: 'error', error: message };
+export async function softDeleteAction(id: string): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(idParamsSchema, { id });
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await patch<ActionSingleResponse>(
+    '/api/action/soft-delete',
+    validationResult.data
+  );
+  return response;
 }
 
-export async function restoreAction(id: string): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    const res = await axios.patch(
-      `${baseURL}/api/action/restore`,
-      { id: parsed.id },
-      { withCredentials: true }
-    );
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to restore action');
-    return { status: 'error', error: message };
+export async function restoreAction(id: string): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(idParamsSchema, { id });
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await patch<ActionSingleResponse>('/api/action/restore', validationResult.data);
+  return response;
 }
 
-export async function hardDeleteAction(id: string): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    const res = await axios.delete(`${baseURL}/api/action/hard-delete`, {
-      withCredentials: true,
-      params: { id: parsed.id },
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to delete action permanently');
-    return { status: 'error', error: message };
+export async function hardDeleteAction(id: string): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(idParamsSchema, { id });
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await del<ActionSingleResponse>('/api/action/hard-delete', {
+    params: validationResult.data,
+  });
+  return response;
 }
 
 export async function updateAction(
   data: ActionUpdateRequest
-): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = actionUpdateRequestSchema.parse(data);
-    const res = await axios.patch(`${baseURL}/api/action/update`, parsed, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to update action');
-    return { status: 'error', error: message };
+): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(actionUpdateRequestSchema, data);
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await patch<ActionSingleResponse>('/api/action/update', validationResult.data);
+  return response;
 }
 
 export async function createAction(
   data: ActionCreateRequest
-): Promise<ActionResult<ActionSingleResponse>> {
-  try {
-    const parsed = actionCreateRequestSchema.parse(data);
-    const res = await axios.post(`${baseURL}/api/action`, parsed, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: res.data };
-  } catch (err) {
-    console.error(err);
-    const message = getErrorMessage(err, 'Failed to create action');
-    return { status: 'error', error: message };
+): Promise<ApiResponse<ActionSingleResponse>> {
+  const validationResult = validateInput(actionCreateRequestSchema, data);
+  if (!validationResult.success) {
+    return validationResult.error;
   }
+  const response = await post<ActionSingleResponse>('/api/action', validationResult.data);
+  return response;
 }

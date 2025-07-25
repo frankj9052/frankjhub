@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   ApiResponse,
   idParamsSchema,
@@ -13,8 +12,8 @@ import {
   organizationTypeUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { ValidationError } from '@frankjhub/shared-errors';
-import { convertZodIssuesToErrorDetails, validateInput } from '@frankjhub/shared-utils';
-import { get, post } from '@/libs/axios/client';
+import { convertZodIssuesToErrorDetails } from '@frankjhub/shared-utils';
+import { del, get, patch, post } from '@/libs/axios/client';
 
 export async function getAllOrganizationTypes(
   pagination: OrganizationTypeListRequest
@@ -69,75 +68,55 @@ export async function createOrganizationType(
 export async function updateOrganizationType(
   data: OrganizationTypeUpdateRequest
 ): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
-  const validation = validateInput(organizationTypeUpdateRequestSchema, data);
-  if (!validation.success) {
-    return validation.error;
+  const parsedInput = organizationTypeUpdateRequestSchema.safeParse(data);
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
-
-  try {
-    const parsed = organizationTypeUpdateSchema.parse(data);
-    await axios.patch(`${baseURL}/api/organization-type/update`, parsed, {
-      withCredentials: true,
-    });
-    return { status: 'success', data: 'Organization type updated successfully!' };
-  } catch (err) {
-    console.log(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to update organization type';
-    return { status: 'error', error: message };
-  }
+  const response = await patch<OrganizationTypeSingleResponse>(
+    '/api/organization-type/update',
+    parsedInput.data
+  );
+  return response;
 }
 
-export async function softDeleteOrganizationType(id: string): Promise<ActionResult<string>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    await axios.patch(
-      `${baseURL}/api/organization-type/soft-delete`,
-      { id: parsed.id },
-      { withCredentials: true }
-    );
-    return { status: 'success', data: 'Organization type soft-deleted successfully!' };
-  } catch (err) {
-    console.error(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to soft-delete organization type';
-    return { status: 'error', error: message };
+export async function softDeleteOrganizationType(
+  id: string
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const parsedInput = idParamsSchema.safeParse({ id });
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await patch<OrganizationTypeSingleResponse>(
+    '/api/organization-type/soft-delete',
+    { id: parsedInput.data.id }
+  );
+  return response;
 }
 
-export async function restoreOrganizationType(id: string): Promise<ActionResult<string>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    await axios.patch(
-      `${baseURL}/api/organization-type/restore`,
-      { id: parsed.id },
-      { withCredentials: true }
-    );
-    return { status: 'success', data: 'Organization type restored successfully!' };
-  } catch (err) {
-    console.error(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to restore organization type';
-    return { status: 'error', error: message };
+export async function restoreOrganizationType(
+  id: string
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const parsedInput = idParamsSchema.safeParse({ id });
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await patch<OrganizationTypeSingleResponse>('/api/organization-type/restore');
+  return response;
 }
 
-export async function hardDeleteOrganizationType(id: string): Promise<ActionResult<string>> {
-  try {
-    const parsed = idParamsSchema.parse({ id });
-    await axios.delete(`${baseURL}/api/organization-type/hard-delete`, {
-      withCredentials: true,
-      params: { id: parsed.id },
-    });
-    return { status: 'success', data: 'Organization type permanently deleted!' };
-  } catch (err) {
-    console.error(err);
-    const message = axios.isAxiosError(err)
-      ? err.response?.data?.details || err.message
-      : 'Failed to hard-delete organization type';
-    return { status: 'error', error: message };
+export async function hardDeleteOrganizationType(
+  id: string
+): Promise<ApiResponse<OrganizationTypeSingleResponse>> {
+  const parsedInput = idParamsSchema.safeParse({ id });
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
   }
+  const response = await del<OrganizationTypeSingleResponse>('/api/organization-type/hard-delete', {
+    params: parsedInput.data.id,
+  });
+  return response;
 }
