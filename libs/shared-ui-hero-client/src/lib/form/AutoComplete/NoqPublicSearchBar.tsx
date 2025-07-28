@@ -12,12 +12,14 @@ export type NoqPublicSearchBarProps = {
     defaultItems?: DefaultAutocompleteItemsType[];
     onInputChange?: (value: string) => void;
     onSelectionChange?: (key: Key | null) => void;
+    allowsCustomValue?: boolean;
   };
   searchAddressInput?: {
     defaultItems?: DefaultAutocompleteItemsType[];
     onInputChange?: (value: string) => void;
     onSelectionChange?: (key: Key | null) => void;
     addressPlaceholder?: string;
+    allowsCustomValue?: boolean;
   };
   handleSearchSubmit?: () => void;
 };
@@ -55,6 +57,7 @@ export function NoqPublicSearchBar({
           }}
         >
           <FrankAutocomplete
+            allowsCustomValue={!!searchMainInput?.allowsCustomValue}
             placeholder="Specialty, condition, or procedure"
             customizeStyles={{
               inputTextStyle: 'font-inter',
@@ -85,6 +88,7 @@ export function NoqPublicSearchBar({
           }}
         >
           <FrankAutocomplete
+            allowsCustomValue={!!searchAddressInput?.allowsCustomValue}
             placeholder={searchAddressInput?.addressPlaceholder ?? 'Enter Address'}
             customizeStyles={{
               inputTextStyle: 'font-inter',

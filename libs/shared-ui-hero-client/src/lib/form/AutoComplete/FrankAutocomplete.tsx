@@ -31,6 +31,7 @@ export type DefaultAutocompleteItemsType = {
  * @param {number} [height] - Optional. Height of the component in pixels.
  */
 export type FrankAutocompleteProps = {
+  allowsCustomValue?: boolean;
   ariaLabel: string;
   className?: string;
   placeholder?: string;
@@ -54,6 +55,7 @@ export type FrankAutocompleteProps = {
 };
 
 export function FrankAutocomplete({
+  allowsCustomValue = false,
   ariaLabel,
   placeholder,
   defaultItems,
@@ -78,6 +80,7 @@ export function FrankAutocomplete({
       }}
     >
       <Autocomplete
+        allowsCustomValue={allowsCustomValue}
         aria-hidden={false}
         className="h-full"
         placeholder={placeholder}
