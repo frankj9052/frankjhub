@@ -7,7 +7,6 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
       "require": "./index.cjs.js",
       "types": "./index.esm.d.ts",
       "import": "./index.esm.js",
@@ -16,8 +15,5 @@
   },
   "dependencies": {
     "zod": "^3.25.42"
-  },
-  "nx": {
-    "sourceRoot": "libs/shared-schema"
   }
 }

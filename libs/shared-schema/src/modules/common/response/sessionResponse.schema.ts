@@ -1,5 +1,5 @@
-import { userPayloadSchema } from '../../../modules/auth';
-import { createSuccessResponseSchema } from '../../../factories';
+import { userPayloadSchema } from '../../../modules/auth/userPayload.schema';
+import { createSuccessResponseSchema } from '../../../factories/createSuccessResponse.schema';
 import { zInfer } from '../../../libs/z';
 
 export const sessionResponseSchema = createSuccessResponseSchema(userPayloadSchema);

@@ -19,8 +19,8 @@ module.exports = withNx(
     external: externalDeps,
     format: ['esm', 'cjs'],
     assets: [
-      { input: 'libs/shared-schema', output: '.', glob: 'README.md' },
-      { input: 'libs/shared-schema/packageBuild', output: '.', glob: 'package.json' },
+      { input: 'libs/shared-errors', output: '.', glob: 'README.md' },
+      { input: 'libs/shared-errors/packageBuild', output: '.', glob: 'package.json' },
     ],
   },
   {
