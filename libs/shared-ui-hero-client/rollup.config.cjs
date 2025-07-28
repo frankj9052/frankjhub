@@ -22,8 +22,8 @@ module.exports = withNx(
     external: externalDeps,
     format: ['esm', 'cjs'],
     assets: [
-      { input: 'libs/shared-ui', output: '.', glob: 'README.md' },
-      { input: 'libs/shared-ui', output: '.', glob: 'package.json'}
+      { input: 'libs/shared-ui-hero-client', output: '.', glob: 'README.md' },
+      { input: 'libs/shared-ui-hero-client/packageBuild', output: '.', glob: 'package.json'}
     ],
   },
   {
@@ -38,5 +38,6 @@ module.exports = withNx(
         limit: 10000, // 10kB
       }),
     ],
+    context: 'globalThis',
   }
 );
