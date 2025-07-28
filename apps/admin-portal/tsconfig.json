@@ -62,10 +62,10 @@
       "path": "../../libs/shared-utils"
     },
     {
-      "path": "../../libs/shared-schema"
+      "path": "../../libs/shared-ui-hero-ssr"
     },
     {
-      "path": "../../libs/shared-ui-hero-ssr"
+      "path": "../../libs/shared-schema"
     }
   ]
 }

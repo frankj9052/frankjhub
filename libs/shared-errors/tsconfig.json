@@ -4,10 +4,10 @@
   "include": [],
   "references": [
     {
-      "path": "../shared-schema"
+      "path": "../server-common"
     },
     {
-      "path": "../server-common"
+      "path": "../shared-schema"
     },
     {
       "path": "./tsconfig.lib.json"

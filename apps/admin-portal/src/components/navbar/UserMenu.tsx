@@ -18,6 +18,9 @@ export default function UserMenu() {
   const dispatch = useDispatch();
   const userProfile = useSelector(state => state.currentUser.userProfile);
   useEffect(() => {
+    console.log('user profile ===> ', userProfile);
+  }, [userProfile]);
+  useEffect(() => {
     dispatch(getUserProfileAsync());
   }, [dispatch]);
   return (

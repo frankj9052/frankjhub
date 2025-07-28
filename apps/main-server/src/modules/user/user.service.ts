@@ -39,6 +39,7 @@ export class UserService {
 
       gender: user.gender ?? null,
       dateOfBirth: normalizeDate(user.dateOfBirth),
+      // dateOfBirth: user.dateOfBirth.toISOString(),
       honorific: user.honorific ?? null,
 
       avatarImage: user.avatarImage ?? null,
