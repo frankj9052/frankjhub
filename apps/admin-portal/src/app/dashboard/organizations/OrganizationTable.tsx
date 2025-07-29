@@ -7,11 +7,7 @@ import {
   useSelector,
 } from '@/libs/redux';
 import { getDefaultTableClassNames } from '@/utils/tableClassnames';
-import {
-  OrderEnum,
-  OrganizationOrderByField,
-  OrganizationWithOrgTypeNameSchema,
-} from '@frankjhub/shared-schema';
+import { OrderEnum, OrganizationDto, OrganizationOrderByField } from '@frankjhub/shared-schema';
 import { formatShortDateTime } from '@frankjhub/shared-utils';
 import {
   Button,
@@ -41,7 +37,7 @@ import { toast } from 'react-toastify';
 export const OrganizationTable = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const all = useSelector(state => state.organization.all);
+  const all = useSelector(state => state.organization.all?.data);
   const pagination = useSelector(state => state.organization.pagination);
   const status = useSelector(state => state.organization.status);
   const visibleColumns = useSelector(state => state.organization.visibleColumns);
@@ -56,7 +52,7 @@ export const OrganizationTable = () => {
       }
     | undefined
   >(undefined);
-  const { data } = all;
+  const data = all?.data ?? [];
   const classNames = useMemo(() => getDefaultTableClassNames(), []);
 
   const headerColumns = useMemo(() => {
@@ -66,8 +62,8 @@ export const OrganizationTable = () => {
 
   // 渲染每个record
   const renderCell = useCallback(
-    (org: OrganizationWithOrgTypeNameSchema, columnKey: Key) => {
-      const cellValue = org[columnKey as keyof OrganizationWithOrgTypeNameSchema];
+    (org: OrganizationDto, columnKey: Key) => {
+      const cellValue = org[columnKey as keyof OrganizationDto];
 
       switch (columnKey) {
         case 'isActive':
@@ -144,11 +140,11 @@ export const OrganizationTable = () => {
     if (openModal) {
       const result = await softDeleteOrganization(openModal.id);
       if (result.status === 'success') {
-        toast.success(result.data);
+        toast.success(result.message);
         setOpenModal(undefined);
         dispatch(getAllOrganizationsAsync({ pagination }));
-      } else if (result.status === 'error') {
-        toast.error(String(result.error));
+      } else {
+        toast.error(String(result.message));
       }
     }
   };

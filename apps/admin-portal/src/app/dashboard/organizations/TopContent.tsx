@@ -20,12 +20,12 @@ export const TopContent = () => {
   const visibleColumns = useSelector(state => state.organization.visibleColumns);
   const columns = useSelector(state => state.organization.columns);
   const pagination = useSelector(state => state.organization.pagination);
-  const all = useSelector(state => state.organization.all);
+  const all = useSelector(state => state.organization.all?.data);
   const statusOptions = useSelector(state => state.organization.statusOptions);
   const [searchValue, setSearchValue] = useState('');
   const [openModal, setOpenModal] = useState(false);
   const { limit, filters } = pagination;
-  const { total } = all;
+  const total = all?.total ?? 0;
 
   const debouncedSearchChange = useDebouncedCallback((value?: string) => {
     if (value) {

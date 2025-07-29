@@ -3,8 +3,10 @@ import { Pagination } from '@heroui/react';
 
 export const BottomContent = () => {
   const dispatch = useDispatch();
-  const all = useSelector(state => state.organizationType.all);
-  const { pageSize, currentPage, pageCount } = all;
+  const all = useSelector(state => state.organizationType.all?.data);
+  const pageSize = all?.pageSize ?? 0;
+  const currentPage = all?.currentPage;
+  const pageCount = all?.pageCount ?? 0;
   return (
     <div className="py-2 px-2 flex justify-center items-center">
       <Pagination

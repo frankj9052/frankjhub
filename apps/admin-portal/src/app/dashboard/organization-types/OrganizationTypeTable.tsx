@@ -9,8 +9,8 @@ import {
 import { getDefaultTableClassNames } from '@/utils/tableClassnames';
 import {
   OrderEnum,
+  OrganizationTypeDto,
   OrganizationTypeOrderByField,
-  OrganizationTypeSchema,
 } from '@frankjhub/shared-schema';
 import { formatShortDateTime } from '@frankjhub/shared-utils';
 import {
@@ -40,7 +40,7 @@ import { toast } from 'react-toastify';
 export const OrganizationTypeTable = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const paginatedOrgType = useSelector(state => state.organizationType.all);
+  const paginatedOrgType = useSelector(state => state.organizationType.all?.data);
   const pagination = useSelector(state => state.organizationType.pagination);
   const state = useSelector(state => state.organizationType.status);
   const visibleColumns = useSelector(state => state.organizationType.visibleColumns);
@@ -53,7 +53,7 @@ export const OrganizationTypeTable = () => {
       }
     | undefined
   >(undefined);
-  const { data } = paginatedOrgType;
+  const data = paginatedOrgType?.data;
   const classNames = useMemo(() => getDefaultTableClassNames(), []);
 
   const headerColumns = useMemo(() => {
@@ -64,8 +64,8 @@ export const OrganizationTypeTable = () => {
 
   // 渲染每个record
   const renderCell = useCallback(
-    (orgType: OrganizationTypeSchema, columnKey: Key) => {
-      const cellValue = orgType[columnKey as keyof OrganizationTypeSchema];
+    (orgType: OrganizationTypeDto, columnKey: Key) => {
+      const cellValue = orgType[columnKey as keyof OrganizationTypeDto];
 
       switch (columnKey) {
         case 'isActive':
@@ -200,11 +200,11 @@ export const OrganizationTypeTable = () => {
               if (openModal) {
                 const result = await softDeleteOrganizationType(openModal.id);
                 if (result.status === 'success') {
-                  toast.success(result.data);
+                  toast.success(result.message);
                   setOpenModal(undefined);
                   dispatch(getAllOrganizationTypesAsync({ pagination }));
-                } else if (result.status === 'error') {
-                  toast.error(String(result.error));
+                } else {
+                  toast.error(String(result.message));
                 }
               }
             },

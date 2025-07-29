@@ -6,8 +6,8 @@ import {
   updateOrganizationType,
 } from '@/services/organizationType';
 import {
-  organizationTypeUpdateSchema,
-  OrganizationTypeUpdateSchema,
+  OrganizationTypeUpdateRequest,
+  organizationTypeUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { FrankModal } from '@frankjhub/shared-ui-hero-client';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
@@ -22,7 +22,7 @@ export const EditOrganizationTypesForm = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useParams();
-  const orgType = useSelector(state => state.organizationType.target);
+  const orgType = useSelector(state => state.organizationType.target?.data);
   const loading = useSelector(state => state.organizationType.status);
   const {
     handleSubmit,
@@ -30,8 +30,8 @@ export const EditOrganizationTypesForm = () => {
     reset,
     setError,
     formState: { isDirty, isSubmitting, errors },
-  } = useForm<OrganizationTypeUpdateSchema>({
-    resolver: zodResolver(organizationTypeUpdateSchema),
+  } = useForm<OrganizationTypeUpdateRequest>({
+    resolver: zodResolver(organizationTypeUpdateRequestSchema),
     mode: 'onTouched',
   });
   const [localLoading, setLocalLoading] = useState(false);
@@ -68,7 +68,7 @@ export const EditOrganizationTypesForm = () => {
     }
   }, [id, dispatch]);
 
-  const onSubmit = (data: OrganizationTypeUpdateSchema) => {
+  const onSubmit = (data: OrganizationTypeUpdateRequest) => {
     setOpenModal({
       header: 'Update',
       body: `Are you sure you want to update organization type: ${orgType?.name}`,
@@ -77,10 +77,10 @@ export const EditOrganizationTypesForm = () => {
       action: async () => {
         const result = await updateOrganizationType(data);
         if (result.status === 'success') {
-          toast.success(result.data);
+          toast.success(result.message);
           setOpenModal(undefined);
           dispatch(getOrganizationTypeByIdAsync({ id: String(id) }));
-        } else if (result.status === 'error') {
+        } else {
           handleFormServerErrors(result, setError);
           setOpenModal(undefined);
         }
@@ -204,11 +204,11 @@ export const EditOrganizationTypesForm = () => {
                   setLocalLoading(true);
                   const result = await hardDeleteOrganizationType(orgType.id);
                   if (result.status === 'success') {
-                    toast.success(result.data);
+                    toast.success(result.message);
                     setOpenModal(undefined);
                     router.back();
-                  } else if (result.status === 'error') {
-                    toast.error(String(result.error));
+                  } else {
+                    toast.error(String(result.message));
                   }
                   setLocalLoading(false);
                 },
@@ -233,11 +233,11 @@ export const EditOrganizationTypesForm = () => {
                   setLocalLoading(true);
                   const result = await restoreOrganizationType(orgType.id);
                   if (result.status === 'success') {
-                    toast.success(result.data);
+                    toast.success(result.message);
                     setOpenModal(undefined);
                     dispatch(getOrganizationTypeByIdAsync({ id: String(id) }));
-                  } else if (result.status === 'error') {
-                    toast.error(String(result.error));
+                  } else {
+                    toast.error(String(result.message));
                   }
                   setLocalLoading(false);
                 },

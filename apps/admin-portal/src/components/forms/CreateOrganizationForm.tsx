@@ -1,4 +1,7 @@
-import { organizationCreateSchema, OrganizationCreateSchema } from '@frankjhub/shared-schema';
+import {
+  OrganizationCreateRequest,
+  organizationCreateRequestSchema,
+} from '@frankjhub/shared-schema';
 import { Button, Form, Input, Select, SelectItem } from '@heroui/react';
 import { Controller, useForm } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
@@ -20,21 +23,21 @@ type Props = {
 export const CreateOrganizationForm = ({ onClose }: Props) => {
   const dispatch = useDispatch();
   const pagination = useSelector(state => state.organization.pagination);
-  const orgTypeOptions = useSelector(state => state.organizationType.options);
+  const orgTypeOptions = useSelector(state => state.organizationType.options?.data);
   const {
     handleSubmit,
     control,
     reset,
     setError,
     formState: { isDirty, isSubmitting, errors },
-  } = useForm<OrganizationCreateSchema>({
-    resolver: zodResolver(organizationCreateSchema),
+  } = useForm<OrganizationCreateRequest>({
+    resolver: zodResolver(organizationCreateRequestSchema),
     mode: 'onTouched',
   });
-  const onSubmit = async (value: OrganizationCreateSchema) => {
+  const onSubmit = async (value: OrganizationCreateRequest) => {
     const result = await createOrganization(value);
     if (result.status === 'success') {
-      toast.success(result.data);
+      toast.success(result.message);
       reset({
         name: '',
         description: '',
@@ -42,7 +45,7 @@ export const CreateOrganizationForm = ({ onClose }: Props) => {
       });
       onClose();
       dispatch(getAllOrganizationsAsync({ pagination }));
-    } else if (result.status === 'error') {
+    } else {
       handleFormServerErrors(result, setError);
       onClose();
     }
@@ -103,30 +106,32 @@ export const CreateOrganizationForm = ({ onClose }: Props) => {
             />
           </div>
           <div className="h-[70px] w-full">
-            <Controller
-              name="orgTypeId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Select
-                  size="sm"
-                  fullWidth
-                  label="Organization Type *"
-                  variant="bordered"
-                  selectedKeys={new Set([field.value])}
-                  onSelectionChange={value => {
-                    const selection = [...value][0];
-                    field.onChange(selection);
-                  }}
-                  onBlur={field.onBlur}
-                  isInvalid={!!fieldState.error}
-                  errorMessage={fieldState.error?.message}
-                >
-                  {orgTypeOptions.map(option => (
-                    <SelectItem key={option.id}>{option.name}</SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
+            {orgTypeOptions && (
+              <Controller
+                name="orgTypeId"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Select
+                    size="sm"
+                    fullWidth
+                    label="Organization Type *"
+                    variant="bordered"
+                    selectedKeys={new Set([field.value])}
+                    onSelectionChange={value => {
+                      const selection = [...value][0];
+                      field.onChange(selection);
+                    }}
+                    onBlur={field.onBlur}
+                    isInvalid={!!fieldState.error}
+                    errorMessage={fieldState.error?.message}
+                  >
+                    {orgTypeOptions.map(option => (
+                      <SelectItem key={option.id}>{option.name}</SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            )}
           </div>
           {errors?.root?.serverError && (
             <p className="text-danger text-sm">

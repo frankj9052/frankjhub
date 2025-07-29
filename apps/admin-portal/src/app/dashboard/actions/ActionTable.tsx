@@ -37,7 +37,7 @@ import { FrankModal } from '@frankjhub/shared-ui-hero-client';
 export const ActionTable = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const all = useSelector(state => state.action.all);
+  const all = useSelector(state => state.action.all?.data);
   const pagination = useSelector(state => state.action.pagination);
   const status = useSelector(state => state.action.status);
   const visibleColumns = useSelector(state => state.action.visibleColumns);
@@ -52,7 +52,7 @@ export const ActionTable = () => {
       }
     | undefined
   >(undefined);
-  const { data } = all;
+  const data = all?.data ?? [];
   const classNames = useMemo(() => getDefaultTableClassNames(), []);
 
   const headerColumns = useMemo(() => {
@@ -140,11 +140,11 @@ export const ActionTable = () => {
     if (openModal) {
       const result = await softDeleteAction(openModal.id);
       if (result.status === 'success') {
-        toast.success(result.data.message);
+        toast.success(result.message);
         setOpenModal(undefined);
         dispatch(getActionListAsync({ pagination }));
-      } else if (result.status === 'error') {
-        toast.error(String(result.error));
+      } else {
+        toast.error(String(result.message));
       }
     }
   };

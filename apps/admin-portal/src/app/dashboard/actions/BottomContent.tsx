@@ -3,8 +3,10 @@ import { Pagination } from '@heroui/react';
 
 export const BottomContent = () => {
   const dispatch = useDispatch();
-  const all = useSelector(state => state.action.all);
-  const { pageSize, currentPage, pageCount } = all;
+  const all = useSelector(state => state.action.all?.data);
+  const pageSize = all?.pageSize ?? 0;
+  const currentPage = all?.currentPage;
+  const pageCount = all?.pageCount ?? 0;
 
   const handlePageChange = (page: number) => {
     const offset = (page - 1) * pageSize;

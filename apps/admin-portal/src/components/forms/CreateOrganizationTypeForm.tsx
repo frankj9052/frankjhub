@@ -1,6 +1,6 @@
 import {
-  organizationTypeCreateSchema,
-  OrganizationTypeCreateSchema,
+  OrganizationTypeCreateRequest,
+  organizationTypeCreateRequestSchema,
 } from '@frankjhub/shared-schema';
 import { Button, Form, Input } from '@heroui/react';
 import { Controller, useForm } from 'react-hook-form';
@@ -23,21 +23,21 @@ export const CreateOrganizationTypeForm = ({ onClose }: Props) => {
     reset,
     setError,
     formState: { isDirty, isSubmitting, errors },
-  } = useForm<OrganizationTypeCreateSchema>({
-    resolver: zodResolver(organizationTypeCreateSchema),
+  } = useForm<OrganizationTypeCreateRequest>({
+    resolver: zodResolver(organizationTypeCreateRequestSchema),
     mode: 'onTouched',
   });
-  const onSubmit = async (value: OrganizationTypeCreateSchema) => {
+  const onSubmit = async (value: OrganizationTypeCreateRequest) => {
     const result = await createOrganizationType(value);
     if (result.status === 'success') {
-      toast.success(result.data);
+      toast.success(result.message);
       reset({
         name: '',
         description: '',
       });
       onClose();
       dispatch(getAllOrganizationTypesAsync({ pagination }));
-    } else if (result.status === 'error') {
+    } else {
       handleFormServerErrors(result, setError);
       onClose();
     }

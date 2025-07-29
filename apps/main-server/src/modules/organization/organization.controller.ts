@@ -62,7 +62,7 @@ export const getOrganizationByIdController: RequestHandler = async (
   try {
     const { id } = idParamsSchema.parse(req.params);
     const result = await organizationService.getOrganizationById(id);
-    res.status(200).json({ status: 'success', data: result });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

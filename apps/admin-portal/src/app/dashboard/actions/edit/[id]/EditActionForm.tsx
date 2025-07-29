@@ -71,10 +71,10 @@ export const EditActionForm = () => {
       action: async () => {
         const result = await updateAction(data);
         if (result.status === 'success') {
-          toast.success(result.data.message);
+          toast.success(result.message);
           setOpenModal(undefined);
           dispatch(getActionByIdAsync({ id: String(id) }));
-        } else if (result.status === 'error') {
+        } else {
           handleFormServerErrors(result, setError);
           setOpenModal(undefined);
         }
@@ -93,11 +93,11 @@ export const EditActionForm = () => {
           setLocalLoading(true);
           const result = await hardDeleteAction(target.id);
           if (result.status === 'success') {
-            toast.success(result.data.message);
+            toast.success(result.message);
             setOpenModal(undefined);
             router.back();
-          } else if (result.status === 'error') {
-            toast.error(String(result.error));
+          } else {
+            toast.error(String(result.message));
           }
           setLocalLoading(false);
         },
@@ -116,11 +116,11 @@ export const EditActionForm = () => {
           setLocalLoading(true);
           const result = await restoreAction(target.id);
           if (result.status === 'success') {
-            toast.success(result.data.message);
+            toast.success(result.message);
             setOpenModal(undefined);
             dispatch(getActionByIdAsync({ id: String(id) }));
-          } else if (result.status === 'error') {
-            toast.error(String(result.error));
+          } else {
+            toast.error(String(result.message));
           }
           setLocalLoading(false);
         },

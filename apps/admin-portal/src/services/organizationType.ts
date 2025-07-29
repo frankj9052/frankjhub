@@ -47,6 +47,7 @@ export async function getOrganizationTypeById(
   const response = await get<OrganizationTypeSingleResponse>(
     `/api/organization-type/${parsedInput.data.id}`
   );
+  console.log('response check ===> ', response);
   return response;
 }
 

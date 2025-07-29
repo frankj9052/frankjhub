@@ -27,14 +27,14 @@ export const CreateActionForm = ({ onClose }: Props) => {
   const onSubmit = async (value: ActionCreateRequest) => {
     const result = await createAction(value);
     if (result.status === 'success') {
-      toast.success(result.data.message);
+      toast.success(result.message);
       reset({
         name: '',
         description: '',
       });
       onClose();
       dispatch(getActionListAsync({ pagination }));
-    } else if (result.status === 'error') {
+    } else {
       handleFormServerErrors(result, setError);
       onClose();
     }

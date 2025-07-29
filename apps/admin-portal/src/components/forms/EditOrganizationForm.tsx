@@ -11,7 +11,10 @@ import {
   restoreOrganization,
   updateOrganization,
 } from '@/services/organization.service';
-import { organizationUpdateSchema, OrganizationUpdateSchema } from '@frankjhub/shared-schema';
+import {
+  OrganizationUpdateRequest,
+  organizationUpdateRequestSchema,
+} from '@frankjhub/shared-schema';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams, useRouter } from 'next/navigation';
@@ -26,9 +29,9 @@ export const EditOrganizationForm = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useParams();
-  const target = useSelector(state => state.organization.target);
+  const target = useSelector(state => state.organization.target?.data);
   const loading = useSelector(state => state.organization.status);
-  const orgTypeOptions = useSelector(state => state.organizationType.options);
+  const orgTypeOptions = useSelector(state => state.organizationType.options?.data);
 
   const {
     handleSubmit,
@@ -36,8 +39,8 @@ export const EditOrganizationForm = () => {
     reset,
     setError,
     formState: { isDirty, isSubmitting, errors },
-  } = useForm<OrganizationUpdateSchema>({
-    resolver: zodResolver(organizationUpdateSchema),
+  } = useForm<OrganizationUpdateRequest>({
+    resolver: zodResolver(organizationUpdateRequestSchema),
     mode: 'onTouched',
   });
   const [localLoading, setLocalLoading] = useState(false);
@@ -70,10 +73,10 @@ export const EditOrganizationForm = () => {
   }, [target, initialValue, reset]);
 
   useEffect(() => {
-    if (orgTypeOptions.length === 0) {
+    if (orgTypeOptions && orgTypeOptions.length === 0) {
       dispatch(getOrganizationTypeOptionsAsync());
     }
-  }, [dispatch, orgTypeOptions.length]);
+  }, [dispatch, orgTypeOptions]);
 
   useEffect(() => {
     if (id && id !== target?.id) {
@@ -81,7 +84,7 @@ export const EditOrganizationForm = () => {
     }
   }, [id, dispatch, target?.id]);
 
-  const onSubmit = (data: OrganizationUpdateSchema) => {
+  const onSubmit = (data: OrganizationUpdateRequest) => {
     setOpenModal({
       header: 'Update',
       body: `Are you sure you want to update organization: ${target?.name}`,
@@ -90,10 +93,10 @@ export const EditOrganizationForm = () => {
       action: async () => {
         const result = await updateOrganization(data);
         if (result.status === 'success') {
-          toast.success(result.data);
+          toast.success(result.message);
           setOpenModal(undefined);
           dispatch(getOrganizationByIdAsync({ id: String(id) }));
-        } else if (result.status === 'error') {
+        } else {
           handleFormServerErrors(result, setError);
           setOpenModal(undefined);
         }
@@ -112,11 +115,11 @@ export const EditOrganizationForm = () => {
           setLocalLoading(true);
           const result = await hardDeleteOrganization(target.id);
           if (result.status === 'success') {
-            toast.success(result.data);
+            toast.success(result.message);
             setOpenModal(undefined);
             router.back();
-          } else if (result.status === 'error') {
-            toast.error(String(result.error));
+          } else {
+            toast.error(String(result.message));
           }
           setLocalLoading(false);
         },
@@ -135,11 +138,11 @@ export const EditOrganizationForm = () => {
           setLocalLoading(true);
           const result = await restoreOrganization(target.id);
           if (result.status === 'success') {
-            toast.success(result.data);
+            toast.success(result.message);
             setOpenModal(undefined);
             dispatch(getOrganizationByIdAsync({ id: String(id) }));
-          } else if (result.status === 'error') {
-            toast.error(String(result.error));
+          } else {
+            toast.error(String(result.message));
           }
           setLocalLoading(false);
         },
@@ -204,30 +207,32 @@ export const EditOrganizationForm = () => {
             />
           </div>
           <div className="flex w-full gap-3">
-            <Controller
-              name="orgTypeId"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Select
-                  size="sm"
-                  fullWidth
-                  label="Organization Type *"
-                  variant="bordered"
-                  selectedKeys={field.value ? new Set([field.value]) : new Set([])}
-                  onSelectionChange={value => {
-                    const selection = [...value][0];
-                    field.onChange(selection);
-                  }}
-                  onBlur={field.onBlur}
-                  isInvalid={!!fieldState.error}
-                  errorMessage={fieldState.error?.message}
-                >
-                  {orgTypeOptions.map(option => (
-                    <SelectItem key={option.id}>{option.name}</SelectItem>
-                  ))}
-                </Select>
-              )}
-            />
+            {orgTypeOptions && (
+              <Controller
+                name="orgTypeId"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Select
+                    size="sm"
+                    fullWidth
+                    label="Organization Type *"
+                    variant="bordered"
+                    selectedKeys={field.value ? new Set([field.value]) : new Set([])}
+                    onSelectionChange={value => {
+                      const selection = [...value][0];
+                      field.onChange(selection);
+                    }}
+                    onBlur={field.onBlur}
+                    isInvalid={!!fieldState.error}
+                    errorMessage={fieldState.error?.message}
+                  >
+                    {orgTypeOptions.map(option => (
+                      <SelectItem key={option.id}>{option.name}</SelectItem>
+                    ))}
+                  </Select>
+                )}
+              />
+            )}
             <Controller
               name="isActive"
               control={control}

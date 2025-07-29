@@ -49,7 +49,7 @@ export const getOrganizationTypeByIdController: RequestHandler = async (
   try {
     const { id } = idParamsSchema.parse(req.params);
     const result = await organizationTypeService.getOrganizationTypeById(id);
-    res.status(200).json({ status: 'success', data: result });
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
