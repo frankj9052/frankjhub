@@ -3,7 +3,7 @@ import {
   ResourceDto,
   ResourceListRequest,
   ResourceListResponse,
-  ResourceOptionListResopnse,
+  ResourceOptionListResponse,
   ResourceSingleResponse,
   ResourceUpdateRequest,
 } from '@frankjhub/shared-schema';
@@ -203,7 +203,7 @@ export class ResourceService {
     };
   }
 
-  async getResourceOptionList(): Promise<ResourceOptionListResopnse> {
+  async getResourceOptionList(): Promise<ResourceOptionListResponse> {
     const resources = await this.resourceRepo.find({
       where: { isActive: true },
       select: ['id', 'name'],

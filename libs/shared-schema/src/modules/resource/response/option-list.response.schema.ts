@@ -17,4 +17,4 @@ export type ResourceOption = zInfer<typeof resourceOptionSchema>;
 
 export type ResourceOptionList = zInfer<typeof resourceOptionListSchema>;
 
-export type ResourceOptionListResopnse = zInfer<typeof resourceOptionListResponseSchema>;
+export type ResourceOptionListResponse = zInfer<typeof resourceOptionListResponseSchema>;

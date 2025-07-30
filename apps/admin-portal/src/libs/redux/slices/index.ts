@@ -9,3 +9,5 @@ export * from './organizationSlice';
 export * from './organizationTypeSlice';
 
 export * from './actionSlice';
+
+export * from './resourceSlice';
