@@ -56,7 +56,7 @@ export class ActionService {
     });
     const savedAction = await this.actionRepo.save(newAction);
 
-    log.info(`Created action "${name}"`);
+    log.info(`Created action "${name}" by "${createdBy}"`);
     const result: ActionSingleResponse = {
       status: 'success',
       message: `Created action "${name}"`,
@@ -213,7 +213,7 @@ export class ActionService {
 
     return {
       status: 'success',
-      message: 'Fetched action options successfully',
+      message: 'Fetched action options successful',
       data: actions.map(action => ({
         id: action.id,
         name: action.name,
