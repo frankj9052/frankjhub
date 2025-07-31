@@ -120,18 +120,27 @@ export function CardParallax({
   });
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: wheelSpeed, // default 1.2
-      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // default easing function
-      smoothWheel: true,
-    });
+    const wrapper = document.querySelector('#lenis-wrapper');
+    const content = document.querySelector('#lenis-content');
+    if (wrapper && content) {
+      const lenis = new Lenis({
+        // 限制Lenis绑定到指定容器，而不是整个页面
+        // 容器id=lenis-wrapper
+        // 内容id=lenis-content
+        wrapper: wrapper,
+        content: content,
+        duration: wheelSpeed, // default 1.2
+        easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // default easing function
+        smoothWheel: true,
+      });
 
-    function raf(time: number) {
-      lenis.raf(time);
+      function raf(time: number) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+
       requestAnimationFrame(raf);
     }
-
-    requestAnimationFrame(raf);
   }, [wheelSpeed]);
 
   return (

@@ -5,6 +5,16 @@ import axios from 'axios';
 import { debounce } from 'lodash';
 import { IoSearchOutline } from 'react-icons/io5';
 
+const defaultItems = Array.from({ length: 30 }, (_, i) => {
+  const labelText =
+    i < 20 ? `Doctor ${String(i + 1).padStart(2, '0')}` : `Cat ${String(i - 19).padStart(2, '0')}`;
+  return {
+    key: `id${String(i + 1).padStart(2, '0')}`,
+    label: <div className="text-[13px]">{labelText}</div>,
+    textValue: labelText,
+  };
+});
+
 const meta = {
   title: 'Shared-UI-Hero-Client/Form/AutoComplete/FrankAutocomplete',
   component: FrankAutocomplete,
@@ -181,28 +191,7 @@ export const ProviderAutocomplete: Story = {
     placeholder: 'Select a provider',
     variant: 'bordered',
     radius: 'sm',
-    defaultItems: [
-      {
-        key: 'id01',
-        label: <div className="text-[13px]">Doctor 01</div>,
-        textValue: 'Doctor 01',
-      },
-      {
-        key: 'id02',
-        label: <div className="text-[13px]">Doctor 02</div>,
-        textValue: 'Doctor 02',
-      },
-      {
-        key: 'id03',
-        label: <div className="text-[13px]">Doctor 03</div>,
-        textValue: 'Doctor 03',
-      },
-      {
-        key: 'id04',
-        label: <div className="text-[13px]">Cat 01</div>,
-        textValue: 'Cat 01',
-      },
-    ],
+    defaultItems: defaultItems,
     defaultFilter: true,
   },
 };
