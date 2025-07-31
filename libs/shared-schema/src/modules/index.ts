@@ -5,3 +5,5 @@ export * from './organizationType';
 export * from './organization';
 export * from './action';
 export * from './resource';
+export * from './permission-action';
+export * from './permission';
