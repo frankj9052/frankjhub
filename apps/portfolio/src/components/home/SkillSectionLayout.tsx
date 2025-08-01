@@ -7,7 +7,7 @@ import { Spacer } from '@heroui/react';
 
 export const SkillSectionLayout = () => {
   return (
-    <div className="bg-red-200 w-full h-full md:pt-8">
+    <div className="bg-red-200 w-full h-full amd:pt-8">
       {/* Title */}
       <div>
         <HeroTitle>Skills</HeroTitle>

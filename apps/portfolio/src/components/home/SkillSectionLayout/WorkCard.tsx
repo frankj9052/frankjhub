@@ -17,19 +17,19 @@ export const WorkCard = ({
   return (
     <FrankCard
       className="cursor-default hover:scale-[1.02]"
-      cardHeight={250}
+      cardHeight={220}
       cardBody={
         <div className="h-full flex flex-col justify-center p-3 gap-3">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-bold">{companyName}</h1>
+          <div className="flex flex-col gap-0.5">
+            <h1 className="text-lg font-bold">{companyName}</h1>
             <div className="italic">{workType}</div>
             <div className="text-color-text-gray">{workPeriod}</div>
           </div>
           <Divider />
-          <div className="w-[194px] min-h-[33px] bg-primary text-white rounded-md flex items-center justify-center">
+          <div className="w-[194px] min-h-[30px] bg-primary text-white rounded-md flex items-center justify-center">
             {jobTitle}
           </div>
-          <p>{jobDescription}</p>
+          <p className="text-xs">{jobDescription}</p>
         </div>
       }
     />

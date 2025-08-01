@@ -6,9 +6,6 @@
       "path": "../shared-ui-core"
     },
     {
-      "path": "../server-common"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

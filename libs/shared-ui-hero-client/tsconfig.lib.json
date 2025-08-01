@@ -41,9 +41,6 @@
     },
     {
       "path": "../shared-hooks/tsconfig.lib.json"
-    },
-    {
-      "path": "../server-common/tsconfig.lib.json"
     }
   ]
 }

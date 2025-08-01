@@ -26,9 +26,5 @@
     "**/*.stories.tsx"
   ],
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
-  "references": [
-    {
-      "path": "../server-common/tsconfig.lib.json"
-    }
-  ]
+  "references": []
 }

@@ -10,9 +10,5 @@
     "types": ["node"]
   },
   "include": ["src/**/*.ts"],
-  "references": [
-    {
-      "path": "../server-common/tsconfig.lib.json"
-    }
-  ]
+  "references": []
 }

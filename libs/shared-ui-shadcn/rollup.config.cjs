@@ -1,7 +1,7 @@
 const { withNx } = require('@nx/rollup/with-nx');
 const url = require('@rollup/plugin-url');
 const svg = require('@svgr/rollup');
-const { getExternalDeps } = require('@frankjhub/server-common');
+const { getExternalDeps } = require('./rollup.utils');
 const path = require('path');
 
 const externalDeps = getExternalDeps({

@@ -12,9 +12,6 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../server-common/tsconfig.lib.json"
-    },
-    {
       "path": "../shared-schema/tsconfig.lib.json"
     }
   ]

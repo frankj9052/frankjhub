@@ -29,9 +29,6 @@
   "references": [
     {
       "path": "../shared-ui-core/tsconfig.lib.json"
-    },
-    {
-      "path": "../server-common/tsconfig.lib.json"
     }
   ]
 }
