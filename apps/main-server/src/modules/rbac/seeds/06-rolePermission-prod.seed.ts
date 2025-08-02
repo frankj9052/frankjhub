@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { Role } from '../entities/Role';
-import { Permission } from '../entities/Permission';
+import { Permission } from '../../permission/entities/Permission';
 import { RolePermission } from '../entities/RolePermission';
 import { SYSTEM_PERMISSIONS } from '../../common/constants/system-permissions';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';

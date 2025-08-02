@@ -200,6 +200,13 @@
           },
           "cwd": "."
         }
+      },
+      "collect-source": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/collectSourceFiles.ts",
+          "cwd": "apps/main-server"
+        }
       }
     }
   }

@@ -1,6 +1,6 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, JoinColumn, ManyToOne } from 'typeorm';
 import { Role } from './Role';
-import { Permission } from './Permission';
+import { Permission } from '../../permission/entities/Permission';
 import { buildRolePermissionName } from '../../codecs/permissionCodec';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 

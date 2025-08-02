@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyServiceJwt } from '../utils/verifyWithJwks';
 import { UnauthorizedError } from '../../common/errors/UnauthorizedError';
 import { createLoggerWithContext } from '../../common/libs/logger';
-import { hasPermission } from '../../rbac/utils/hasPermission';
+import { hasPermission } from '../../permission/utils/hasPermission';
 
 const logger = createLoggerWithContext('requireServiceJwt');
 

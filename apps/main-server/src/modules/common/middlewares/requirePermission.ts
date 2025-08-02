@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { UnauthorizedError } from '../errors/UnauthorizedError';
-import { hasPermission } from '../../rbac/utils/hasPermission';
-import { extractUserPermissionStrings } from '../../rbac/utils/extractUserPermissionStrings';
+import { hasPermission } from '../../permission/utils/hasPermission';
+import { extractUserPermissionStrings } from '../../permission/utils/extractUserPermissionStrings';
 
 /**
  * Middleware: Require a single permission to access a route.
