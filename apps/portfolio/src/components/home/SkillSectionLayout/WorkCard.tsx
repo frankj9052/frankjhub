@@ -17,7 +17,7 @@ export const WorkCard = ({
   return (
     <FrankCard
       className="cursor-default hover:scale-[1.02]"
-      cardHeight={220}
+      cardHeight={240}
       cardBody={
         <div className="h-full flex flex-col justify-center p-3 gap-3">
           <div className="flex flex-col gap-0.5">

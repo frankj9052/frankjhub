@@ -9,7 +9,7 @@ export type AccordionItemType = {
   content: ReactNode;
   subtitle?: string;
   indicator?: {
-    isOpen: ReactNode;
+    isOpen?: ReactNode;
     isClose: ReactNode;
   };
 };
@@ -94,6 +94,8 @@ export function FrankAccordion({
                 indicator={isOpen => {
                   if (item.indicator && item.indicator.isOpen && item.indicator.isClose) {
                     return isOpen.isOpen ? item.indicator.isOpen : item.indicator.isClose;
+                  } else if (item.indicator && item.indicator.isClose) {
+                    return item.indicator.isClose;
                   }
                   return;
                 }}
