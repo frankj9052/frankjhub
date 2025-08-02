@@ -159,3 +159,5 @@ vitest.config.*.timestamp*
 # Next.js
 .next
 out
+
+**/collected-source.txt
