@@ -9,6 +9,15 @@
   },
   "nx": {
     "projectType": "application",
-    "sourceRoot": "apps/admin-portal"
+    "sourceRoot": "apps/admin-portal",
+    "targets": {
+      "collect-source": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/collectSourceFiles.ts",
+          "cwd": "apps/admin-portal"
+        }
+      }
+    }
   }
 }

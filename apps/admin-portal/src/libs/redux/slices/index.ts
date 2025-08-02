@@ -11,3 +11,5 @@ export * from './organizationTypeSlice';
 export * from './actionSlice';
 
 export * from './resourceSlice';
+
+export * from './permissionSlice';

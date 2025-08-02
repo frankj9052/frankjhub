@@ -3,6 +3,7 @@ import {
   currentUserSlice,
   organizationSlice,
   organizationTypeSlice,
+  permissionSlice,
   resourceSlice,
   testSlice,
   usersSlice,
@@ -16,4 +17,5 @@ export const reducer = {
   organization: organizationSlice.reducer,
   action: actionSlice.reducer,
   resource: resourceSlice.reducer,
+  permission: permissionSlice.reducer,
 };
