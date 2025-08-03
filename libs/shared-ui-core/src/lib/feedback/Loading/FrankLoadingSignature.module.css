@@ -1,97 +1,97 @@
 .customizeSvg path {
-    stroke: #6A59D1;
-    stroke-linecap: round;
-    stroke-width: 2px;
+  stroke: #6a59d1;
+  stroke-linecap: round;
+  stroke-width: 2px;
 }
 
 .customizeSvg .svgPath_01 {
-    stroke-dasharray: 55.65549850463867;
-    stroke-dashoffset: 55.65549850463867;
-    animation: draw .1s linear 0s forwards;
+  stroke-dasharray: 55.65549850463867;
+  stroke-dashoffset: 55.65549850463867;
+  animation: draw 0.1s linear 0s forwards;
 }
 
 .customizeSvg .svgPath_02 {
-    stroke-dasharray: 388.09344482421875;
-    stroke-dashoffset: 388.09344482421875;
-    animation: draw .6s linear .1s forwards;
+  stroke-dasharray: 388.09344482421875;
+  stroke-dashoffset: 388.09344482421875;
+  animation: draw 0.6s linear 0.1s forwards;
 }
 
 .customizeSvg .svgPath_03 {
-    stroke-dasharray: 8.982131958007812;
-    stroke-dashoffset: 8.982131958007812;
-    animation: draw .04s linear .7s forwards;
+  stroke-dasharray: 8.982131958007812;
+  stroke-dashoffset: 8.982131958007812;
+  animation: draw 0.04s linear 0.7s forwards;
 }
 
 .customizeSvg .svgPath_04 {
-    stroke-dasharray: 24.706472396850586;
-    stroke-dashoffset: 24.706472396850586;
-    animation: draw .04s linear .74s forwards;
+  stroke-dasharray: 24.706472396850586;
+  stroke-dashoffset: 24.706472396850586;
+  animation: draw 0.04s linear 0.74s forwards;
 }
 .customizeSvg .svgPath_05 {
-    stroke-dasharray: 35.53479766845703;
-    stroke-dashoffset: 35.53479766845703;
-    animation: draw .04s linear .78s forwards;
+  stroke-dasharray: 35.53479766845703;
+  stroke-dashoffset: 35.53479766845703;
+  animation: draw 0.04s linear 0.78s forwards;
 }
 .customizeSvg .svgPath_06 {
-    stroke-dasharray: 17.28966522216797;
-    stroke-dashoffset: 17.28966522216797;
-    animation: draw .04s linear .82s forwards;
+  stroke-dasharray: 17.28966522216797;
+  stroke-dashoffset: 17.28966522216797;
+  animation: draw 0.04s linear 0.82s forwards;
 }
 .customizeSvg .svgPath_07 {
-    stroke-dasharray: 265.89337158203125;
-    stroke-dashoffset: 265.89337158203125;
-    animation: draw .4s linear .86s forwards;
+  stroke-dasharray: 265.89337158203125;
+  stroke-dashoffset: 265.89337158203125;
+  animation: draw 0.4s linear 0.86s forwards;
 }
 .customizeSvg .svgPath_08 {
-    stroke-dasharray: 49.23040771484375;
-    stroke-dashoffset: 49.23040771484375;
-    animation: draw .1s linear 1.26s forwards;
+  stroke-dasharray: 49.23040771484375;
+  stroke-dashoffset: 49.23040771484375;
+  animation: draw 0.1s linear 1.26s forwards;
 }
 .customizeSvg .svgPath_09 {
-    stroke-dasharray: 5.856894493103027;
-    stroke-dashoffset: 5.856894493103027;
-    animation: draw .04s linear 1.36s forwards;
+  stroke-dasharray: 5.856894493103027;
+  stroke-dashoffset: 5.856894493103027;
+  animation: draw 0.04s linear 1.36s forwards;
 }
 .customizeSvg .svgPath_10 {
-    stroke-dasharray: 37.88462448120117;
-    stroke-dashoffset: 37.88462448120117;
-    animation: draw .04s linear 1.4s forwards;
+  stroke-dasharray: 37.88462448120117;
+  stroke-dashoffset: 37.88462448120117;
+  animation: draw 0.04s linear 1.4s forwards;
 }
 .customizeSvg .svgPath_11 {
-    stroke-dasharray: 41.88480758666992;
-    stroke-dashoffset: 41.88480758666992;
-    animation: draw .04s linear 1.44s forwards;
+  stroke-dasharray: 41.88480758666992;
+  stroke-dashoffset: 41.88480758666992;
+  animation: draw 0.04s linear 1.44s forwards;
 }
 .customizeSvg .svgPath_12 {
-    stroke-dasharray: 27.115333557128906;
-    stroke-dashoffset: 27.115333557128906;
-    animation: draw .04s linear 1.48s forwards;
+  stroke-dasharray: 27.115333557128906;
+  stroke-dashoffset: 27.115333557128906;
+  animation: draw 0.04s linear 1.48s forwards;
 }
 .customizeSvg .svgPath_13 {
-    stroke-dasharray: 175.81446838378906;
-    stroke-dashoffset: 175.81446838378906;
-    animation: draw .2s linear 1.52s forwards;
+  stroke-dasharray: 175.81446838378906;
+  stroke-dashoffset: 175.81446838378906;
+  animation: draw 0.2s linear 1.52s forwards;
 }
 
 .spinner {
-    opacity: 0;
-    animation: revealLeftToRight 0.28s ease-in-out 1.72s forwards;
-    margin-top: 1rem;
+  opacity: 0;
+  animation: revealLeftToRight 0.28s ease-in-out 1.72s forwards;
+  margin-top: 1rem;
 }
 
 @keyframes draw {
-    to {
-        stroke-dashoffset: 0;
-    }
+  to {
+    stroke-dashoffset: 0;
+  }
 }
 
 @keyframes revealLeftToRight {
-    0% {
-      mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-      opacity: 0;
-    }
-    100% {
-      mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%);
-      opacity: 1;
-    }
+  0% {
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
+    opacity: 0;
   }
+  100% {
+    mask-image: linear-gradient(to right, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 100%);
+    opacity: 1;
+  }
+}
