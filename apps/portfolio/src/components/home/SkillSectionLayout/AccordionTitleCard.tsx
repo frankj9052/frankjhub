@@ -7,7 +7,7 @@ type Props = {
 
 export const AccordionTitleCard = ({ icon, title }: Props) => {
   return (
-    <div className="flex items-center pl-4 gap-4 font-bold h-[54px] text-xl">
+    <div className="flex items-center pl-4 gap-4 font-bold h-[54px] lg:text-xl text-[16px]">
       {/* icon */}
       <div>{icon}</div>
       {/* Text */}

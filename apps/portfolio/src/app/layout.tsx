@@ -1,6 +1,7 @@
+import Providers from '@/components/Providers';
 import { TopNav } from '../components/navbar/TopNav';
 import './global.css';
-import { LandingAnimationPage } from '../components/LandingAnimationPage';
+import LandGuard from '@/components/LandGuard';
 
 export const metadata = {
   title: 'Welcome to portfolio',
@@ -11,9 +12,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="font-popins portfolio-theme text-color-text-black">
-        <TopNav />
-        <LandingAnimationPage />
-        {children}
+        <Providers>
+          <LandGuard>
+            <TopNav />
+            {children}
+          </LandGuard>
+        </Providers>
       </body>
     </html>
   );

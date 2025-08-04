@@ -271,7 +271,7 @@ export const SkillSectionLayout = () => {
           />
         </div>
         {/* skills */}
-        <div className="col-span-2">
+        <div className="col-span-2 pt-6 pb-6 lg:pt-0 lg:pb-0">
           <h1 className="bg-primary w-[60px] h-[32px] flex items-center justify-center text-white rounded-md cursor-default mb-4">
             Skills
           </h1>

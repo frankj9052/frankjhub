@@ -9,8 +9,7 @@
     ".": {
       "require": "./index.cjs.js",
       "types": "./index.esm.d.ts",
-      "import": "./index.esm.js",
-      "default": "./index.cjs.js"
+      "import": "./index.esm.js"
     }
   }
 }

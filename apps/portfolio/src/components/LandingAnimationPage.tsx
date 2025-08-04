@@ -1,25 +1,31 @@
 'use client';
 
+import { systemSlice, useDispatch, useSelector } from '@/libs/redux';
 import { FrankLoadingSignature } from '@frankjhub/shared-ui-core';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export const LandingAnimationPage = () => {
-  const [firstTimeLanding, setFirstTimeLanding] = useState<boolean>(true);
+  const isFirstLoad = useSelector(state => state.systemSlice.isFirstLoad);
+  const dispatch = useDispatch();
   useEffect(() => {
-    setTimeout(() => {
-      setFirstTimeLanding(false);
-    }, 1000);
-  }, []);
-  switch (firstTimeLanding) {
-    case true:
-      return (
-        <div className="absolute top-0 left-0 right-0 bottom-0 z-[999] bg-white">
-          <div className="flex items-center justify-center h-full">
-            <FrankLoadingSignature />
-          </div>
-        </div>
-      );
-    case false:
-      return null;
+    let timer = undefined;
+    if (isFirstLoad) {
+      timer = setTimeout(() => {
+        dispatch(systemSlice.actions.markLandingSeen());
+      }, 3000);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isFirstLoad, dispatch]);
+
+  if (!isFirstLoad) {
+    return null;
   }
+  return (
+    <div className="absolute top-0 left-0 right-0 bottom-0 z-[999] bg-white">
+      <div className="flex items-center justify-center h-full">
+        <FrankLoadingSignature />
+      </div>
+    </div>
+  );
 };
