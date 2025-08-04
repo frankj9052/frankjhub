@@ -15,7 +15,7 @@ type Props = {
 };
 export const SkillContent = ({ data }: Props) => {
   return (
-    <div className="px-5 pb-4 pt-2 grid grid-cols-2 gap-8">
+    <div className="px-5 pb-4 pt-2 grid lg:grid-cols-2 grid-cols-1 gap-8">
       {data &&
         data.length > 0 &&
         data.map(item => (
