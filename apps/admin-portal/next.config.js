@@ -22,7 +22,9 @@ const nextConfig = {
       },
     ],
   },
-  nx: {},
+  nx: {
+    svgr: false,
+  },
 };
 
 const plugins = [

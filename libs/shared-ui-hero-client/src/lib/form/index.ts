@@ -18,3 +18,5 @@ export * from './Radio-Group';
 
 // 时间输入框组件
 export * from './Time-Input';
+
+export * from './Select';

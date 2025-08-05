@@ -31,7 +31,7 @@ const columns: TableColumn[] = generateColumnsFromData(permissionDataExample, {
   sortableFields,
   extraColumns: [
     {
-      name: 'Actions',
+      name: 'ACTIONS',
       uid: 'actions',
       sortable: false,
     },

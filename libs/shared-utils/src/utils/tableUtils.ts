@@ -54,3 +54,19 @@ export function getLabeledEnumList<T extends Record<string, string>>(
     uid: value,
   }));
 }
+
+export const formatValue = (value: unknown): string => {
+  if (value === null) {
+    return 'null';
+  }
+  if (value === undefined) {
+    return 'undefined';
+  }
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  if (typeof value === 'object') {
+    return JSON.stringify(value);
+  }
+  return String(value);
+};

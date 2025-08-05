@@ -5,7 +5,7 @@ import { Key, ReactNode } from 'react';
 export type DefaultAutocompleteItemsType = {
   label: string | ReactNode;
   key: string;
-  textValue: string;
+  textValue?: string;
   description?: string;
 };
 
@@ -33,6 +33,10 @@ export type DefaultAutocompleteItemsType = {
 export type FrankAutocompleteProps = {
   allowsCustomValue?: boolean;
   ariaLabel: string;
+  label?: ReactNode;
+  onBlur?: () => void;
+  isInvalid?: boolean;
+  errorMessage?: ReactNode;
   className?: string;
   placeholder?: string;
   defaultItems?: DefaultAutocompleteItemsType[];
@@ -57,6 +61,10 @@ export type FrankAutocompleteProps = {
 export function FrankAutocomplete({
   allowsCustomValue = false,
   ariaLabel,
+  label,
+  onBlur,
+  isInvalid,
+  errorMessage,
   placeholder,
   defaultItems,
   defaultFilter,
@@ -80,6 +88,10 @@ export function FrankAutocomplete({
       }}
     >
       <Autocomplete
+        label={label}
+        onBlur={onBlur}
+        isInvalid={!!isInvalid}
+        errorMessage={errorMessage}
         allowsCustomValue={allowsCustomValue}
         aria-hidden={false}
         className="h-full"
@@ -88,10 +100,13 @@ export function FrankAutocomplete({
         variant={variant === 'ghost' ? 'bordered' : variant}
         inputProps={{
           classNames: {
-            label: 'hidden',
-            inputWrapper: clsx('h-full min-h-0', {
+            label: clsx({
+              hidden: !label,
+            }),
+            inputWrapper: clsx('h-full', {
               'border-none shadow-none': variant === 'ghost',
               'border-1': variant !== 'ghost',
+              'min-h-0': !label,
             }),
             input: `${
               customizeStyles?.inputTextStyle ? customizeStyles.inputTextStyle : 'text-[13px]'

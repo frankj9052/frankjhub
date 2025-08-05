@@ -1,0 +1,252 @@
+'use client';
+import {
+  permissionSlice,
+  getPermissionByIdAsync,
+  getPermissionListAsync,
+  useDispatch,
+  useSelector,
+} from '@/libs/redux';
+import { softDeletePermission } from '@/services/permission.service';
+import { getDefaultTableClassNames } from '@/utils/tableClassnames';
+import { PermissionDto, PermissionOrderByField, OrderEnum } from '@frankjhub/shared-schema';
+import { formatShortDateTime, formatValue } from '@frankjhub/shared-utils';
+import {
+  Button,
+  Chip,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  SortDescriptor,
+  Spinner,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@heroui/react';
+import { useRouter } from 'next/navigation';
+import { Key, useCallback, useEffect, useMemo, useState } from 'react';
+import { HiDotsVertical } from 'react-icons/hi';
+import { toast } from 'react-toastify';
+import { FrankModal } from '@frankjhub/shared-ui-hero-client';
+import { TopContent } from './TopContent';
+import { BottomContent } from './BottomContent';
+
+export const PermissionTable = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const all = useSelector(state => state.permission.all?.data);
+  const pagination = useSelector(state => state.permission.pagination);
+  const status = useSelector(state => state.permission.status);
+  const visibleColumns = useSelector(state => state.permission.visibleColumns);
+  const columns = useSelector(state => state.permission.columns);
+  const loadingStatus = status === 'loading' ? 'loading' : 'idle';
+  const [openModal, setOpenModal] = useState<
+    | {
+        name: string;
+        id: string;
+        header: string;
+        body: string;
+      }
+    | undefined
+  >(undefined);
+  const data = all?.data ?? [];
+  const classNames = useMemo(() => getDefaultTableClassNames(), []);
+
+  const headerColumns = useMemo(() => {
+    if (visibleColumns === 'all') return columns;
+    return columns.filter(column => Array.from(visibleColumns).includes(column.uid));
+  }, [visibleColumns, columns]);
+
+  const renderCell = useCallback(
+    (data: PermissionDto, columnKey: Key) => {
+      const cellValue = data[columnKey as keyof PermissionDto];
+
+      switch (columnKey) {
+        case 'fields':
+          return Array.isArray(cellValue) ? <span>{cellValue.join(', ')}</span> : <span>*</span>;
+
+        case 'resource':
+          return cellValue && typeof cellValue === 'object' && 'name' in cellValue ? (
+            <span>{String(cellValue.name)}</span>
+          ) : (
+            <span>-</span>
+          );
+
+        case 'permissionActions':
+          return Array.isArray(cellValue) ? (
+            <span>
+              {cellValue
+                .map(action =>
+                  typeof action === 'object' &&
+                  action !== null &&
+                  'action' in action &&
+                  'name' in action.action
+                    ? action.action.name
+                    : typeof action === 'string'
+                    ? action
+                    : '[Unknown]'
+                )
+                .join(', ')}
+            </span>
+          ) : (
+            <span>-</span>
+          );
+        case 'condition':
+          return cellValue ? (
+            <pre className="max-w-[200px] overflow-auto text-xs text-left whitespace-pre-wrap">
+              {JSON.stringify(cellValue, null, 2)}
+            </pre>
+          ) : (
+            <span>-</span>
+          );
+
+        case 'isActive':
+          return cellValue ? (
+            <Chip color="success">Active</Chip>
+          ) : (
+            <Chip color="default">Inactive</Chip>
+          );
+        case 'createdAt':
+        case 'updatedAt':
+        case 'deletedAt':
+          return cellValue ? (
+            <div>{formatShortDateTime(new Date(String(cellValue)))}</div>
+          ) : (
+            cellValue
+          );
+        case 'actions':
+          return (
+            <div className="relative flex justify-end items-center gap-2">
+              <Dropdown className="bg-background border-1 border-default-200">
+                <DropdownTrigger>
+                  <Button isIconOnly radius="full" size="sm" variant="light">
+                    <HiDotsVertical className="text-default-400" />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem
+                    key="edit"
+                    onPress={() => {
+                      dispatch(getPermissionByIdAsync({ id: data.id }));
+                      router.push(`/dashboard/permissions/edit/${data.id}`);
+                    }}
+                  >
+                    Edit
+                  </DropdownItem>
+                  <DropdownItem
+                    key="delete"
+                    onPress={() => {
+                      setOpenModal({
+                        name: data.name,
+                        id: data.id,
+                        header: 'Delete',
+                        body: `Are you sure you want to delete permission: ${data.name}?`,
+                      });
+                    }}
+                  >
+                    Delete
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            </div>
+          );
+        default:
+          return <span>{formatValue(cellValue)}</span>;
+      }
+    },
+    [router, dispatch]
+  );
+
+  useEffect(() => {
+    dispatch(getPermissionListAsync({ pagination }));
+  }, [pagination, dispatch]);
+
+  const handleSortChange = (sortDescriptor: SortDescriptor) => {
+    const { column, direction } = sortDescriptor;
+    if (direction === 'ascending') {
+      dispatch(permissionSlice.actions.setOrder(OrderEnum.ASC));
+    } else if (direction === 'descending') {
+      dispatch(permissionSlice.actions.setOrder(OrderEnum.DESC));
+    }
+    dispatch(permissionSlice.actions.setOrderBy(String(column) as PermissionOrderByField));
+  };
+
+  const handleSoftDeleteClick = async () => {
+    if (openModal) {
+      const result = await softDeletePermission(openModal.id);
+      if (result.status === 'success') {
+        toast.success(result.message);
+        setOpenModal(undefined);
+        dispatch(getPermissionListAsync({ pagination }));
+      } else {
+        toast.error(String(result.message));
+      }
+    }
+  };
+
+  return (
+    <div>
+      <Table
+        isCompact
+        removeWrapper
+        aria-label="async paginated permission data"
+        selectionMode="single"
+        color="secondary"
+        topContent={<TopContent />}
+        topContentPlacement="outside"
+        bottomContent={<BottomContent />}
+        bottomContentPlacement="outside"
+        classNames={classNames}
+        onSortChange={handleSortChange}
+      >
+        <TableHeader columns={headerColumns}>
+          {column => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'action' ? 'center' : 'start'}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody
+          items={data ?? []}
+          loadingContent={<Spinner color="secondary" />}
+          loadingState={loadingStatus}
+          emptyContent={'No permission found'}
+        >
+          {item => (
+            <TableRow key={item.id}>
+              {columnKey => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      <FrankModal
+        isOpen={!!openModal}
+        onClose={() => setOpenModal(undefined)}
+        header={openModal?.header}
+        body={<p>{openModal?.body}</p>}
+        footerButtons={[
+          {
+            color: 'default',
+            variant: 'light',
+            customizeContent: <div className="h-8 flex items-center justify-center">Cancel</div>,
+            onPress: () => setOpenModal(undefined),
+          },
+          {
+            color: 'danger',
+            variant: 'solid',
+            customizeContent: <div className="h-8 flex items-center justify-center">Delete</div>,
+            onPress: handleSoftDeleteClick,
+          },
+        ]}
+      />
+    </div>
+  );
+};
