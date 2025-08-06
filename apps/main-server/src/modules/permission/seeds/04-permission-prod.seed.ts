@@ -7,6 +7,7 @@ import { SYSTEM_PERMISSIONS } from '../../common/constants/system-permissions';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
 import { Action } from '../../action/entities/Action';
 import { Resource } from '../../resource/entities/Resource';
+import { buildPermissionName } from '../../codecs/permissionCodec';
 
 /**
  * Seeder: PermissionProdSeed
@@ -73,10 +74,11 @@ export default class PermissionProdSeed extends BaseSeeder {
       resource,
       fields: [], // 如果有字段控制，这里填
       condition: {}, // 如果有条件，这里填
+      name: buildPermissionName(
+        resource.name,
+        actions.map(action => action.name)
+      ),
     });
-
-    // ⚠️ 必须显式设置动作名，用于 name 构建（这个不会存 DB）
-    permission.setActionsForNameBuild(actions.map(a => a.name));
 
     // 保存 permission（此时 name 会自动生成）
     const savedPermission = await permissionRepo.save(permission);

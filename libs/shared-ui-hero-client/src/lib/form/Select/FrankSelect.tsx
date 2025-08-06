@@ -26,6 +26,7 @@ export type FrankSelectProps = {
   isInvalid?: boolean;
   errorMessage?: string;
   disallowEmptySelection?: boolean;
+  variant?: 'flat' | 'faded' | 'bordered' | 'underlined';
 };
 
 /**
@@ -42,6 +43,7 @@ export type FrankSelectProps = {
  * @param items - The list of options to display in the select dropdown.
  * @param size - Size of the select field: 'lg', 'md', or 'sm'.
  * @param width - Optional fixed width for the select component in pixels. Defaults to 100%.
+ * @param {'flat' | 'faded' | 'bordered' | 'underlined'} [props.variant] - 视觉风格。
  *
  * @returns A JSX.Element representing the FrankSelect dropdown component.
  */
@@ -60,6 +62,7 @@ export const FrankSelect = ({
   isInvalid,
   errorMessage,
   disallowEmptySelection,
+  variant,
 }: FrankSelectProps) => {
   return (
     <div
@@ -81,6 +84,7 @@ export const FrankSelect = ({
         isInvalid={isInvalid}
         errorMessage={errorMessage}
         disallowEmptySelection={!!disallowEmptySelection}
+        variant={variant}
       >
         {item => <SelectItem key={item.key}>{item.label}</SelectItem>}
       </Select>

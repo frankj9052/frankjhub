@@ -20,3 +20,5 @@ export * from './Radio-Group';
 export * from './Time-Input';
 
 export * from './Select';
+
+export * from './Textarea';

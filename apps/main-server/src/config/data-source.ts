@@ -34,7 +34,8 @@ const cloudUrlOptions = env.DATABASE_URL
 const baseOptions = {
   type: 'postgres',
   synchronize: false,
-  logging: isProd ? ['error'] : ['query', 'error'],
+  // logging: isProd ? ['error'] : ['query', 'error'],
+  logging: false,
   maxQueryExecutionTime: 3000,
   namingStrategy: new SnakeNamingStrategy(),
 

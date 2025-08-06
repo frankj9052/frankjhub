@@ -97,6 +97,7 @@ export async function updatePermission(
     '/api/permission/update',
     validationResult.data
   );
+  console.log('check params ===> ', validationResult.data);
   return response;
 }
 

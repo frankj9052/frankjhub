@@ -56,6 +56,11 @@ const meta: Meta<typeof FrankSelect> = {
       action: 'onSelectionChange',
       description: 'Callback fired when selection changes.',
     },
+    variant: {
+      control: { type: 'radio' },
+      options: ['flat', 'faded', 'bordered', 'underlined'],
+      description: 'Visual variant of the textarea.',
+    },
   },
   args: {
     label: 'Select a person',

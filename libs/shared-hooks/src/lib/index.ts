@@ -18,3 +18,6 @@ export * from './useWindowSize';
 
 // markdown提取文字和格式内容
 export * from './useMarkdown';
+
+// 确认弹窗的通用逻辑 Hook
+export * from './useConfirmModal';

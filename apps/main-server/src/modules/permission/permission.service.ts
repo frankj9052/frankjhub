@@ -123,12 +123,12 @@ export class PermissionService {
       resource,
       fields: fields ?? undefined,
       condition: condition ?? undefined,
-      description,
+      description: description ?? undefined,
       createdBy,
+      name,
     };
 
     const permission = this.permissionRepo.create(permissionData);
-    permission.setActionsForNameBuild(actions.map(a => a.name));
 
     const savedPermission = await this.permissionRepo.save(permission);
 
@@ -274,7 +274,10 @@ export class PermissionService {
     permission.isActive = typeof isActive === 'boolean' ? isActive : permission.isActive;
     permission.updatedBy = updatedBy;
 
-    // 如果 actions 变了，更新关联表
+    // 先保存 permission 本体（触发 @BeforeUpdate，但此时 actions 还未更新）
+    await this.permissionRepo.save(permission);
+
+    // 如果 actions 变了，更新关联表, 在保存 permission 后做
     if (actionsChanged) {
       await this.permissionActionRepo.delete({ permission: { id: permission.id } });
       const permissionActions = actions.map(action =>
@@ -287,6 +290,18 @@ export class PermissionService {
       await this.permissionActionRepo.save(permissionActions);
     }
 
+    const reloaded = await this.permissionRepo.findOneOrFail({
+      where: { id: permission.id },
+      relations: {
+        resource: true,
+        permissionActions: {
+          action: true,
+        },
+      },
+    });
+    reloaded.setName();
+    await this.permissionRepo.save(reloaded);
+
     // 重新加载关联数据
     const loaded = await this.permissionRepo.findOneOrFail({
       where: { id: permission.id },
@@ -297,6 +312,8 @@ export class PermissionService {
         },
       },
     });
+    log.debug('Checking loaded', { name: loaded.name });
+
     log.info(`Permission "${permission.name}" updated by "${updatedBy}" successfully`);
     return {
       status: 'success',

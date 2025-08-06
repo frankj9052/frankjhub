@@ -30,23 +30,14 @@ export class Permission extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
 
-  /** 非持久化字段，仅用于 name 构建 */
-  private _actionNames?: string[];
-
-  setActionsForNameBuild(actionNames: string[]) {
-    this._actionNames = actionNames;
-  }
-
   @BeforeInsert()
   @BeforeUpdate()
-  protected setName(): void {
-    if (!this.resource?.name || !this._actionNames) return;
+  public setName(): void {
+    const resourceName = this.resource?.name;
+    const actionNames = this.permissionActions?.map(pa => pa.action?.name).filter(Boolean);
 
-    this.name = buildPermissionName(
-      this.resource.name,
-      this._actionNames,
-      this.fields,
-      this.condition
-    );
+    if (!resourceName || !actionNames?.length) return;
+
+    this.name = buildPermissionName(resourceName, actionNames, this.fields, this.condition);
   }
 }

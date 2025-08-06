@@ -8,12 +8,12 @@ import {
 } from '@/libs/redux';
 import { createPermission } from '@/services/permission.service';
 import { PermissionCreateRequest, permissionCreateRequestSchema } from '@frankjhub/shared-schema';
-import { FrankAutocomplete, FrankSelect } from '@frankjhub/shared-ui-hero-client';
+import { FrankAutocomplete, FrankSelect, FrankTextArea } from '@frankjhub/shared-ui-hero-client';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
 import { Button, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { IoMdClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
 
@@ -31,6 +31,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
     control,
     reset,
     setError,
+    clearErrors,
     formState: { isDirty, isSubmitting, errors },
   } = useForm<PermissionCreateRequest>({
     resolver: zodResolver(permissionCreateRequestSchema),
@@ -45,7 +46,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
         resourceId: '',
         actionIds: [],
         fields: [],
-        condition: {},
+        condition: undefined,
         description: '',
       });
       onClose();
@@ -60,6 +61,22 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
     dispatch(getResourceOptionsAsync());
     dispatch(getActoinOptionsAsync());
   }, [dispatch]);
+
+  // textarea value
+  const watchedCondition = useWatch({ control, name: 'condition' });
+  const [conditionText, setConditionText] = useState('');
+  const hasMountedRef = useRef(false);
+  // 同步 RHF 初始值（仅当首次或 reset 后更新）
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      if (watchedCondition && typeof watchedCondition === 'object') {
+        setConditionText(JSON.stringify(watchedCondition, null, 2));
+      } else {
+        setConditionText('');
+      }
+      hasMountedRef.current = true;
+    }
+  }, []);
 
   return (
     <div className="p-4 flex flex-col gap-3">
@@ -82,7 +99,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
               control={control}
               render={({ field, fieldState }) => (
                 <FrankAutocomplete
-                  label="Select Resource"
+                  label="Select Resource (*)"
                   ariaLabel="Select resource"
                   variant="bordered"
                   selectedKey={field.value ?? ''}
@@ -108,10 +125,10 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
               control={control}
               render={({ field, fieldState }) => (
                 <FrankSelect
-                  label="Select Actions"
+                  label="Select Actions (*)"
                   ariaLabel="select actions"
                   selectionMode="multiple"
-                  selectedKeys={field.value}
+                  selectedKeys={field.value ?? []}
                   onSelectionChange={sharedSelection => {
                     const selected: string[] =
                       sharedSelection === 'all'
@@ -131,6 +148,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
                   }
                   size="sm"
                   disallowEmptySelection={true}
+                  variant="bordered"
                 />
               )}
             />
@@ -141,7 +159,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
               control={control}
               render={({ field, fieldState }) => (
                 <Input
-                  label="Fields"
+                  label="Fields (Use commas to separate)"
                   variant="bordered"
                   value={Array.isArray(field.value) ? field.value.join(', ') : ''}
                   onChange={event => {
@@ -149,6 +167,57 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
                     const fields = value.split(',').map(item => item.trim());
                     field.onChange(fields);
                   }}
+                  onBlur={field.onBlur}
+                  isInvalid={!!fieldState.error}
+                  errorMessage={fieldState.error?.message}
+                  fullWidth
+                  size="sm"
+                />
+              )}
+            />
+          </div>
+          <div className="h-[140px] w-full">
+            <Controller
+              name="condition"
+              control={control}
+              render={({ field, fieldState }) => {
+                return (
+                  <FrankTextArea
+                    label="Condition (JSON format)"
+                    variant="bordered"
+                    value={conditionText}
+                    onValueChange={(input: string) => {
+                      setConditionText(input);
+                      try {
+                        const parsed = input.trim() === '' ? null : JSON.parse(input);
+                        field.onChange(parsed);
+                        clearErrors('condition');
+                      } catch {
+                        field.onChange(undefined); // 表单上保留 undefined/null
+                        setError('condition', { message: 'Invalid JSON format' });
+                      }
+                    }}
+                    onBlur={field.onBlur}
+                    isInvalid={!!fieldState.error}
+                    errorMessage={fieldState.error?.message ?? undefined}
+                    size="sm"
+                    minRows={4}
+                    maxRows={4}
+                  />
+                );
+              }}
+            />
+          </div>
+          <div className="h-[70px] w-full">
+            <Controller
+              name="description"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  label="Description"
+                  variant="bordered"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
                   onBlur={field.onBlur}
                   isInvalid={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
