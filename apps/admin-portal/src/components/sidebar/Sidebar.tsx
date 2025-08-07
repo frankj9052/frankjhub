@@ -63,6 +63,16 @@ const sidebarData: SidebarDataType[] = [
       },
     ],
   },
+  {
+    category: 'Role',
+    list: [
+      {
+        icon: <div>3</div>,
+        label: 'Roles',
+        src: '/dashboard/roles',
+      },
+    ],
+  },
 ];
 
 type Props = {

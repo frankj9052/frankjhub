@@ -1,4 +1,3 @@
-// libs/shared-schema/src/modules/permission/examples/examples.ts
 import { PermissionDto } from '../entity';
 import { PermissionListPageData, PermissionListResponse } from '../response/list.response.schema';
 import { PermissionOptionListResponse } from '../response/option-list.response.schema';

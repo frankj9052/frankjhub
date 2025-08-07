@@ -4,12 +4,12 @@ import { z, zInfer } from '../../../libs/z';
 // ---------------------------------------------
 export const baseEntitySchema = z.object({
   id: z.string().uuid(),
-  isActive: z.boolean(),
+  isActive: z.boolean().default(true).optional(),
   createdAt: z.string(),
-  createdBy: z.string().nullable(),
+  createdBy: z.string().max(255).nullable().optional(),
   updatedAt: z.string(),
-  updatedBy: z.string().nullable(),
-  deletedAt: z.string().nullable(),
-  deletedBy: z.string().nullable(),
+  updatedBy: z.string().max(255).nullable().optional(),
+  deletedAt: z.string().nullable().optional(),
+  deletedBy: z.string().max(255).nullable().optional(),
 });
 export type BaseEntityDto = zInfer<typeof baseEntitySchema>;

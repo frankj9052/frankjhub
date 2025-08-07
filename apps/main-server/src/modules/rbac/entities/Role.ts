@@ -26,10 +26,10 @@ export class Role extends BaseEntity {
   name!: string;
 
   @Column({ type: 'varchar', length: 255, default: '' })
-  description!: string;
+  description?: string;
 
   @Column({ type: 'boolean', default: true })
-  isActive!: boolean;
+  isActive?: boolean;
 
   /**
    * Source type of the role
@@ -37,7 +37,7 @@ export class Role extends BaseEntity {
    * - 'org': custom role belonging to a specific organization
    */
   @Column({ type: 'enum', enum: RoleSource, default: RoleSource.TYPE })
-  roleSource!: RoleSource;
+  roleSource?: RoleSource;
 
   @ManyToOne(() => OrganizationType, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationTypeId' })
@@ -52,7 +52,7 @@ export class Role extends BaseEntity {
 
   @BeforeInsert()
   @BeforeUpdate()
-  protected setCode(): void {
+  public setCode(): void {
     if (!this.name || !this.roleSource) return;
 
     if (this.roleSource === RoleSource.ORG && this.organization?.name) {

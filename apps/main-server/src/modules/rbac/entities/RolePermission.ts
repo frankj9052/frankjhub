@@ -11,7 +11,7 @@ export class RolePermission extends BaseEntity {
   name!: string;
 
   @Column({ type: 'boolean', default: true })
-  isActive!: boolean;
+  isActive?: boolean;
 
   /* 外键 */
   @ManyToOne(() => Permission, { nullable: false })
