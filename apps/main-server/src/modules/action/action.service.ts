@@ -13,6 +13,8 @@ import { Action } from './entities/Action';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { NotFoundError } from '../common/errors/NotFoundError';
+import { Permission } from '../permission/entities/Permission';
+import { updateEntityFields } from '@frankjhub/shared-utils';
 
 const logger = createLoggerWithContext('ActionService');
 
@@ -29,7 +31,7 @@ export class ActionService {
     return {
       id: action.id,
       name: action.name,
-      description: action.description ?? null,
+      description: action.description ?? '',
       isActive: action.isActive,
       createdAt: action.createdAt.toISOString(),
       updatedAt: action.updatedAt.toISOString(),
@@ -116,29 +118,81 @@ export class ActionService {
     update: ActionUpdateRequest,
     performedBy: string
   ): Promise<ActionSingleResponse> {
+    const log = logger.child({ method: 'updateAction', id: update.id, performedBy });
     const { id } = update;
-    const action = await this.actionRepo.findOne({ where: { id }, withDeleted: true });
-    if (!action) {
-      throw new NotFoundError(`Action ${id} not found`);
-    }
 
-    for (const [key, value] of Object.entries(update)) {
-      if (key === 'id') continue;
-      if (value !== undefined) {
-        if (key === 'orgType') {
-          (action as any)[key] = { id: value };
-        } else {
-          (action as any)[key] = value;
-        }
+    const allowedFields: (keyof ActionDto)[] = [
+      'createdAt',
+      'createdBy',
+      'deletedAt',
+      'deletedBy',
+      'description',
+      'isActive',
+      'name',
+      'updatedAt',
+      'updatedBy',
+    ];
+
+    // transaction management
+    await AppDataSource.transaction(async manager => {
+      const actionRepo = manager.getRepository(Action);
+      const permissionRepo = manager.getRepository(Permission);
+
+      const action = await actionRepo.findOne({ where: { id }, withDeleted: true });
+      if (!action) {
+        throw new NotFoundError(`Action ${id} not found`);
       }
-    }
 
-    action.updatedBy = performedBy;
-    const savedAction = await this.actionRepo.save(action);
+      // 判断name是否被更改
+      const nameChanged = update.name !== action.name;
+
+      // 更新字段
+      updateEntityFields(action, update, allowedFields);
+      action.updatedBy = performedBy;
+      action.updatedAt = new Date();
+
+      const savedAction = await actionRepo.save(action);
+
+      // 同步更改权限名称
+      if (nameChanged) {
+        const permissions = await permissionRepo.find({
+          where: {
+            permissionActions: {
+              action: {
+                id,
+              },
+            },
+          },
+          relations: {
+            resource: true,
+            permissionActions: {
+              action: true,
+              permission: true,
+            },
+          },
+          withDeleted: true,
+        });
+
+        await Promise.all(
+          permissions.map(async permission => {
+            permission.setName();
+
+            // 不要 save，使用 update 避免联级保存失败
+            await permissionRepo.update(permission.id, {
+              name: permission.name,
+            });
+          })
+        );
+      }
+
+      log.info(`Resource ${savedAction.name} updated By ${performedBy}`);
+    });
+
+    const updated = await this.actionRepo.findOneOrFail({ where: { id }, withDeleted: true });
     const result: ActionSingleResponse = {
       status: 'success',
-      message: `Action ${savedAction.name} updated by ${performedBy}`,
-      data: this.buildAction(savedAction),
+      message: `Action ${updated.name} updated by ${performedBy}`,
+      data: this.buildAction(updated),
     };
     return result;
   }

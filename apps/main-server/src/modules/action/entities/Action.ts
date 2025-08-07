@@ -8,7 +8,7 @@ export class Action extends BaseEntity {
   name!: string;
 
   @Column({ type: 'varchar', length: 255, default: '' })
-  description!: string;
+  description?: string;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;

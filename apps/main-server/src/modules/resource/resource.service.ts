@@ -13,6 +13,8 @@ import { Resource } from './entities/Resource';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { NotFoundError } from '../common/errors/NotFoundError';
+import { Permission } from '../permission/entities/Permission';
+import { updateEntityFields } from '@frankjhub/shared-utils';
 
 const logger = createLoggerWithContext('ActionService');
 
@@ -29,7 +31,7 @@ export class ResourceService {
     return {
       id: resource.id,
       name: resource.name,
-      description: resource.description ?? null,
+      description: resource.description ?? '',
       isActive: resource.isActive,
       createdAt: resource.createdAt.toISOString(),
       updatedAt: resource.updatedAt.toISOString(),
@@ -123,24 +125,66 @@ export class ResourceService {
   ): Promise<ResourceSingleResponse> {
     const log = logger.child({ method: 'updateResource', id: update.id, performedBy });
     const { id } = update;
-    const resource = await this.resourceRepo.findOne({ where: { id }, withDeleted: true });
-    if (!resource) {
-      throw new NotFoundError(`Resource ${id} not found`);
-    }
-    for (const [key, value] of Object.entries(update)) {
-      if (key === 'id') continue;
-      if (value !== undefined) {
-        (resource as any)[key] = value;
-      }
-    }
 
-    resource.updatedBy = performedBy;
-    const savedResource = await this.resourceRepo.save(resource);
-    log.info(`Resource ${savedResource.name} updated By ${performedBy}`);
+    const allowedFields: (keyof ResourceDto)[] = [
+      'createdAt',
+      'createdBy',
+      'deletedAt',
+      'deletedBy',
+      'description',
+      'isActive',
+      'name',
+      'updatedAt',
+      'updatedBy',
+    ];
+
+    // 事务处理 Transaction Management
+    await AppDataSource.transaction(async manager => {
+      const resourceRepo = manager.getRepository(Resource);
+      const permissionRepo = manager.getRepository(Permission);
+
+      const resource = await resourceRepo.findOne({ where: { id }, withDeleted: true });
+      if (!resource) {
+        throw new NotFoundError(`Resource ${id} not found`);
+      }
+
+      // 判断name是否被更改
+      const nameChanged = update.name !== resource.name;
+
+      // 更新字段
+      updateEntityFields(resource, update, allowedFields);
+      resource.updatedBy = performedBy;
+      resource.updatedAt = new Date();
+
+      const savedResource = await resourceRepo.save(resource);
+
+      // 同步更新权限名称
+      if (nameChanged) {
+        const permissions = await permissionRepo.find({
+          where: { resource: { id } },
+          relations: {
+            resource: true,
+            permissionActions: { action: true },
+          },
+          withDeleted: true,
+        });
+
+        await Promise.all(
+          permissions.map(async permission => {
+            permission.setName();
+            await permissionRepo.save(permission);
+          })
+        );
+      }
+
+      log.info(`Resource ${savedResource.name} updated By ${performedBy}`);
+    });
+
+    const updated = await this.resourceRepo.findOneOrFail({ where: { id }, withDeleted: true });
     const result: ResourceSingleResponse = {
       status: 'success',
-      message: `Resource ${savedResource.name} updated By ${performedBy}`,
-      data: this.buildResource(savedResource),
+      message: `Resource ${updated.name} updated By ${performedBy}`,
+      data: this.buildResource(updated),
     };
     return result;
   }

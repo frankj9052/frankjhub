@@ -48,7 +48,7 @@ export class PermissionService {
       resource: {
         id: permission.resource.id,
         name: permission.resource.name,
-        description: permission.resource.description,
+        description: permission.resource.description ?? '',
         isActive: permission.resource.isActive,
         createdAt: permission.resource.createdAt.toISOString(),
         createdBy: permission.resource.createdBy ?? null,
@@ -70,7 +70,7 @@ export class PermissionService {
         action: {
           id: pa.action.id,
           name: pa.action.name,
-          description: pa.action.description,
+          description: pa.action.description ?? '',
           isActive: pa.action.isActive,
           createdAt: pa.action.createdAt.toISOString(),
           createdBy: pa.action.createdBy ?? null,
@@ -312,7 +312,6 @@ export class PermissionService {
         },
       },
     });
-    log.debug('Checking loaded', { name: loaded.name });
 
     log.info(`Permission "${permission.name}" updated by "${updatedBy}" successfully`);
     return {
