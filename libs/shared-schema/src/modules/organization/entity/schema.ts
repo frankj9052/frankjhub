@@ -6,7 +6,7 @@ export const organizationSchema = z.object({
   description: z.string().nullable().optional(),
   orgTypeId: z.string().uuid(),
   orgTypeName: z.string(),
-  isActive: z.boolean(),
+  isActive: z.boolean().default(true).optional(),
   createdAt: z.string(),
   createdBy: z.string().nullable(),
   updatedAt: z.string(),
