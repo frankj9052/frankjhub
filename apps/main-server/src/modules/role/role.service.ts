@@ -20,6 +20,14 @@ import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { In } from 'typeorm';
 
+const filterConditionMap: Record<string, string> = {
+  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
+  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
+  deleted: `(t."deleted_at" IS NOT NULL)`,
+  source_organization: `(t."organization" IS NOT NULL)`,
+  source_organization_type: `(t."organization_type" IS NOT NULL)`,
+};
+
 export class RoleService {
   private roleRepo = AppDataSource.getRepository(Role);
   private permissionRepo = AppDataSource.getRepository(Permission);
@@ -187,7 +195,17 @@ export class RoleService {
       modifyQueryBuilder: qb => {
         const { search, filters } = pagination;
         if (search) {
-          qb.where('t.name ILIKE :search', { search: `%${search.trim()}%` });
+          qb.where('t.name ILIKE :search OR t.description ILIKE :search', {
+            search: `%${search.trim()}%`,
+          });
+        }
+
+        // 状态过滤（active / inactive / deleted）
+        if (filters?.length) {
+          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
+          if (validConditions.length > 0) {
+            qb.andWhere(`(${validConditions.join(' OR ')})`);
+          }
         }
         return qb
           .leftJoinAndSelect('t.organization', 'organization')
@@ -291,7 +309,11 @@ export class RoleService {
     return {
       status: 'success',
       message: 'Get role options successful',
-      data: roles,
+      data: roles.map(r => ({
+        id: r.id,
+        name: r.name,
+        code: r.code,
+      })),
     };
   }
 }
