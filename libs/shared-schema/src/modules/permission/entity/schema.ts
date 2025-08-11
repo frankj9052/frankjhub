@@ -1,7 +1,7 @@
 import { baseEntitySchema } from '../../../modules/common';
 import { z, zInfer } from '../../../libs/z';
 import { resourceRefSchema } from '../../../modules/resource';
-import { actionRefSchema } from 'src/modules/action';
+import { actionRefSchema } from '../../../modules/action';
 
 export const permissionSchema = z.object({
   ...baseEntitySchema.shape,

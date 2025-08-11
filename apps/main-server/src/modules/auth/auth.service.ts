@@ -45,7 +45,7 @@ export class AuthService {
       orgType: orgRole.organization.orgType?.name || 'No Category',
       roleCode: orgRole.role.code,
       roleName: orgRole.role.name,
-      permissionStrings: orgRole.role.rolePermissions?.map(rp => rp.permission.name) ?? [],
+      permissionStrings: orgRole.role?.rolePermissions?.map(rp => rp.permission.name) ?? [],
     }));
 
     return {

@@ -8,8 +8,8 @@ import AppDataSource from '../../config/data-source';
 import { Service } from './entities/Service';
 import * as argon2 from 'argon2';
 import { ServiceRole } from './entities/ServiceRole';
-import { RolePermission } from '../rbac/entities/RolePermission';
 import { In } from 'typeorm';
+import { RolePermission } from '../role/entities/RolePermission';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),

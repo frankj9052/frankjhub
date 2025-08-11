@@ -80,7 +80,7 @@ export class RoleService {
     let organization: Organization | undefined;
     let organizationType: OrganizationType | undefined;
 
-    if (roleSource === 'org') {
+    if (roleSource === RoleSource.ORG) {
       organization = await this.orgRepo.findOneByOrFail({ id: sourceId });
     } else {
       organizationType = await this.orgTypeRepo.findOneByOrFail({ id: sourceId });
@@ -113,7 +113,9 @@ export class RoleService {
     const reloaded = await this.roleRepo.findOneOrFail({
       where: { id: saved.id },
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -134,7 +136,9 @@ export class RoleService {
     const role = await this.roleRepo.findOne({
       where: { id },
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -174,7 +178,9 @@ export class RoleService {
     const reloaded = await this.roleRepo.findOneOrFail({
       where: { id },
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -209,12 +215,14 @@ export class RoleService {
         }
         return qb
           .leftJoinAndSelect('t.organization', 'organization')
+          .leftJoinAndSelect('organization.orgType', 'orgType')
           .leftJoinAndSelect('t.organizationType', 'organizationType')
           .leftJoinAndSelect('t.rolePermissions', 'rolePermissions')
           .leftJoinAndSelect('rolePermissions.permission', 'permission')
           .withDeleted();
       },
     });
+
     return {
       status: 'success',
       message: 'Get role list successful',
@@ -229,7 +237,9 @@ export class RoleService {
     const role = await this.roleRepo.findOne({
       where: { id },
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -244,7 +254,9 @@ export class RoleService {
     const role = await this.roleRepo.findOne({
       where: { id },
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -264,7 +276,9 @@ export class RoleService {
       where: { id },
       withDeleted: true,
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },
@@ -288,7 +302,9 @@ export class RoleService {
       where: { id },
       withDeleted: true,
       relations: {
-        organization: true,
+        organization: {
+          orgType: true,
+        },
         organizationType: true,
         rolePermissions: { permission: true },
       },

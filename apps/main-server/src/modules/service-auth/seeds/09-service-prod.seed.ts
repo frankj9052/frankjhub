@@ -3,8 +3,8 @@ import { Service } from '../entities/Service';
 import { ServiceRole } from '../entities/ServiceRole';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
 import { SYSTEM_SERVICES } from '../../common/constants/system-services';
-import { Role } from '../../rbac/entities/Role';
 import { RoleSource } from '../../common/enums/roleSource.enum';
+import { Role } from '../../role/entities/Role';
 
 export default class ServiceProdSeed extends BaseSeeder {
   private servicesToInsert: Service[] = [];

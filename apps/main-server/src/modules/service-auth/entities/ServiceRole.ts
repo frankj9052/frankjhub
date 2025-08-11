@@ -1,7 +1,7 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Service } from './Service';
-import { Role } from '../../rbac/entities/Role';
+import { Role } from '../../role/entities/Role';
 
 @Entity()
 export class ServiceRole extends BaseEntity {

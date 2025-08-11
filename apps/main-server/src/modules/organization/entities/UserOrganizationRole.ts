@@ -2,8 +2,8 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne } from 'ty
 import { Organization } from './Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { User } from '../../user/entities/User';
-import { Role } from '../../rbac/entities/Role';
 import { buildFullUserOrgRoleName } from '../../codecs/permissionCodec';
+import { Role } from '../../role/entities/Role';
 
 @Entity()
 @Index('IDX_uor_name', ['name'], { unique: true })

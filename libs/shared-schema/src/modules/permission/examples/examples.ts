@@ -3,7 +3,7 @@ import { PermissionDto, permissionRef } from '../entity';
 import { PermissionListPageData, PermissionListResponse } from '../response/list.response.schema';
 import { PermissionOptionListResponse } from '../response/option-list.response.schema';
 import { PermissionSingleResponse } from '../response/single.response.schema';
-import { actionRefDataExample } from 'src/modules/action';
+import { actionRefDataExample } from '../../../modules/action';
 
 export const permissionDataExample: PermissionDto = {
   id: 'd8d5d735-7722-4be4-8be0-1cd1d9349e61',
