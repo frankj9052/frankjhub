@@ -15,6 +15,7 @@ import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { Permission } from '../permission/entities/Permission';
 import { updateEntityFields } from '@frankjhub/shared-utils';
+import { applyFilters } from '../common/utils/applyFilters';
 
 const logger = createLoggerWithContext('ActionService');
 
@@ -78,12 +79,11 @@ export class ActionService {
             search: `%${search.trim()}%`,
           });
         }
-        if (filters?.length) {
-          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: filterConditionMap,
+          },
+        });
         return qb.withDeleted();
       },
     });

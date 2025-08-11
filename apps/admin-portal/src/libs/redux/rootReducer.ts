@@ -5,6 +5,7 @@ import {
   organizationTypeSlice,
   permissionSlice,
   resourceSlice,
+  roleSlice,
   testSlice,
   usersSlice,
 } from './slices';
@@ -18,4 +19,5 @@ export const reducer = {
   action: actionSlice.reducer,
   resource: resourceSlice.reducer,
   permission: permissionSlice.reducer,
+  role: roleSlice.reducer,
 };

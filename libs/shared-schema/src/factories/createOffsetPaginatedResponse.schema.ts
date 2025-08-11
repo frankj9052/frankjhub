@@ -1,4 +1,4 @@
-import { ZodSchema, ZodTypeAny, ZodArray, ZodString } from 'zod';
+import { ZodTypeAny } from 'zod';
 import { z, zInfer } from '../libs/z';
 
 /**
@@ -20,7 +20,7 @@ import { z, zInfer } from '../libs/z';
  */
 export function createOffsetPaginatedResponseSchema<
   T extends ZodTypeAny,
-  F extends ZodSchema<any> = ZodArray<ZodString>
+  F extends ZodTypeAny = ReturnType<typeof z.array> // 泛型只为占位，真正的默认值在实现里内联
 >(itemSchema: T, filtersSchema?: F) {
   return z.object({
     /**

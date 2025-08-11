@@ -1,24 +1,25 @@
 import {
-  PERMISSION_FILTER,
-  PERMISSION_ORDER_BY_FIELDS,
-  permissionDataExample,
-  PermissionListRequest,
-  PermissionListResponse,
-  PermissionOptionListResponse,
-  PermissionOrderByField,
-  PermissionSingleResponse,
+  ROLE_STATUS_FILTER,
+  ROLE_ORDER_BY_FIELDS,
+  roleDataExample,
+  RoleListRequest,
+  RoleListResponse,
+  RoleOptionListResponse,
+  RoleSingleResponse,
   LabeledEnumItem,
   OrderEnum,
   TableColumn,
+  RoleOrderByFields,
 } from '@frankjhub/shared-schema';
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Key } from 'react';
 import { ZodIssue } from 'zod';
-import { getPermissionByIdAsync, getPermissionListAsync, getPermissionOptionsAsync } from './thunk';
+import { getRoleByIdAsync, getRoleListAsync, getRoleOptionsAsync } from './thunk';
 
-const INITIAL_VISIBLE_COLUMNS: string[] = [
+const INITIAL_VISIBLE_COLUMNS: Key[] | 'all' = [
   'name',
+  'code',
   'isActive',
   'createdAt',
   'updatedAt',
@@ -26,8 +27,8 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'actions',
 ];
 
-const sortableFields = new Set(Object.values(PERMISSION_ORDER_BY_FIELDS));
-const columns: TableColumn[] = generateColumnsFromData(permissionDataExample, {
+const sortableFields = new Set(Object.values(ROLE_ORDER_BY_FIELDS));
+const columns: TableColumn[] = generateColumnsFromData(roleDataExample, {
   sortableFields,
   extraColumns: [
     {
@@ -36,31 +37,30 @@ const columns: TableColumn[] = generateColumnsFromData(permissionDataExample, {
       sortable: false,
     },
   ],
-  exclude: ['actions'],
 });
 
-const filters = getLabeledEnumList(PERMISSION_FILTER);
+const filters = getLabeledEnumList(ROLE_STATUS_FILTER);
 const initialStatusFilter = filters.map(item => item.uid);
 
-export interface PermissionSliceState {
-  all: PermissionListResponse | undefined;
-  pagination: PermissionListRequest;
+export interface RoleSliceState {
+  all: RoleListResponse | undefined;
+  pagination: RoleListRequest;
   status: 'idle' | 'loading' | 'failed';
   columns: TableColumn[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
-  target?: PermissionSingleResponse;
-  options?: PermissionOptionListResponse;
+  target?: RoleSingleResponse;
+  options?: RoleOptionListResponse;
   error?: string | ZodIssue[];
 }
 
-const initialState: PermissionSliceState = {
+const initialState: RoleSliceState = {
   all: undefined,
   pagination: {
     limit: 10,
     offset: 0,
     order: OrderEnum.DESC,
-    orderBy: PERMISSION_ORDER_BY_FIELDS.NAME,
+    orderBy: ROLE_ORDER_BY_FIELDS.NAME, // 如果你的 schema 使用 CODE 作为默认排序字段，可改为 ROLE_ORDER_BY_FIELDS.CODE
     search: '',
     filters: initialStatusFilter,
   },
@@ -73,8 +73,8 @@ const initialState: PermissionSliceState = {
   error: undefined,
 };
 
-export const permissionSlice = createSlice({
-  name: 'permission',
+export const roleSlice = createSlice({
+  name: 'role',
   initialState,
   reducers: {
     setLimit: (state, action: PayloadAction<number>) => {
@@ -86,7 +86,7 @@ export const permissionSlice = createSlice({
     setOrder: (state, action: PayloadAction<OrderEnum>) => {
       state.pagination.order = action.payload;
     },
-    setOrderBy: (state, action: PayloadAction<PermissionOrderByField>) => {
+    setOrderBy: (state, action: PayloadAction<RoleOrderByFields>) => {
       state.pagination.orderBy = action.payload;
     },
     setStatusFilter: (state, action: PayloadAction<string[]>) => {
@@ -102,7 +102,7 @@ export const permissionSlice = createSlice({
       state.pagination.order = OrderEnum.DESC;
     },
     cleanOrderBy: state => {
-      state.pagination.orderBy = PERMISSION_ORDER_BY_FIELDS.NAME;
+      state.pagination.orderBy = ROLE_ORDER_BY_FIELDS.NAME;
     },
     setVisibleColumn: (state, action: PayloadAction<Key[] | 'all'>) => {
       state.visibleColumns = action.payload;
@@ -119,41 +119,44 @@ export const permissionSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(getPermissionListAsync.pending, state => {
+      // list
+      .addCase(getRoleListAsync.pending, state => {
         state.status = 'loading';
         state.error = undefined;
       })
-      .addCase(getPermissionListAsync.rejected, (state, action) => {
+      .addCase(getRoleListAsync.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
-      .addCase(getPermissionListAsync.fulfilled, (state, action) => {
+      .addCase(getRoleListAsync.fulfilled, (state, action) => {
         state.all = action.payload;
         state.status = 'idle';
         state.error = undefined;
       })
-      .addCase(getPermissionByIdAsync.pending, state => {
+      // getById
+      .addCase(getRoleByIdAsync.pending, state => {
         state.status = 'loading';
         state.error = undefined;
       })
-      .addCase(getPermissionByIdAsync.rejected, (state, action) => {
+      .addCase(getRoleByIdAsync.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
-      .addCase(getPermissionByIdAsync.fulfilled, (state, action) => {
+      .addCase(getRoleByIdAsync.fulfilled, (state, action) => {
         state.target = action.payload;
         state.status = 'idle';
         state.error = undefined;
       })
-      .addCase(getPermissionOptionsAsync.pending, state => {
+      // options
+      .addCase(getRoleOptionsAsync.pending, state => {
         state.status = 'loading';
         state.error = undefined;
       })
-      .addCase(getPermissionOptionsAsync.rejected, (state, action) => {
+      .addCase(getRoleOptionsAsync.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
-      .addCase(getPermissionOptionsAsync.fulfilled, (state, action) => {
+      .addCase(getRoleOptionsAsync.fulfilled, (state, action) => {
         state.options = action.payload;
         state.status = 'idle';
         state.error = undefined;
@@ -161,4 +164,4 @@ export const permissionSlice = createSlice({
   },
 });
 
-export default permissionSlice.reducer;
+export default roleSlice.reducer;

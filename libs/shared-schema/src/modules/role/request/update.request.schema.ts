@@ -17,7 +17,7 @@ export const roleUpdateRequestSchema = z
   )
   .extend({
     sourceId: z.string().uuid().optional(),
-    permissionIds: z.array(z.string().uuid().optional()).optional(),
+    permissionIds: z.array(z.string().uuid()).optional(),
   });
 
 export type RoleUpdateRequest = zInfer<typeof roleUpdateRequestSchema>;

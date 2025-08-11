@@ -13,6 +13,7 @@ import {
 import { User } from './entities/User';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { normalizeDate } from '@frankjhub/shared-utils';
+import { applyFilters } from '../common/utils/applyFilters';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -84,15 +85,11 @@ export class UserService {
         }
 
         // 态筛选（支持多选 OR 组合）
-        if (filters?.length) {
-          const validConditions = filters
-            .map(status => userFilterConditionMap[status])
-            .filter(Boolean);
-
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: userFilterConditionMap,
+          },
+        });
         return qb.withDeleted();
       },
     });

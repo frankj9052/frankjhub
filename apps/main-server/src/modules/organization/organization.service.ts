@@ -15,6 +15,7 @@ import {
 } from '@frankjhub/shared-schema';
 import { OrganizationType } from '../organizationType/entities/OrganizationType';
 import { BadRequestError } from '../common/errors/BadRequestError';
+import { applyFilters } from '../common/utils/applyFilters';
 
 const logger = createLoggerWithContext('OrganizationService');
 
@@ -113,12 +114,11 @@ export class OrganizationService {
             search: `%${search.trim()}%`,
           });
         }
-        if (filters?.length) {
-          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: filterConditionMap,
+          },
+        });
         return qb.withDeleted().leftJoinAndSelect('t.orgType', 'orgType');
       },
     });

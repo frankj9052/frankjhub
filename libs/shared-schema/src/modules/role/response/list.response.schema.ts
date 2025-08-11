@@ -3,12 +3,12 @@ import {
   createSuccessResponseSchema,
 } from '../../../factories';
 import { roleSchema } from '../entity';
-import { roleFilterListSchema } from '../constants';
+import { roleFiltersSchema } from '../constants';
 import { zInfer } from '../../../libs/z';
 
 export const roleListPageDataSchema = createOffsetPaginatedResponseSchema(
   roleSchema,
-  roleFilterListSchema
+  roleFiltersSchema
 );
 
 export const roleListResponseSchema = createSuccessResponseSchema(roleListPageDataSchema);

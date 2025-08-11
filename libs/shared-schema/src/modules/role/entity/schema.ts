@@ -9,11 +9,11 @@ export const roleSchema = z.object({
   ...baseEntitySchema.shape,
   code: z.string().max(255),
   name: z.string().max(50),
-  description: z.string().max(255).default(''),
+  description: z.string().max(255).default('').optional(),
   roleSource: z.nativeEnum(RoleSource).default(RoleSource.TYPE).optional(),
   organizationType: organizationTypeRefSchema.optional(),
   organization: organizationRefSchema.optional(),
-  permissions: z.array(permissionRefSchema.optional()).optional(),
+  permissions: z.array(permissionRefSchema).optional(),
 });
 
 export const roleRefSchema = roleSchema.pick({

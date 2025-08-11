@@ -19,14 +19,7 @@ import { NotFoundError } from '../common/errors/NotFoundError';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { In } from 'typeorm';
-
-const filterConditionMap: Record<string, string> = {
-  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
-  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
-  deleted: `(t."deleted_at" IS NOT NULL)`,
-  source_organization: `(t."organization" IS NOT NULL)`,
-  source_organization_type: `(t."organization_type" IS NOT NULL)`,
-};
+import { applyFilters } from '../common/utils/applyFilters';
 
 export class RoleService {
   private roleRepo = AppDataSource.getRepository(Role);
@@ -207,19 +200,50 @@ export class RoleService {
         }
 
         // 状态过滤（active / inactive / deleted）
-        if (filters?.length) {
-          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: {
+              active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
+              inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
+              deleted: `(t."deleted_at" IS NOT NULL)`,
+            },
+            source: {
+              source_organization: `t."action_source" = :srcOrg`,
+              source_organization_type: `t."action_source" = :srcOrgType`,
+            },
+          },
+          params: {
+            srcOrg: RoleSource.ORG,
+            srcOrgType: RoleSource.TYPE,
+          },
+        });
+
         return qb
-          .leftJoinAndSelect('t.organization', 'organization')
-          .leftJoinAndSelect('organization.orgType', 'orgType')
-          .leftJoinAndSelect('t.organizationType', 'organizationType')
-          .leftJoinAndSelect('t.rolePermissions', 'rolePermissions')
-          .leftJoinAndSelect('rolePermissions.permission', 'permission')
-          .withDeleted();
+          .leftJoinAndSelect(
+            't.organization',
+            'organization',
+            `t."role_source" = :srcOrg AND "organization"."deleted_at" IS NULL`,
+            { srcOrg: RoleSource.ORG }
+          )
+          .leftJoinAndSelect('organization.orgType', 'orgType', `"orgType"."deleted_at" IS NULL`)
+          .leftJoinAndSelect(
+            't.organizationType',
+            'organizationType',
+            `t."role_source" = :srcOrgType AND "organizationType"."deleted_at" IS NULL`,
+            { srcOrgType: RoleSource.TYPE }
+          )
+          .leftJoinAndSelect(
+            't.rolePermissions',
+            'rolePermissions',
+            `"rolePermissions"."deleted_at" IS NULL`
+          )
+          .leftJoinAndSelect(
+            'rolePermissions.permission',
+            'permission',
+            `"permission"."deleted_at" IS NULL`
+          )
+          .withDeleted()
+          .distinct(true);
       },
     });
 

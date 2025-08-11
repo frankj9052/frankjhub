@@ -18,6 +18,7 @@ import { DeepPartial, In } from 'typeorm';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { buildPermissionName } from '../codecs/permissionCodec';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
+import { applyFilters } from '../common/utils/applyFilters';
 
 const filterConditionMap: Record<string, string> = {
   active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
@@ -150,12 +151,11 @@ export class PermissionService {
         }
 
         // 状态过滤（active / inactive / deleted）
-        if (filters?.length) {
-          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: filterConditionMap,
+          },
+        });
         return qb
           .leftJoinAndSelect('t.resource', 'resource')
           .leftJoinAndSelect(`t.permissionActions`, 'permissionActions')

@@ -14,6 +14,7 @@ import {
   OrganizationTypeSingleResponse,
   OrganizationTypeUpdateRequest,
 } from '@frankjhub/shared-schema';
+import { applyFilters } from '../common/utils/applyFilters';
 
 const logger = createLoggerWithContext('OrganizationTypeService');
 
@@ -85,14 +86,11 @@ export class OrganizationTypeService {
             search: `%${search.trim()}%`,
           });
         }
-        // 态筛选（支持多选 OR 组合）
-        if (filters?.length) {
-          const validConditions = filters.map(status => filterConditionMap[status]).filter(Boolean);
-
-          if (validConditions.length > 0) {
-            qb.andWhere(`(${validConditions.join(' OR ')})`);
-          }
-        }
+        applyFilters(qb, filters, {
+          byKey: {
+            status: filterConditionMap,
+          },
+        });
         return qb.withDeleted();
       },
     });
