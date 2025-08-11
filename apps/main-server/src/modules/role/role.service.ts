@@ -6,6 +6,7 @@ import {
   RoleListResponse,
   RoleSingleResponse,
   RoleOptionListResponse,
+  RoleSource,
 } from '@frankjhub/shared-schema';
 import AppDataSource from '../../config/data-source';
 import { Role } from './entities/Role';
@@ -36,26 +37,18 @@ export class RoleService {
       roleSource: role.roleSource,
       organization: role.organization
         ? {
-            ...role.organization,
+            id: role.organization.id,
+            name: role.organization.name,
+            description: role.organization.description,
             orgTypeId: role.organization.orgType.id,
             orgTypeName: role.organization.orgType.name,
-            createdAt: role.organization.createdAt.toISOString(),
-            createdBy: role.organization.createdBy ?? null,
-            updatedAt: role.organization.updatedAt.toISOString(),
-            updatedBy: role.organization.updatedBy ?? null,
-            deletedAt: role.organization.deletedAt?.toISOString() ?? null,
-            deletedBy: role.organization.deletedBy ?? null,
           }
         : undefined,
       organizationType: role.organizationType
         ? {
-            ...role.organizationType,
-            createdAt: role.organizationType.createdAt.toISOString(),
-            createdBy: role.organizationType.createdBy ?? null,
-            updatedAt: role.organizationType.updatedAt.toISOString(),
-            updatedBy: role.organizationType.updatedBy ?? null,
-            deletedAt: role.organizationType.deletedAt?.toISOString() ?? null,
-            deletedBy: role.organizationType.deletedBy ?? null,
+            id: role.organizationType.id,
+            name: role.organizationType.name,
+            description: role.organizationType.description,
           }
         : undefined,
       createdAt: role.createdAt.toISOString(),
@@ -64,42 +57,16 @@ export class RoleService {
       createdBy: role.createdBy ?? null,
       updatedBy: role.updatedBy ?? null,
       deletedBy: role.deletedBy ?? null,
-      rolePermissions: role.rolePermissions.map(rp => ({
-        id: rp.id,
-        name: rp.name,
-        isActive: rp.isActive,
-        createdAt: rp.createdAt.toISOString(),
-        createdBy: rp.createdBy ?? null,
-        updatedAt: rp.updatedAt.toISOString(),
-        updatedBy: rp.updatedBy ?? null,
-        deletedAt: rp.deletedAt?.toISOString() ?? null,
-        deletedBy: rp.deletedBy ?? null,
-        permission: {
-          ...rp.permission,
-          resource: {
-            ...rp.permission.resource,
-            description: rp.permission.resource.description ?? '',
-            createdAt: rp.permission.resource.createdAt.toISOString(),
-            createdBy: rp.permission.resource.createdBy ?? null,
-            updatedAt: rp.permission.resource.updatedAt.toISOString(),
-            updatedBy: rp.permission.resource.updatedBy ?? null,
-            deletedAt: rp.permission.resource.deletedAt?.toISOString() ?? null,
-            deletedBy: rp.permission.resource.deletedBy ?? null,
-          },
-          createdAt: rp.permission.createdAt.toISOString(),
-          createdBy: rp.permission.createdBy ?? null,
-          updatedAt: rp.permission.updatedAt.toISOString(),
-          updatedBy: rp.permission.updatedBy ?? null,
-          deletedAt: rp.permission.deletedAt?.toISOString() ?? null,
-          deletedBy: rp.permission.deletedBy ?? null,
-        },
-        role: { id: role.id },
+      permissions: role.rolePermissions.map(rp => ({
+        id: rp.permission.id,
+        name: rp.permission.name,
+        description: rp.permission.description,
       })),
     };
   }
 
   async createRole(data: RoleCreateRequest, createdBy: string): Promise<RoleSingleResponse> {
-    const { name, description, permissionIds, roleSource = 'type', sourceId } = data;
+    const { name, description, permissionIds, roleSource, sourceId } = data;
     const log = logger.child({ method: 'createRole', name, createdBy });
 
     let organization: Organization | undefined;
@@ -167,7 +134,7 @@ export class RoleService {
     if (!role) throw new NotFoundError('Role not found');
 
     // handle source switch
-    if (roleSource === 'org') {
+    if (roleSource === RoleSource.ORG) {
       role.organization = sourceId
         ? await this.orgRepo.findOneByOrFail({ id: sourceId })
         : role.organization;

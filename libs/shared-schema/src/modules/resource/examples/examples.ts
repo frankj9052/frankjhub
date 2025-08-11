@@ -1,4 +1,4 @@
-import { ResourceDto } from '../entity';
+import { ResourceDto, ResourceRef } from '../entity';
 import { ResourceListPageData, ResourceListResponse } from '../response';
 
 export const resourceDataExample: ResourceDto = {
@@ -12,6 +12,12 @@ export const resourceDataExample: ResourceDto = {
   updatedBy: 'Frank',
   deletedAt: null,
   deletedBy: null,
+};
+
+export const resourceRefDataExample: ResourceRef = {
+  id: resourceDataExample.id,
+  name: resourceDataExample.name,
+  description: resourceDataExample.description,
 };
 
 export const resourceListPageDataExample: ResourceListPageData = {

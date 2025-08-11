@@ -1,4 +1,4 @@
-import { OrganizationDto } from '../entity';
+import { OrganizationDto, OrganizationRef } from '../entity';
 import { OrganizationListResponse } from '../response/list.response.schema';
 
 export const organizationDataExample: OrganizationDto = {
@@ -14,6 +14,14 @@ export const organizationDataExample: OrganizationDto = {
   updatedBy: 'd2f4e9a1-1c23-4bfa-bf0c-7b5ee1234567',
   deletedAt: null,
   deletedBy: null,
+};
+
+export const organizationRefDataExample: OrganizationRef = {
+  id: organizationDataExample.id,
+  name: organizationDataExample.name,
+  description: organizationDataExample.description,
+  orgTypeId: organizationDataExample.orgTypeId,
+  orgTypeName: organizationDataExample.orgTypeName,
 };
 
 export const organizationListResponseExample: OrganizationListResponse = {

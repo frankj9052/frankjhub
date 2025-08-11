@@ -41,11 +41,11 @@ export class Role extends BaseEntity {
 
   @ManyToOne(() => OrganizationType, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationTypeId' })
-  organizationType?: OrganizationType;
+  organizationType?: OrganizationType | null;
 
   @ManyToOne(() => Organization, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })
-  organization?: Organization;
+  organization?: Organization | null;
 
   @OneToMany(() => RolePermission, rp => rp.role, { nullable: true, onDelete: 'CASCADE' })
   rolePermissions!: RolePermission[];

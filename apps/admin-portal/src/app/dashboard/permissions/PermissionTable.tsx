@@ -80,11 +80,8 @@ export const PermissionTable = () => {
             <span>
               {cellValue
                 .map(action =>
-                  typeof action === 'object' &&
-                  action !== null &&
-                  'action' in action &&
-                  'name' in action.action
-                    ? action.action.name
+                  typeof action === 'object' && action !== null && 'name' in action
+                    ? action.name
                     : typeof action === 'string'
                     ? action
                     : '[Unknown]'

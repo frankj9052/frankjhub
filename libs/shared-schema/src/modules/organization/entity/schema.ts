@@ -15,4 +15,13 @@ export const organizationSchema = z.object({
   deletedBy: z.string().nullable(),
 });
 
+export const organizationRefSchema = organizationSchema.pick({
+  id: true,
+  name: true,
+  description: true,
+  orgTypeId: true,
+  orgTypeName: true,
+});
+
 export type OrganizationDto = zInfer<typeof organizationSchema>;
+export type OrganizationRef = zInfer<typeof organizationRefSchema>;

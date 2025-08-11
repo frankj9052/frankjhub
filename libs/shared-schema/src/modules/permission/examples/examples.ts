@@ -1,7 +1,9 @@
-import { PermissionDto } from '../entity';
+import { resourceRefDataExample } from '../../../modules/resource';
+import { PermissionDto, permissionRef } from '../entity';
 import { PermissionListPageData, PermissionListResponse } from '../response/list.response.schema';
 import { PermissionOptionListResponse } from '../response/option-list.response.schema';
 import { PermissionSingleResponse } from '../response/single.response.schema';
+import { actionRefDataExample } from 'src/modules/action';
 
 export const permissionDataExample: PermissionDto = {
   id: 'd8d5d735-7722-4be4-8be0-1cd1d9349e61',
@@ -16,66 +18,14 @@ export const permissionDataExample: PermissionDto = {
   updatedBy: 'system',
   deletedAt: null,
   deletedBy: null,
-  resource: {
-    id: '21f6cf8e-7e15-430a-abe9-f2b3f0cb5f45',
-    name: 'appointment',
-    description: 'Appointment entity resource',
-    isActive: true,
-    createdAt: '2025-07-20T08:00:00.000Z',
-    createdBy: 'system',
-    updatedAt: '2025-07-21T10:00:00.000Z',
-    updatedBy: 'system',
-    deletedAt: null,
-    deletedBy: null,
-  },
-  permissionActions: [
-    {
-      id: '9cadd960-df71-4a0d-94e1-7edc8f118d2a',
-      isActive: true,
-      createdAt: '2025-07-29T10:01:00.000Z',
-      createdBy: 'system',
-      updatedAt: '2025-07-29T10:01:00.000Z',
-      updatedBy: 'system',
-      deletedAt: null,
-      deletedBy: null,
-      permission: { id: 'd8d5d735-7722-4be4-8be0-1cd1d9349e61' },
-      action: {
-        id: 'a1e2f3d4-5678-90ab-cdef-1234567890ab',
-        name: 'create',
-        description: 'Create an entity',
-        isActive: true,
-        createdAt: '2025-07-10T09:00:00.000Z',
-        createdBy: 'admin',
-        updatedAt: '2025-07-10T09:30:00.000Z',
-        updatedBy: 'admin',
-        deletedAt: null,
-        deletedBy: null,
-      },
-    },
-    {
-      id: 'b7acffe9-4636-4bc1-bdee-4d6e5672c5b2',
-      isActive: true,
-      createdAt: '2025-07-29T10:02:00.000Z',
-      createdBy: 'system',
-      updatedAt: '2025-07-29T10:02:00.000Z',
-      updatedBy: 'system',
-      deletedAt: null,
-      deletedBy: null,
-      permission: { id: 'd8d5d735-7722-4be4-8be0-1cd1d9349e61' },
-      action: {
-        id: 'a2e3f4d5-6789-01bc-def0-2345678901bc',
-        name: 'delete',
-        description: 'Delete an entity',
-        isActive: true,
-        createdAt: '2025-07-10T09:05:00.000Z',
-        createdBy: 'admin',
-        updatedAt: '2025-07-10T09:35:00.000Z',
-        updatedBy: 'admin',
-        deletedAt: null,
-        deletedBy: null,
-      },
-    },
-  ],
+  resource: resourceRefDataExample,
+  actions: [actionRefDataExample],
+};
+
+export const permissionRefDataExample: permissionRef = {
+  id: permissionDataExample.id,
+  name: permissionDataExample.name,
+  description: permissionDataExample.description,
 };
 
 export const permissionListPageDataExample: PermissionListPageData = {

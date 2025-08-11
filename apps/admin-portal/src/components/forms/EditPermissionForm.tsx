@@ -68,7 +68,7 @@ export const EditPermissionForm = () => {
     return {
       id: target.id,
       resourceId: target.resource.id,
-      actionIds: target.permissionActions.map(pa => pa.action.id),
+      actionIds: target.actions.map(action => action.id),
       fields: target.fields,
       condition: target.condition ?? undefined,
       description: target.description ?? '',

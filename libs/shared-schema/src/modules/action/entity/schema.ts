@@ -13,4 +13,11 @@ export const actionSchema = z.object({
   deletedBy: z.string().nullable(),
 });
 
+export const actionRefSchema = actionSchema.pick({
+  id: true,
+  name: true,
+  description: true,
+});
+
 export type ActionDto = zInfer<typeof actionSchema>;
+export type ActionRef = zInfer<typeof actionRefSchema>;
