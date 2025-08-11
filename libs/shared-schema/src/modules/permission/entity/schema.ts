@@ -1,7 +1,7 @@
 import { baseEntitySchema } from '../../../modules/common';
 import { z, zInfer } from '../../../libs/z';
-import { resourceSchema } from '../../../modules/resource';
-import { permissionActionSchema } from '../../../modules/permission-action';
+import { resourceRefSchema } from '../../../modules/resource';
+import { actionRefSchema } from 'src/modules/action';
 
 export const permissionSchema = z.object({
   ...baseEntitySchema.shape,
@@ -9,8 +9,15 @@ export const permissionSchema = z.object({
   description: z.string().max(255).optional().nullable(),
   fields: z.array(z.string()).optional().nullable(),
   condition: z.record(z.unknown()).optional().nullable(),
-  resource: resourceSchema,
-  permissionActions: z.array(permissionActionSchema),
+  resource: resourceRefSchema,
+  actions: z.array(actionRefSchema),
+});
+
+export const permissionRefSchema = permissionSchema.pick({
+  id: true,
+  name: true,
+  description: true,
 });
 
 export type PermissionDto = zInfer<typeof permissionSchema>;
+export type permissionRef = zInfer<typeof permissionRefSchema>;

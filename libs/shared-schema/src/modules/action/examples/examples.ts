@@ -1,5 +1,5 @@
-import { ActionDto } from "../entity";
-import { ActionListPageData, ActionListResponse } from "../response";
+import { ActionDto, ActionRef } from '../entity';
+import { ActionListPageData, ActionListResponse } from '../response';
 
 export const actionDataExample: ActionDto = {
   id: 'a3e1b2c4-7d56-42f9-a938-9a5c6b1a2f3d',
@@ -12,10 +12,16 @@ export const actionDataExample: ActionDto = {
   updatedBy: 'user_123',
   deletedAt: null,
   deletedBy: null,
-}
+};
+
+export const actionRefDataExample: ActionRef = {
+  id: actionDataExample.id,
+  name: actionDataExample.name,
+  description: actionDataExample.description,
+};
 
 export const actionListPageDataExample: ActionListPageData = {
-data: [
+  data: [
     {
       id: 'b1e2a3f4-5c6d-7e8f-9012-3456789abcde',
       name: 'create_appointment',
@@ -47,10 +53,10 @@ data: [
   pageSize: 10,
   search: 'appointment',
   filters: ['active', 'deleted'],
-}
+};
 
 export const actionListResponseExample: ActionListResponse = {
   status: 'success',
   message: 'Get action list successful',
-  data: actionListPageDataExample
-}
+  data: actionListPageDataExample,
+};

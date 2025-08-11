@@ -13,4 +13,11 @@ export const resourceSchema = z.object({
   deletedBy: z.string().nullable(),
 });
 
+export const resourceRefSchema = resourceSchema.pick({
+  id: true,
+  name: true,
+  description: true,
+});
+
 export type ResourceDto = zInfer<typeof resourceSchema>;
+export type ResourceRef = zInfer<typeof resourceRefSchema>;

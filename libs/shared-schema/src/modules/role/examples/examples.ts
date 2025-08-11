@@ -1,10 +1,10 @@
-import { RoleDto } from '../entity';
+import { RoleDto, RoleRef } from '../entity';
 import { RoleListPageData, RoleListResponse } from '../response/list.response.schema';
 import { RoleSingleResponse } from '../response/single.response.schema';
 import { RoleOptionListResponse } from '../response/option-list.response.schema';
 import { RoleSource } from '../../../enums';
-import { permissionDataExample } from 'src/modules/permission/examples/examples';
-import { organizationDataExample } from 'src/modules/organization/examples/examples';
+import { permissionRefDataExample } from '../../../modules/permission/examples/examples';
+import { organizationRefDataExample } from '../../../modules/organization/examples/examples';
 
 export const roleDataExample: RoleDto = {
   id: '6b7f4e8d-1234-4cde-9abc-9876543210ff',
@@ -19,22 +19,20 @@ export const roleDataExample: RoleDto = {
   updatedBy: 'system',
   deletedAt: null,
   deletedBy: null,
-  organization: organizationDataExample,
+  organization: organizationRefDataExample,
   organizationType: undefined,
-  rolePermissions: [
-    {
-      id: 'fabc1234-5678-90ab-cdef-123456789abc',
-      name: 'org|bb9c12e3-4567-4abc-bcde-9876543210aa::administrator=>appointment:[create,delete]@date,status?ownerOnly=true',
-      createdAt: '2025-07-30T09:10:00.000Z',
-      createdBy: 'system',
-      updatedAt: '2025-07-30T09:10:00.000Z',
-      updatedBy: 'system',
-      deletedAt: null,
-      deletedBy: null,
-      permission: permissionDataExample,
-      role: { id: '6b7f4e8d-1234-4cde-9abc-9876543210ff' },
-    },
-  ],
+  permissions: [permissionRefDataExample],
+};
+
+export const roleRefDataExample: RoleRef = {
+  id: roleDataExample.id,
+  code: roleDataExample.code,
+  name: roleDataExample.name,
+  description: roleDataExample.description,
+  roleSource: roleDataExample.roleSource,
+  organization: roleDataExample.organization,
+  organizationType: roleDataExample.organizationType,
+  permissions: roleDataExample.permissions,
 };
 
 export const roleListPageDataExample: RoleListPageData = {
