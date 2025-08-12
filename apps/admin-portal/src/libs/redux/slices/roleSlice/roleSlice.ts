@@ -10,6 +10,10 @@ import {
   OrderEnum,
   TableColumn,
   RoleOrderByFields,
+  ROLE_SOURCE_FILTER,
+  RoleStatusFilter,
+  makeFiltersToolkit,
+  RoleSourceFilter,
 } from '@frankjhub/shared-schema';
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
@@ -39,8 +43,39 @@ const columns: TableColumn[] = generateColumnsFromData(roleDataExample, {
   ],
 });
 
-const filters = getLabeledEnumList(ROLE_STATUS_FILTER);
-const initialStatusFilter = filters.map(item => item.uid);
+const statusFilters = getLabeledEnumList(ROLE_STATUS_FILTER);
+const sourceFilters = getLabeledEnumList(ROLE_SOURCE_FILTER);
+const initialStatusFilter = {
+  any: [
+    {
+      key: 'status',
+      values: statusFilters.map(item => item.uid),
+    },
+  ],
+  all: [
+    {
+      key: 'source',
+      values: sourceFilters.map(item => item.uid),
+    },
+  ],
+};
+
+const roleFiltersToolkit = makeFiltersToolkit({
+  status: ROLE_STATUS_FILTER,
+  source: ROLE_SOURCE_FILTER,
+});
+
+// 小工具：只更新某个 key 的某个分组（any/all）
+function upsertClause(
+  f: ReturnType<typeof roleFiltersToolkit.ensureStructured>,
+  group: 'any' | 'all',
+  key: 'status' | 'source',
+  values: string[]
+) {
+  const list = (f[group] ?? []).filter(c => c.key !== key);
+  if (values.length > 0) list.push({ key, values });
+  f[group] = list.length ? list : undefined;
+}
 
 export interface RoleSliceState {
   all: RoleListResponse | undefined;
@@ -49,6 +84,7 @@ export interface RoleSliceState {
   columns: TableColumn[];
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
+  sourceOptions: LabeledEnumItem[];
   target?: RoleSingleResponse;
   options?: RoleOptionListResponse;
   error?: string | ZodIssue[];
@@ -67,7 +103,8 @@ const initialState: RoleSliceState = {
   status: 'loading',
   columns,
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
-  statusOptions: filters,
+  statusOptions: statusFilters,
+  sourceOptions: sourceFilters,
   target: undefined,
   options: undefined,
   error: undefined,
@@ -89,8 +126,19 @@ export const roleSlice = createSlice({
     setOrderBy: (state, action: PayloadAction<RoleOrderByFields>) => {
       state.pagination.orderBy = action.payload;
     },
-    setStatusFilter: (state, action: PayloadAction<string[]>) => {
-      state.pagination.filters = action.payload;
+    setStatusFilter: (state, action: PayloadAction<RoleStatusFilter[]>) => {
+      const structured = roleFiltersToolkit.ensureStructured(state.pagination.filters, {
+        onUnknown: 'ignore',
+      });
+      upsertClause(structured, 'any', 'status', action.payload);
+      state.pagination.filters = structured;
+    },
+    setSourceFilter: (state, action: PayloadAction<RoleSourceFilter[]>) => {
+      const structured = roleFiltersToolkit.ensureStructured(state.pagination.filters, {
+        onUnknown: 'ignore',
+      });
+      upsertClause(structured, 'all', 'source', action.payload);
+      state.pagination.filters = structured;
     },
     cleanLimit: state => {
       state.pagination.limit = 10;

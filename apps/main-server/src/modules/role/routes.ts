@@ -38,6 +38,13 @@ router.get(
   getRoleListController
 );
 
+router.post(
+  '/role/list/search',
+  requirePermission(buildPermissionName('role', ['read'])),
+  validateRequest({ body: roleListRequestSchema }),
+  getRoleListController
+);
+
 router.get(
   '/role/options',
   requirePermission(buildPermissionName('role', ['read'])),

@@ -33,7 +33,8 @@ export const getRoleListController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parsed = roleListRequestSchema.parse(req.query);
+    const raw = req.method === 'GET' ? req.query : req.body;
+    const parsed = roleListRequestSchema.parse(raw);
     const result = await roleService.getRoleList(parsed);
     res.status(200).json(result);
   } catch (error) {

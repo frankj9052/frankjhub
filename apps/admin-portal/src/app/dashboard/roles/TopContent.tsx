@@ -2,6 +2,13 @@
 import { CreateRoleForm } from '@/components/forms/CreateRoleForm';
 import { roleSlice, useDispatch, useSelector } from '@/libs/redux';
 import { useDebouncedCallback } from '@frankjhub/shared-hooks';
+import {
+  makeFiltersToolkit,
+  ROLE_SOURCE_FILTER,
+  ROLE_STATUS_FILTER,
+  RoleSourceFilter,
+  RoleStatusFilter,
+} from '@frankjhub/shared-schema';
 import { FrankModal } from '@frankjhub/shared-ui-hero-client';
 import {
   Button,
@@ -23,11 +30,21 @@ export const TopContent = () => {
   const pagination = useSelector(state => state.role.pagination);
   const all = useSelector(state => state.role.all?.data);
   const statusOptions = useSelector(state => state.role.statusOptions);
+  const sourceOptions = useSelector(state => state.role.sourceOptions);
 
   const [searchValue, setSearchValue] = useState('');
   const [openModal, setOpenModal] = useState(false);
   const { limit, filters } = pagination;
   const total = all?.total ?? 0;
+
+  const roleFiltersToolkit = makeFiltersToolkit({
+    status: ROLE_STATUS_FILTER,
+    source: ROLE_SOURCE_FILTER,
+  });
+  const structured = roleFiltersToolkit.ensureStructured(filters, { onUnknown: 'ignore' });
+
+  const selectedStatus = new Set(structured.any?.find(c => c.key === 'status')?.values ?? []);
+  const selectedSource = new Set(structured.all?.find(c => c.key === 'source')?.values ?? []);
 
   const debouncedSearchChange = useDebouncedCallback((value?: string) => {
     if (value) {
@@ -44,7 +61,12 @@ export const TopContent = () => {
 
   const handleStatusSelectionChange = (selection: SharedSelection) => {
     const selectionArray = Array.from(selection);
-    dispatch(roleSlice.actions.setStatusFilter(selectionArray as string[]));
+    dispatch(roleSlice.actions.setStatusFilter(selectionArray as RoleStatusFilter[]));
+  };
+
+  const handleSourceSelectionChange = (selection: SharedSelection) => {
+    const selectionArray = Array.from(selection);
+    dispatch(roleSlice.actions.setSourceFilter(selectionArray as RoleSourceFilter[]));
   };
 
   const handleColumnSelectionChange = (keys: SharedSelection) => {
@@ -80,6 +102,32 @@ export const TopContent = () => {
             onValueChange={setSearchValue}
           />
           <div className="flex gap-3">
+            {/* source filter */}
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  endContent={<MdKeyboardArrowDown className="text-small" />}
+                >
+                  Role Source
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="role source selection"
+                closeOnSelect={false}
+                selectedKeys={selectedSource}
+                selectionMode="multiple"
+                onSelectionChange={handleSourceSelectionChange}
+              >
+                {sourceOptions.map(status => (
+                  <DropdownItem key={status.uid}>{status.name}</DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+
+            {/* status filter */}
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button
@@ -94,7 +142,7 @@ export const TopContent = () => {
                 disallowEmptySelection
                 aria-label="status selection"
                 closeOnSelect={false}
-                selectedKeys={new Set(filters)}
+                selectedKeys={selectedStatus}
                 selectionMode="multiple"
                 onSelectionChange={handleStatusSelectionChange}
               >
@@ -104,6 +152,7 @@ export const TopContent = () => {
               </DropdownMenu>
             </Dropdown>
 
+            {/* columns selection */}
             <Dropdown>
               <DropdownTrigger className="hidden sm:flex">
                 <Button

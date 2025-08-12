@@ -1,4 +1,3 @@
-// apps/main-server/src/modules/role/docs/openapi.ts
 import { registry } from '../../../config/openapiRegistry';
 import {
   idParamsSchema,
@@ -80,6 +79,53 @@ registry.registerPath({
         filters: ['active', 'source_organization'],
       },
     }),
+  },
+  responses: {
+    200: {
+      description: 'List returned',
+      content: {
+        'application/json': {
+          schema: roleListResponseSchema.openapi({
+            example: roleListResponseExample,
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+    }),
+  },
+});
+
+// list advanced search
+// list (advanced search via POST body)
+registry.registerPath({
+  method: 'post',
+  path: '/role/list/search',
+  tags: ['Role'],
+  summary: 'Search roles (advanced, structured filters)',
+  description:
+    'Advanced search for roles using structured filters (any/all). Accepts the same pagination and sorting fields as GET /role/list.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: roleListRequestSchema.openapi({
+            example: {
+              limit: 3,
+              offset: 0,
+              order: 'DESC',
+              orderBy: 'name',
+              filters: {
+                any: [{ key: 'status', values: ['active', 'inactive'] }],
+                all: [{ key: 'source', values: ['source_organization'] }],
+              },
+            },
+          }),
+        },
+      },
+    },
   },
   responses: {
     200: {

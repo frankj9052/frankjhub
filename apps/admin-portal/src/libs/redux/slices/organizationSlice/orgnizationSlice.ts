@@ -13,9 +13,14 @@ import {
   OrganizationListRequest,
   OrganizationSingleResponse,
   OrganizationOrderByField,
+  OrganizationOptionListResponse,
 } from '@frankjhub/shared-schema';
 
-import { getAllOrganizationsAsync, getOrganizationByIdAsync } from './thunk';
+import {
+  getAllOrganizationsAsync,
+  getOrganizationByIdAsync,
+  getOrganizationOptionListAsync,
+} from './thunk';
 
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 
@@ -56,6 +61,7 @@ export interface OrganizationSliceState {
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
   target?: OrganizationSingleResponse;
+  options: OrganizationOptionListResponse | undefined;
 }
 
 const initialState: OrganizationSliceState = {
@@ -73,6 +79,7 @@ const initialState: OrganizationSliceState = {
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
   target: undefined,
+  options: undefined,
 };
 
 export const organizationSlice = createSlice({
@@ -146,6 +153,17 @@ export const organizationSlice = createSlice({
       })
       .addCase(getOrganizationByIdAsync.fulfilled, (state, action) => {
         state.target = action.payload;
+        state.status = 'idle';
+      })
+
+      .addCase(getOrganizationOptionListAsync.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(getOrganizationOptionListAsync.rejected, state => {
+        state.status = 'failed';
+      })
+      .addCase(getOrganizationOptionListAsync.fulfilled, (state, action) => {
+        state.options = action.payload;
         state.status = 'idle';
       });
   },

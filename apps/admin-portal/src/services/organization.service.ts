@@ -6,6 +6,7 @@ import {
   OrganizationListRequest,
   organizationListRequestSchema,
   OrganizationListResponse,
+  OrganizationOptionListResponse,
   OrganizationSingleResponse,
   OrganizationUpdateRequest,
   organizationUpdateRequestSchema,
@@ -25,6 +26,13 @@ export async function getAllOrganizations(
   const response = await get<OrganizationListResponse>('/api/organization/list', {
     params: parsedInput.data,
   });
+  return response;
+}
+
+export async function getOrganizationOptionList(): Promise<
+  ApiResponse<OrganizationOptionListResponse>
+> {
+  const response = get<OrganizationOptionListResponse>('/api/organization/options');
   return response;
 }
 

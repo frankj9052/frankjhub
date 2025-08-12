@@ -68,6 +68,12 @@ export const RoleTable = () => {
       const cellValue = row[columnKey as keyof RoleDto];
 
       switch (columnKey) {
+        case 'organization':
+        case 'organizationType':
+          if (cellValue && typeof cellValue === 'object' && 'name' in cellValue) {
+            return <div>{cellValue.name}</div>;
+          }
+          return <div>-</div>;
         case 'permissions':
           // Render list of permission names or a count fallback
           if (Array.isArray(cellValue)) {

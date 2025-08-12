@@ -5,11 +5,13 @@ import {
   useSelector,
   getRoleListAsync,
   getPermissionOptionsAsync,
+  getOrganizationTypeOptionsAsync,
+  getOrganizationOptionListAsync,
 } from '@/libs/redux';
 import { createRole } from '@/services/role.service';
-import { RoleCreateRequest, roleCreateRequestSchema } from '@frankjhub/shared-schema';
+import { RoleCreateRequest, roleCreateRequestSchema, RoleSource } from '@frankjhub/shared-schema';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
-import { FrankSelect } from '@frankjhub/shared-ui-hero-client';
+import { FrankSelect, SelectItemType } from '@frankjhub/shared-ui-hero-client';
 import { Button, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
@@ -29,6 +31,14 @@ export const CreateRoleForm = ({ onClose }: Props) => {
   // permission options for multi-select
   const permissionOptionList = useSelector(state => state.permission.options);
 
+  const sourceItems: SelectItemType[] = Object.values(RoleSource).map(s => ({
+    key: String(s),
+    label: String(s),
+  }));
+
+  const orgTypeOptionList = useSelector(state => state.organizationType.options?.data);
+  const orgOptionList = useSelector(state => state.organization.options?.data);
+
   const {
     handleSubmit,
     control,
@@ -43,6 +53,8 @@ export const CreateRoleForm = ({ onClose }: Props) => {
   useEffect(() => {
     // 拉权限下拉
     dispatch(getPermissionOptionsAsync());
+    dispatch(getOrganizationTypeOptionsAsync());
+    dispatch(getOrganizationOptionListAsync());
   }, [dispatch]);
 
   const onSubmit = async (value: RoleCreateRequest) => {
@@ -100,22 +112,50 @@ export const CreateRoleForm = ({ onClose }: Props) => {
             />
           </div>
 
-          {/* Role Code */}
-          {/* <div className="h-[70px] w-full">
+          {/* Role Source */}
+          <div className="h-[70px] w-full">
             <Controller
-              name="code"
+              name="roleSource"
+              control={control}
+              render={({ field, fieldState }) => (
+                <FrankSelect
+                  label="Role Source(*)"
+                  variant="bordered"
+                  onBlur={field.onBlur}
+                  isInvalid={!!fieldState.error}
+                  errorMessage={fieldState.error?.message}
+                  size="sm"
+                  items={sourceItems}
+                  selectionMode="single"
+                  disallowEmptySelection={true}
+                  selectedKeys={
+                    Array.isArray(field.value) ? field.value.map(v => String(v)) : undefined
+                  }
+                  onSelectionChange={sharedSelection => {
+                    const selection =
+                      sharedSelection === 'all'
+                        ? Object.values(sharedSelection)
+                        : Array.from(sharedSelection);
+                    field.onChange(selection[0]);
+                  }}
+                />
+              )}
+            />
+          </div>
+
+          {/* Role Source Id */}
+
+          {/* Description */}
+          <div className="h-[70px] w-full">
+            <Controller
+              name="description"
               control={control}
               render={({ field, fieldState }) => (
                 <Input
-                  label="Role Code (*)"
-                  description="Recommend uppercase with underscores, e.g., ADMIN, CLINIC_STAFF"
+                  label="Description"
                   variant="bordered"
                   value={field.value ?? ''}
-                  onChange={e => {
-                    // 若你不想自动处理大小写，去掉这段 transform
-                    const v = e.currentTarget.value;
-                    field.onChange(v.trim());
-                  }}
+                  onChange={field.onChange}
                   onBlur={field.onBlur}
                   isInvalid={!!fieldState.error}
                   errorMessage={fieldState.error?.message}
@@ -124,7 +164,7 @@ export const CreateRoleForm = ({ onClose }: Props) => {
                 />
               )}
             />
-          </div> */}
+          </div>
 
           {/* Permissions */}
           <div className="h-[70px] w-full">
@@ -156,27 +196,6 @@ export const CreateRoleForm = ({ onClose }: Props) => {
                   size="sm"
                   disallowEmptySelection={false}
                   variant="bordered"
-                />
-              )}
-            />
-          </div>
-
-          {/* Description */}
-          <div className="h-[70px] w-full">
-            <Controller
-              name="description"
-              control={control}
-              render={({ field, fieldState }) => (
-                <Input
-                  label="Description"
-                  variant="bordered"
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  isInvalid={!!fieldState.error}
-                  errorMessage={fieldState.error?.message}
-                  fullWidth
-                  size="sm"
                 />
               )}
             />

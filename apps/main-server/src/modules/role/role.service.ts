@@ -208,8 +208,8 @@ export class RoleService {
               deleted: `(t."deleted_at" IS NOT NULL)`,
             },
             source: {
-              source_organization: `t."action_source" = :srcOrg`,
-              source_organization_type: `t."action_source" = :srcOrgType`,
+              source_organization: `t."role_source" = :srcOrg`,
+              source_organization_type: `t."role_source" = :srcOrgType`,
             },
           },
           params: {
