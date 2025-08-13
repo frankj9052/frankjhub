@@ -28,5 +28,9 @@
     "**/*.stories.tsx"
   ],
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
-  "references": []
+  "references": [
+    {
+      "path": "../shared-ui-core/tsconfig.lib.json"
+    }
+  ]
 }

@@ -6,6 +6,37 @@ export interface CarouselNavigationProps {
   onClick?: () => void;
 }
 
+/**
+ * CarouselNavigation - A navigation arrow component used in carousels.
+ *
+ * This component renders a left or right navigation arrow, typically used to scroll
+ * through carousel items. It uses responsive design and only displays on medium-sized
+ * screens and larger (`md:block`). Arrows are disabled visually and functionally
+ * based on the `disabled` prop.
+ *
+ * @component
+ * @example
+ * ```tsx
+ * <CarouselNavigation
+ *   direction="left"
+ *   onClick={() => handleNavigation('left')}
+ *   disabled={isAtStart}
+ * />
+ *
+ * <CarouselNavigation
+ *   direction="right"
+ *   onClick={() => handleNavigation('right')}
+ *   disabled={isAtEnd}
+ * />
+ * ```
+ *
+ * @param {CarouselNavigationProps} props - The props for the component.
+ * @param {'left' | 'right'} props.direction - Direction of the arrow to render.
+ * @param {boolean} [props.disabled=false] - Whether the arrow is disabled (non-clickable and gray).
+ * @param {() => void} [props.onClick] - Callback fired when the arrow is clicked.
+ *
+ * @returns {JSX.Element} The rendered arrow button.
+ */
 export const CarouselNavigation = ({
   direction,
   disabled = false,

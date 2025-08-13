@@ -10,5 +10,19 @@
       "default": "./src/index.ts"
     },
     "./package.json": "./package.json"
+  },
+  "nx": {
+    "targets": {
+      "storybook-static": {
+        "executor": "@nx/web:file-server",
+        "options": {
+          "staticFilePath": "libs/storybook-host/storybook-static",
+          "port": 6006,
+          "fallback": "index.html",
+          "spa": true,
+          "watch": false
+        }
+      }
+    }
   }
 }

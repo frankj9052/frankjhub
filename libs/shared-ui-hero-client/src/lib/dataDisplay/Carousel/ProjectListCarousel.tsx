@@ -31,6 +31,18 @@ export interface ProjectListCarouselProps {
   width?: number;
 }
 
+/**
+ * ProjectListCarousel - A responsive carousel for showcasing a list of project cards.
+ *
+ * Includes navigation arrows, pagination dots, and a modal that displays project details
+ * when a card is clicked. Uses a custom `FrankCarousel` component internally for slide behavior.
+ *
+ * @param {Object} props - Component props
+ * @param {ProjectData[]} props.projects - List of project objects to render as cards
+ * @param {number} [props.width] - Optional fixed width of the carousel container (in pixels)
+ *
+ * @returns {JSX.Element} A carousel UI displaying project cards with navigation and modal preview
+ */
 export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProps) => {
   const swiperRef = useRef<FrankCarouselRefType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
