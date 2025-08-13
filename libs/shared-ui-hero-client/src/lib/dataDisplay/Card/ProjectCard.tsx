@@ -25,8 +25,9 @@ export interface ProjectCardProps {
   };
   title: string;
   subTitle: string;
+  onPress?: () => void;
 }
-export const ProjectCard = ({ image, title, subTitle }: ProjectCardProps) => {
+export const ProjectCard = ({ image, title, subTitle, onPress }: ProjectCardProps) => {
   return (
     <motion.div initial="rest" animate="rest" whileHover="hover" variants={coverVariants}>
       <FrankCard
@@ -60,6 +61,7 @@ export const ProjectCard = ({ image, title, subTitle }: ProjectCardProps) => {
         cardHeight={339}
         isPressable={true}
         shadow="none"
+        onPress={onPress}
       />
     </motion.div>
   );

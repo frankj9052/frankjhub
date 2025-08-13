@@ -80,10 +80,6 @@ router.delete(
   hardDeleteActionController
 );
 
-// Resource Routes
-
-// Permission Routes
-
 export function register(parent: Router) {
   parent.use('/', router);
 }

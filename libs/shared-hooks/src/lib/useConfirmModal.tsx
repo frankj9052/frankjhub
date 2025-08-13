@@ -18,6 +18,11 @@ type ModalConfig = {
   action: () => Promise<void>;
 };
 
+/** 类型守卫：判断是否含有可调用的 action */
+function hasAction(v: unknown): v is { action: (...args: any[]) => Promise<void> | void } {
+  return !!v && typeof (v as any).action === 'function';
+}
+
 /**
  * A custom hook to manage a reusable confirmation modal.
  *
@@ -48,12 +53,12 @@ type ModalConfig = {
  *   action: async () => { await deleteItem(); }
  * });
  */
-export function useConfirmModal() {
+export function useConfirmModal<T = ModalConfig>() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [config, setConfig] = useState<ModalConfig | null>(null);
+  const [config, setConfig] = useState<T | null>(null);
 
-  const openModal = useCallback((config: ModalConfig) => {
+  const openModal = useCallback((config: T) => {
     setConfig(config);
     setIsOpen(true);
   }, []);
@@ -65,6 +70,16 @@ export function useConfirmModal() {
 
   const confirmAction = useCallback(async () => {
     if (!config) return;
+
+    // 没有 action：直接关闭，不进入 loading
+    if (!hasAction(config)) {
+      closeModal();
+      return;
+    }
+
+    // 已在执行：防重复点击
+    if (loading) return;
+
     setLoading(true);
     try {
       await config.action();
@@ -75,7 +90,7 @@ export function useConfirmModal() {
     } finally {
       setLoading(false);
     }
-  }, [config, closeModal]);
+  }, [config, closeModal, loading]);
 
   return {
     isOpen,
