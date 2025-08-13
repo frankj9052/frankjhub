@@ -23,7 +23,7 @@ export const LandingAnimationPage = () => {
   }
   return (
     <div className="absolute top-0 left-0 right-0 bottom-0 z-[999] bg-white">
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full scale-50 lg:scale-100">
         <FrankLoadingSignature />
       </div>
     </div>
