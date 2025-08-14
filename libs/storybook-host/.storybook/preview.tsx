@@ -8,6 +8,8 @@ const SB_ENV = (typeof import.meta !== 'undefined' && (import.meta as any).env) 
 const GOOGLE_MAPS_API_KEY =
   SB_ENV.STORYBOOK_GOOGLE_MAPS_API_KEY || process.env.STORYBOOK_GOOGLE_MAPS_API_KEY || '';
 
+const GOOGLE_MAP_ID = SB_ENV.STORYBOOK_GOOGLE_MAP_ID || process.env.STORYBOOK_GOOGLE_MAP_ID || '';
+
 const preview: Preview = {
   decorators: [
     Story => (
@@ -15,6 +17,7 @@ const preview: Preview = {
         <RuntimeConfigProvider
           value={{
             googleMapApiKey: GOOGLE_MAPS_API_KEY,
+            googleMapId: GOOGLE_MAP_ID,
           }}
         >
           <Story />

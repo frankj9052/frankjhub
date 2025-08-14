@@ -3,6 +3,7 @@ import { createContext, PropsWithChildren, useContext } from 'react';
 // 让storybook可以安全读取环境变量
 export type PublicRuntimeConfig = {
   googleMapApiKey: string;
+  googleMapId: string;
 };
 
 const RuntimeConfigContext = createContext<PublicRuntimeConfig | null>(null);

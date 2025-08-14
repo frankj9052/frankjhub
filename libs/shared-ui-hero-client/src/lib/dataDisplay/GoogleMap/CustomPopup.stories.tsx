@@ -1,0 +1,28 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { CustomPopup } from './CustomPopup';
+
+const meta = {
+  title: 'Shared-UI-Hero-Client/DataDisplay/GoogleMap/CustomPopup',
+  component: CustomPopup,
+  tags: ['autodocs'],
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: '',
+      },
+    },
+    actions: {},
+  },
+  argTypes: {},
+  args: {},
+} satisfies Meta<typeof CustomPopup>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  args: {
+    active: false,
+  },
+};
