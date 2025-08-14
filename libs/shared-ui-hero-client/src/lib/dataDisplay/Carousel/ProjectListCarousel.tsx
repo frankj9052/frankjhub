@@ -116,7 +116,7 @@ export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProp
       {/* Pagination */}
       <div className="flex justify-center mt-1">
         <CarouselPagination
-          size={projects.length - pageSize + 1}
+          size={projects.length - pageSize}
           currentIndex={currentIndex}
           onClick={index => {
             swiperRef.current?.swiper?.slideTo(index);
@@ -134,7 +134,7 @@ export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProp
         body={
           <div>
             <div className="flex justify-between gap-8 relative">
-              <div className="flex-[0.5]">
+              <div className="lg:flex-[0.5]">
                 <div>
                   {/* description */}
                   <h1 className="font-semibold mb-1">Description:</h1>
@@ -154,7 +154,7 @@ export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProp
                 </div>
 
                 {/* link */}
-                <div className="absolute left-0 bottom-0">
+                <div className="lg:absolute lg:left-0 lg:bottom-0">
                   <FrankButtonBase
                     width={72}
                     height={36}
@@ -165,7 +165,7 @@ export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProp
                 </div>
               </div>
               {/* Image */}
-              <div className="flex-[0.5]">
+              <div className="flex-[0.5] lg:block hidden">
                 <Image
                   width={config?.image.width}
                   height={config?.image.height}
