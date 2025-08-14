@@ -1,30 +1,20 @@
 'use client';
 
 import { HeroTitle } from '@frankjhub/shared-ui-core';
-import {
-  // FrankCarousel,
-  // FrankCarouselRefType,
-  // ProjectCard,
-  ProjectData,
-  ProjectListCarousel,
-} from '@frankjhub/shared-ui-hero-client';
-// import clsx from 'clsx';
-// import { useEffect, useRef, useState } from 'react';
-// import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
-// import { GoDotFill } from 'react-icons/go';
-// import { GoDot } from 'react-icons/go';
+import { ProjectData, ProjectListCarousel } from '@frankjhub/shared-ui-hero-client';
 
 const projectData: ProjectData[] = [
   {
     image: {
-      width: 640,
-      height: 426,
+      width: 600,
+      height: 678,
       alt: 'noqclinic',
-      src: '/images/project01.jpg',
+      src: '/images/noqclinic.png',
     },
     title: 'NoQ Clinic',
     subTitle: 'AI-powered medical appointment platform',
-    description: 'Website adaptable to all devices, with ui components and animated interactions',
+    description:
+      'A comprehensive AI-driven medical appointment platform supporting patient registration, doctor booking, and real-time communication. Features responsive design, dynamic UI components, and seamless integration with payment and authentication systems.',
     link: {
       label: 'Visit',
       href: 'https://noqclinic.com',
@@ -45,14 +35,15 @@ const projectData: ProjectData[] = [
   },
   {
     image: {
-      width: 640,
-      height: 426,
+      width: 600,
+      height: 678,
       alt: 'frankjhub',
-      src: '/images/project02.jpg',
+      src: '/images/frankjhub.png',
     },
     title: 'Frankjhub',
     subTitle: 'BaaS core with RBAC & multi-tenant architecture',
-    description: 'Website adaptable to all devices, with ui components and animated interactions',
+    description:
+      'An enterprise-grade backend-as-a-service platform featuring role-based access control, multi-tenant support, and modular architecture. Built for scalability, maintainability, and high security, with comprehensive documentation pipelines.',
     link: {
       label: 'Visit',
       href: 'https://noqclinic.com',
@@ -79,14 +70,15 @@ const projectData: ProjectData[] = [
   },
   {
     image: {
-      width: 640,
-      height: 426,
+      width: 600,
+      height: 678,
       alt: 'dmsolving',
-      src: '/images/project03.jpg',
+      src: '/images/dmsolving.png',
     },
     title: 'DMSolving',
     subTitle: 'Implemented the official DMSolving website from UI/UX design',
-    description: 'Website adaptable to all devices, with ui components and animated interactions',
+    description:
+      'A modern corporate website developed from UI/UX design to deployment. Fully responsive across devices, featuring smooth animations, optimized performance, and a clean visual identity aligned with brand guidelines.',
     link: {
       label: 'Visit',
       href: 'https://dmsolving.com',
@@ -95,14 +87,15 @@ const projectData: ProjectData[] = [
   },
   {
     image: {
-      width: 640,
-      height: 426,
+      width: 1095,
+      height: 501,
       alt: 'plush-up',
-      src: '/images/project01.jpg',
+      src: '/images/plush-up.png',
     },
     title: 'Plush Up',
     subTitle: 'Built official VR game website with admin access control',
-    description: 'Website adaptable to all devices, with ui components and animated interactions',
+    description:
+      'Official website for a VR claw machine game, featuring secure admin access control, engaging visual effects, and interactive animations to enhance user engagement. Optimized for speed and cross-device compatibility.',
     link: {
       label: 'Visit',
       href: 'https://plush-up.com',
@@ -111,14 +104,15 @@ const projectData: ProjectData[] = [
   },
   {
     image: {
-      width: 640,
-      height: 426,
+      width: 1094,
+      height: 501,
       alt: 'claclaws',
-      src: '/images/project02.jpg',
+      src: '/images/claclaws.png',
     },
     title: 'Claclaws',
     subTitle: 'Implemented official arcade claw machine store website from design',
-    description: 'Website adaptable to all devices, with ui components and animated interactions',
+    description:
+      'E-commerce website for an arcade claw machine store, developed from design to launch. Includes responsive layout, intuitive navigation, and an engaging product showcase optimized for conversions.',
     link: {
       label: 'Visit',
       href: 'https://claclaws.com',
@@ -128,90 +122,14 @@ const projectData: ProjectData[] = [
 ];
 
 export const PortfolioSectionLayout = () => {
-  // const swiperRef = useRef<FrankCarouselRefType | null>(null);
-  // const [isBeginning, setIsBeginning] = useState(true);
-  // const [isEnd, setIsEnd] = useState(false);
-  // const [pageSize, setPageSize] = useState(1);
-  // const [currentIndex, setCurrentIndex] = useState(0);
-
-  // useEffect(() => {
-  //   if (swiperRef.current?.swiper) {
-  //     setIsBeginning(swiperRef.current?.swiper?.isBeginning);
-  //     setIsEnd(swiperRef.current?.swiper?.isEnd);
-  //     setPageSize(swiperRef.current.swiper.slidesPerViewDynamic() - 1);
-  //   }
-  // }, []);
-
   return (
-    <div className="w-full h-full md:pt-8">
+    <div className="w-full h-full md:pt-8 pb-8">
       {/* Title */}
-      <div className="mb-8">
+      <div className="md:mb-32 mb-16">
         <HeroTitle>Portfolio</HeroTitle>
       </div>
       {/* Swiper */}
       <ProjectListCarousel projects={projectData} />
-      {/* <div className="">
-        <div className="flex justify-between items-center">
-          <MdKeyboardArrowLeft
-            size={100}
-            className={clsx('', {
-              'cursor-pointer text-primary': !isBeginning,
-              'cursor-default text-gray-400': isBeginning,
-            })}
-            onClick={() => {
-              swiperRef.current?.swiper?.slidePrev();
-            }}
-          />
-          <div className="overflow-hidden select-none">
-            <FrankCarousel
-              ref={swiperRef}
-              childWidth={300}
-              spaceBetween={40}
-              freeMode={true}
-              slidesPerView={'auto'}
-              onActiveIndexChange={index => {
-                if (swiperRef.current?.swiper) {
-                  setIsBeginning(swiperRef.current?.swiper?.isBeginning);
-                  setIsEnd(swiperRef.current?.swiper?.isEnd);
-                  // setPageSize(swiperRef.current.swiper.slidesPerViewDynamic() - 1);
-                  setCurrentIndex(index);
-                }
-              }}
-            >
-              {projectData.map(item => (
-                <ProjectCard
-                  key={item.title}
-                  image={{
-                    height: item.image.height,
-                    width: item.image.width,
-                    alt: item.image.alt,
-                    src: item.image.src,
-                  }}
-                  title={item.title}
-                  subTitle={item.subTitle}
-                />
-              ))}
-            </FrankCarousel>
-          </div>
-          <MdKeyboardArrowRight
-            size={100}
-            className={clsx('', {
-              'cursor-pointer text-primary': !isEnd,
-              'cursor-default text-gray-400': isEnd,
-            })}
-            onClick={() => {
-              swiperRef.current?.swiper?.slideNext();
-            }}
-          />
-        </div>
-        <div className="flex justify-center mt-1">
-          {Array.from({ length: projectData.length - pageSize + 1 }).map((_, index) => (
-            <div key={`pagination-${index}`}>
-              {currentIndex === index ? <GoDotFill /> : <GoDot />}
-            </div>
-          ))}
-        </div>
-      </div> */}
     </div>
   );
 };
