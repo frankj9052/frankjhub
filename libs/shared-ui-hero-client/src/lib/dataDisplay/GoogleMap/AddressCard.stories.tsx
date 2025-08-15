@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CustomLocationMarker } from './CustomLocationMarker';
+import { AddressCard } from './AddressCard';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/DataDisplay/GoogleMap/CustomLocationMarker',
-  component: CustomLocationMarker,
+  title: 'Shared-UI-Hero-Client/DataDisplay/GoogleMap/AddressCard',
+  component: AddressCard,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -16,14 +16,11 @@ const meta = {
   },
   argTypes: {},
   args: {},
-} satisfies Meta<typeof CustomLocationMarker>;
+} satisfies Meta<typeof AddressCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    hovered: false,
-    selected: false,
-  },
+  args: {},
 };
