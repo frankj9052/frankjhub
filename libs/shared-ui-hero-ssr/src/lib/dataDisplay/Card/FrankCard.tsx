@@ -20,6 +20,7 @@ export type FrankCardProps = {
   disableAnimation?: boolean;
   disableRipple?: boolean;
   allowTextSelectionOnPress?: boolean;
+  radius?: 'sm' | 'md' | 'lg' | 'none';
 };
 
 /**
@@ -65,6 +66,7 @@ export const FrankCard = ({
   disableAnimation,
   disableRipple,
   allowTextSelectionOnPress,
+  radius,
 }: FrankCardProps) => {
   return (
     <div
@@ -87,6 +89,7 @@ export const FrankCard = ({
         disableAnimation={disableAnimation}
         disableRipple={disableRipple}
         allowTextSelectionOnPress={allowTextSelectionOnPress}
+        radius={radius}
       >
         {cardCover}
         <div className="absolute w-full h-full flex flex-col">

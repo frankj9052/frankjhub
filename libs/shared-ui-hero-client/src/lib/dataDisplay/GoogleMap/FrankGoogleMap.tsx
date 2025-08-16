@@ -2,6 +2,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { renderReactToElement } from '@frankjhub/shared-ui-core';
 import { CustomLocationMarker } from './CustomLocationMarker';
+import { CustomPopup } from './CustomPopup';
 
 export interface FrankGoogleMapAddress {
   id: string;
@@ -32,6 +33,7 @@ export interface FrankGoogleMapProps {
   height?: number;
   hoveredAddressId?: string | null;
   selectedAddressId?: string | null;
+  selectedTick?: number;
 }
 
 const getLoader = (() => {
@@ -58,10 +60,11 @@ export const FrankGoogleMap = ({
   height,
   hoveredAddressId,
   selectedAddressId,
+  selectedTick = 0,
 }: FrankGoogleMapProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
-  // const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
   // id => marker 映射 & 高亮恢复句柄
@@ -75,6 +78,8 @@ export const FrankGoogleMap = ({
         hover: () => void;
         select: () => void;
         resetSelect: () => void;
+        infoContentEl?: HTMLElement;
+        infoUnmount?: () => void;
         cleanup: () => void;
       }
     >
@@ -109,6 +114,7 @@ export const FrankGoogleMap = ({
       markerIndexRef.current.get(currentSelectedIdRef.current)?.resetSelect();
       currentSelectedIdRef.current = null;
     }
+    infoWindowRef.current?.close();
   }, []);
 
   // 触发 hover 高亮（默认不 pan，避免频繁抖动；如需可传 true）
@@ -137,6 +143,53 @@ export const FrankGoogleMap = ({
     item.select();
     if (pan) mapRef.current.panTo(item.marker.position as google.maps.LatLng);
     currentSelectedIdRef.current = id;
+  }, []);
+
+  // 打开infoWindow
+  const openInfoWindow = useCallback((id: string) => {
+    const item = markerIndexRef.current.get(id);
+    if (!item || !mapRef.current) return;
+
+    // 首次全局创建 InfoWindow
+    if (!infoWindowRef.current) {
+      infoWindowRef.current = new google.maps.InfoWindow({
+        // 调位置
+        pixelOffset: new google.maps.Size(0, 144),
+        // maxWidth: 260,
+        // disableAutoPan: false,
+        headerDisabled: true,
+      });
+    }
+
+    // 等infoWindow DOM 挂好后再修改内部样式
+    infoWindowRef.current.addListener('domready', () => {
+      const mapEl = containerRef.current;
+      if (!mapEl) return;
+
+      // 隐藏原生三角箭头(tail)
+      const tails = mapEl.querySelectorAll<HTMLElement>('.gm-style-iw-tc');
+      tails.forEach(el => (el.style.display = 'none'));
+
+      // 去掉默认padding
+      const content = mapEl.querySelector<HTMLElement>('.gm-style-iw-c');
+      if (content) {
+        content.style.padding = '0';
+        // 避免内容被裁剪
+        content.style.overflow = 'visible';
+      }
+    });
+
+    // InfoWindow内容
+    const infoContent = renderReactToElement(<CustomPopup />);
+    item.infoContentEl = infoContent.el;
+    item.infoUnmount = infoContent.unmount;
+
+    // 绑定内容并打开
+    infoWindowRef.current.setContent(item.infoContentEl);
+    infoWindowRef.current.open({
+      map: mapRef.current,
+      anchor: item.marker,
+    });
   }, []);
 
   useEffect(() => {
@@ -235,6 +288,12 @@ export const FrankGoogleMap = ({
           content: hostEl ?? root,
         });
 
+        // 添加点击事件
+        marker.addListener('click', () => {
+          selectHighLight(input.id, true);
+          openInfoWindow(input.id);
+        });
+
         // DOM状态控制
         const setHover = (on: boolean) => {
           if (!hostEl) return;
@@ -244,7 +303,9 @@ export const FrankGoogleMap = ({
         const setSelect = (on: boolean) => {
           if (!hostEl) return;
           if (on) hostEl.setAttribute('data-selected', 'true');
-          else hostEl.setAttribute('data-selected', 'false');
+          else {
+            hostEl.setAttribute('data-selected', 'false');
+          }
         };
 
         // 清理
@@ -283,15 +344,26 @@ export const FrankGoogleMap = ({
 
     return () => {
       cancelled = true;
+      infoWindowRef.current?.close();
       // ✅ 使用上面快照到的 mapForCleanup，而不是 markerIndexRef.current
       const markersSnapshot = Array.from(mapForCleanup.values());
       markersSnapshot.forEach(item => {
         item.marker.map = null;
+        item.infoUnmount?.();
         item.cleanup();
       });
       mapForCleanup.clear();
     };
-  }, [googleMapApiKey, mergedOptions, addresses, zoom, clearHoverOnly, clearSelectOnly]);
+  }, [
+    googleMapApiKey,
+    mergedOptions,
+    addresses,
+    zoom,
+    clearHoverOnly,
+    clearSelectOnly,
+    selectHighLight,
+    openInfoWindow,
+  ]);
 
   // 监听hoveredAddressId
   useEffect(() => {
@@ -316,11 +388,13 @@ export const FrankGoogleMap = ({
         markerIndexRef.current.get(currentSelectedIdRef.current)?.resetSelect();
         currentSelectedIdRef.current = null;
       }
+      infoWindowRef.current?.close();
       return;
     }
-    if (currentSelectedIdRef.current === selectedAddressId) return;
+
     selectHighLight(selectedAddressId, true);
-  }, [selectedAddressId, selectHighLight]);
+    openInfoWindow(selectedAddressId);
+  }, [selectedAddressId, selectHighLight, selectedTick, openInfoWindow]);
 
   return (
     <div

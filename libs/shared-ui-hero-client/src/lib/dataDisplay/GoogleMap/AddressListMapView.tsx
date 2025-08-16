@@ -15,6 +15,12 @@ export const AddressListMapView = ({
 }: AddressListMapViewProps) => {
   const [hoveredAddressId, setHoveredAddressId] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [selectedTick, setSelectedTick] = useState(0);
+
+  const hanldeSelect = (id: string) => {
+    setSelectedAddressId(id);
+    setSelectedTick(t => t + 1);
+  };
 
   return (
     <div className="w-[1000px] h-[400px] bg-blue-200 flex">
@@ -26,7 +32,9 @@ export const AddressListMapView = ({
               <div key={address.id} onMouseEnter={() => setHoveredAddressId(address.id)}>
                 <FrankButtonBase
                   customizeContent={`${address.label}`}
-                  onPress={() => setSelectedAddressId(address.id)}
+                  onPress={() => {
+                    hanldeSelect(address.id);
+                  }}
                 />
               </div>
             );
@@ -40,6 +48,7 @@ export const AddressListMapView = ({
           googleMapId={googleMapId}
           hoveredAddressId={hoveredAddressId}
           selectedAddressId={selectedAddressId}
+          selectedTick={selectedTick}
         />
       </div>
     </div>
