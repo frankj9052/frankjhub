@@ -1,8 +1,6 @@
 import clsx from 'clsx';
 import Image from 'next/image';
 import { RiMapPin3Fill } from 'react-icons/ri';
-// import { FrankModal } from '../../feedback';
-// import { useEffect, useRef, useState } from 'react';
 
 // 用 MutationObserver 监听根节点的 data-selected 变化，然后把它映射到本地的 open 状态
 export interface CustomLocationMarkerProps {
@@ -17,42 +15,9 @@ export const CustomLocationMarker = ({
   hovered = false,
   selected = false,
 }: CustomLocationMarkerProps) => {
-  // 绑定到真正作为 AdvancedMarker content 的宿主元素
-  // const hostRef = useRef<HTMLDivElement>(null);
-  // 本地“是否打开Modal”的状态：仅在 data-selected 变化时更新
-  // const [open, setOpen] = useState<boolean>(selected ?? false);
-  // 监听 props.selected（如果父层愿意用 React 方式控制，保持同步）
-  // useEffect(() => {
-  //   setOpen(!!selected);
-  // }, [selected]);
-  // 监听 DOM 属性 data-selected 的变化（外部 setAttribute 时触发）
-  // useEffect(() => {
-  //   const el = hostRef.current;
-  //   if (!el) return;
-
-  //   // 初始化一次（以防外部先改了 attribute 再挂载 observer）
-  //   const syncFromAttr = () => {
-  //     const attr = el.getAttribute('data-selected');
-  //     setOpen(attr === 'true');
-  //   };
-  //   syncFromAttr();
-
-  //   const mo = new MutationObserver(mutations => {
-  //     for (const m of mutations) {
-  //       if (m.type === 'attributes' && m.attributeName === 'data-selected') {
-  //         syncFromAttr();
-  //       }
-  //     }
-  //   });
-
-  //   mo.observe(el, { attributes: true, attributeFilter: ['data-selected'] });
-  //   return () => mo.disconnect();
-  // }, []);
-
   return (
     // 根节点加上data-marker-root更好找
     <div
-      // ref={hostRef}
       data-marker-root
       data-hovered={hovered ? 'true' : 'false'}
       data-selected={selected ? 'true' : 'false'}
@@ -96,35 +61,6 @@ export const CustomLocationMarker = ({
           </div>
         </div>
       </div>
-
-      {/* popover window */}
-      {/* <FrankModal
-        isOpen={open}
-        onClose={() => {
-          hostRef.current?.setAttribute('data-selected', 'false');
-        }}
-        body={<div>this is modal</div>}
-        size="xs"
-        placement="bottom-center"
-      /> */}
-      {/* <div
-        className={clsx([
-          'absolute z-30',
-          'bg-white w-[100px] h-[100px]',
-          'cursor-default',
-          'opacity-0 scale-0 transition-all duration-500 ease-out',
-          'group-data-[selected=true]:opacity-100 group-data-[selected=true]:scale-100'
-        ])}
-      >
-        sample content
-        <div>
-          <button
-            onClick={() => {
-              console.log("clicked")
-            }}
-          >test button</button>
-        </div>
-      </div> */}
     </div>
   );
 };

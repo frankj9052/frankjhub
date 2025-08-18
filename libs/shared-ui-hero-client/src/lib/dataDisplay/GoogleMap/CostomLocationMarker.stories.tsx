@@ -27,3 +27,10 @@ export const Default: Story = {
     selected: false,
   },
 };
+
+export const Selected: Story = {
+  args: {
+    hovered: false,
+    selected: true,
+  },
+};

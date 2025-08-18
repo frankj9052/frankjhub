@@ -23,6 +23,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    active: false,
+    selected: true,
+    address: '100 Queen St W, Toronto, ON',
+    label: 'Toronto City Hall',
   },
 };
