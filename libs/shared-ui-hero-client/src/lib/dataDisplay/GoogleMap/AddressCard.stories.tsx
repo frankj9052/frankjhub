@@ -22,5 +22,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    width: 300,
+    address: '100 Queen St W, Toronto, ON',
+    label: 'Toronto City Hall',
+    selected: false,
+    hovered: false,
+  },
 };

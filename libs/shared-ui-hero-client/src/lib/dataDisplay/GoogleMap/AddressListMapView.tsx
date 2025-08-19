@@ -1,17 +1,21 @@
-import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import { FrankGoogleMap, FrankGoogleMapAddress } from './FrankGoogleMap';
 import { useState } from 'react';
+import { AddressCard } from './AddressCard';
 
 export interface AddressListMapViewProps {
   addresses: FrankGoogleMapAddress[];
   googleMapApiKey: string;
   googleMapId: string;
+  width?: number;
+  height?: number;
 }
 
 export const AddressListMapView = ({
   addresses,
   googleMapApiKey,
   googleMapId,
+  width,
+  height,
 }: AddressListMapViewProps) => {
   const [hoveredAddressId, setHoveredAddressId] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -23,19 +27,35 @@ export const AddressListMapView = ({
   };
 
   return (
-    <div className="w-[1000px] h-[400px] bg-blue-200 flex">
+    <div
+      className="flex outline outline-offset-1 outline-gray-400"
+      style={{
+        width: width ? `${width}px` : '100%',
+        height: height ? `${height}px` : '100%',
+      }}
+    >
       {/* address list */}
-      <div className="bg-red-200 flex-[0.3]">
+      <div className="flex-[0.3] p-1">
         {addresses.length > 0 &&
           addresses.map(address => {
             return (
               <div key={address.id} onMouseEnter={() => setHoveredAddressId(address.id)}>
-                <FrankButtonBase
+                <AddressCard
+                  onPress={() => {
+                    hanldeSelect(address.id);
+                  }}
+                  address={address.address}
+                  label={address.label}
+                  link={address.link}
+                  selected={address.id === selectedAddressId}
+                  hovered={address.id === hoveredAddressId}
+                />
+                {/* <FrankButtonBase
                   customizeContent={`${address.label}`}
                   onPress={() => {
                     hanldeSelect(address.id);
                   }}
-                />
+                /> */}
               </div>
             );
           })}

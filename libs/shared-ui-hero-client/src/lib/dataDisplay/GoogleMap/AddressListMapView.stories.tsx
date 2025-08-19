@@ -19,6 +19,8 @@ const meta = {
   args: {
     googleMapApiKey: '',
     googleMapId: '',
+    width: 1000,
+    height: 400,
   },
   decorators: [
     (Story, context) => {

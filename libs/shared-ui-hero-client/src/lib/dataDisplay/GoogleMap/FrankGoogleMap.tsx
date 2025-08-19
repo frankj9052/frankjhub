@@ -5,7 +5,6 @@ import { renderReactToElement } from '@frankjhub/shared-ui-core';
 import { CustomLocationMarker } from './CustomLocationMarker';
 import { CustomPopup, POPUP_ROOT_SELECTOR, POPUP_SELECTED_ATTR } from './CustomPopup';
 import { createPopupOverlayClass, PopupOverlayCtor } from './PopupOverlay';
-import { flushSync } from 'react-dom';
 
 export interface FrankGoogleMapAddress {
   id: string;

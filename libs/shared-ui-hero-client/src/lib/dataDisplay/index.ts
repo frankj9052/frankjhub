@@ -4,3 +4,5 @@ export * from './Calendar';
 export * from './Carousel';
 
 export * from './Card';
+
+export * from './GoogleMap';
