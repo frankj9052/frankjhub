@@ -26,5 +26,17 @@ export const Default: Story = {
     selected: true,
     address: '100 Queen St W, Toronto, ON',
     label: 'Toronto City Hall',
+    width: 288,
+    height: 314,
+  },
+};
+
+export const Small: Story = {
+  args: {
+    selected: true,
+    address: '100 Queen St W, Toronto, ON',
+    label: 'Toronto City Hall',
+    width: 200,
+    height: 130,
   },
 };

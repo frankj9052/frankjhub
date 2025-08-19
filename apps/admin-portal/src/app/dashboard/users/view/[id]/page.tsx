@@ -35,7 +35,7 @@ const ViewUserPage = () => {
               alt={user.userName}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 160px"
+              sizes="160px"
               priority
             />
           </div>

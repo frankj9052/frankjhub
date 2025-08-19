@@ -30,6 +30,8 @@ const meta = {
   args: {
     googleMapApiKey: '',
     googleMapId: '',
+    popupWindowHeight: 130,
+    popupWindowWith: 200,
   },
   decorators: [
     (Story, context) => {

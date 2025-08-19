@@ -39,7 +39,7 @@ export const CustomLocationMarker = ({
         {/* 显示图片 */}
         <div
           className={clsx([
-            'absolute -translate-y-[0.7px]',
+            'absolute -translate-y-[7%]',
             'w-[12px] h-[12px] rounded-full overflow-hidden',
             'pointer-events-none', // 不挡点击
             'opacity-0 scale-0 transition-all duration-500 ease-out', // 初始隐藏
@@ -49,12 +49,12 @@ export const CustomLocationMarker = ({
         >
           <div className="relative w-full h-full">
             <Image
-              fill
-              priority
+              width={400}
+              height={267}
               alt="clinic photo"
               src={
                 image ??
-                'https://res.cloudinary.com/dqluguvjq/image/upload/v1755200815/no-photo_yjgz9e.jpg'
+                'https://res.cloudinary.com/dqluguvjq/image/upload/c_crop,w_400,h_267/v1755200815/no-photo_yjgz9e.jpg'
               }
               className="object-cover w-full h-full"
             />

@@ -27,6 +27,8 @@ export interface FrankGoogleMapProps {
   hoveredAddressId?: string | null;
   selectedAddressId?: string | null;
   selectedTick?: number;
+  popupWindowWith?: number;
+  popupWindowHeight?: number;
 }
 
 const getLoader = (() => {
@@ -60,6 +62,8 @@ export const FrankGoogleMap = ({
   hoveredAddressId,
   selectedAddressId,
   selectedTick = 0,
+  popupWindowWith,
+  popupWindowHeight,
 }: FrankGoogleMapProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -292,6 +296,8 @@ export const FrankGoogleMap = ({
             label={addr?.label}
             image={addr?.image}
             link={addr?.link}
+            width={popupWindowWith}
+            height={popupWindowHeight}
           />
         </div>
       );

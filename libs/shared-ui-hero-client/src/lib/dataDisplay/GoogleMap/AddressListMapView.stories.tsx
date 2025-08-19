@@ -21,6 +21,8 @@ const meta = {
     googleMapId: '',
     width: 1000,
     height: 400,
+    popupWindowHeight: 130,
+    popupWindowWidth: 200,
   },
   decorators: [
     (Story, context) => {

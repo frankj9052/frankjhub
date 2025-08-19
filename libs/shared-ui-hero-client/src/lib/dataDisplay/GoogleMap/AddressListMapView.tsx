@@ -8,6 +8,8 @@ export interface AddressListMapViewProps {
   googleMapId: string;
   width?: number;
   height?: number;
+  popupWindowWidth?: number;
+  popupWindowHeight?: number;
 }
 
 export const AddressListMapView = ({
@@ -16,6 +18,8 @@ export const AddressListMapView = ({
   googleMapId,
   width,
   height,
+  popupWindowWidth,
+  popupWindowHeight,
 }: AddressListMapViewProps) => {
   const [hoveredAddressId, setHoveredAddressId] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -50,18 +54,12 @@ export const AddressListMapView = ({
                   selected={address.id === selectedAddressId}
                   hovered={address.id === hoveredAddressId}
                 />
-                {/* <FrankButtonBase
-                  customizeContent={`${address.label}`}
-                  onPress={() => {
-                    hanldeSelect(address.id);
-                  }}
-                /> */}
               </div>
             );
           })}
       </div>
       {/* map */}
-      <div className="bg-yellow-200 flex-[0.7]">
+      <div className="flex-1">
         <FrankGoogleMap
           addresses={addresses}
           googleMapApiKey={googleMapApiKey}
@@ -69,6 +67,8 @@ export const AddressListMapView = ({
           hoveredAddressId={hoveredAddressId}
           selectedAddressId={selectedAddressId}
           selectedTick={selectedTick}
+          popupWindowHeight={popupWindowHeight}
+          popupWindowWith={popupWindowWidth}
         />
       </div>
     </div>
