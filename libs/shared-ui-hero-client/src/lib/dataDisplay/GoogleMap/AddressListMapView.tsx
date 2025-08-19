@@ -35,7 +35,7 @@ export const AddressListMapView = ({
       }}
     >
       {/* address list */}
-      <div className="flex-[0.3] p-1">
+      <div className="flex-[0.3] p-1 overflow-y-scroll">
         {addresses.length > 0 &&
           addresses.map(address => {
             return (

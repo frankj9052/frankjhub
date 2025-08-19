@@ -28,14 +28,14 @@ export const CustomLocationMarker = ({
         className={clsx([
           'cursor-pointer',
           'relative inline-flex items-center justify-center',
-          'origin-bottom -translate-y-1/2',
+          'origin-bottom -translate-y-1/2 z-0 absolute',
           'transform-gpu will-change-transform transition-transform duration-500 ease-out',
           'group-data-[hovered=true]:scale-[3]',
           'group-data-[selected=true]:scale-[3]',
         ])}
       >
         {/* 主标记点 */}
-        <RiMapPin3Fill size={21} className="text-primary drop-shadow-sm" />
+        <RiMapPin3Fill size={21} className="text-primary" />
         {/* 显示图片 */}
         <div
           className={clsx([

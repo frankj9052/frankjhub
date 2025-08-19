@@ -41,6 +41,12 @@ const getLoader = (() => {
   };
 })();
 
+const Z = {
+  BASE: undefined as number | undefined, // 还原默认：按屏幕纵向排序
+  SELECTED: 2_000_000, // 选中时置顶
+  HOVERED: 2_000_001, // hover 比选中更靠前
+};
+
 export const FrankGoogleMap = ({
   googleMapApiKey,
   center,
@@ -361,6 +367,8 @@ export const FrankGoogleMap = ({
       const { AdvancedMarkerElement } = markerLib as google.maps.MarkerLibrary;
       const { Geocoder } = geocodeLib as google.maps.GeocodingLibrary;
 
+      const CB = google.maps.CollisionBehavior;
+
       if (!mapRef.current) {
         mapRef.current = new Map(el, mergedOptions);
         geocoderRef.current = new Geocoder();
@@ -429,6 +437,7 @@ export const FrankGoogleMap = ({
           position,
           title: input.label || input.address,
           content: hostEl,
+          collisionBehavior: CB.REQUIRED,
         });
 
         marker.addListener('click', () => {
@@ -439,10 +448,20 @@ export const FrankGoogleMap = ({
         const setHover = (on: boolean) => {
           if (!hostEl) return;
           hostEl.setAttribute('data-hovered', on ? 'true' : 'false');
+          marker.zIndex = on
+            ? Z.HOVERED
+            : currentSelectedIdRef.current === input.id
+            ? Z.SELECTED
+            : Z.BASE;
         };
         const setSelect = (on: boolean) => {
           if (!hostEl) return;
           hostEl.setAttribute('data-selected', on ? 'true' : 'false');
+          marker.zIndex = on
+            ? Z.SELECTED
+            : currentHoveredIdRef.current === input.id
+            ? Z.HOVERED
+            : Z.BASE;
         };
 
         const disposers: Array<() => void> = [
