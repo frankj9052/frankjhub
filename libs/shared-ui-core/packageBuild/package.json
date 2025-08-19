@@ -1,6 +1,6 @@
 {
   "name": "@frankjhub/shared-ui-core",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",
