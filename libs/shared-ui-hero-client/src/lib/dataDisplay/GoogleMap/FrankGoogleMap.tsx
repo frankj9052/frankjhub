@@ -1,7 +1,6 @@
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import { renderReactToElement } from '@frankjhub/shared-ui-core';
 import { CustomLocationMarker } from './CustomLocationMarker';
 import { CustomPopup, POPUP_ROOT_SELECTOR, POPUP_SELECTED_ATTR } from './CustomPopup';
 import { createPopupOverlayClass, PopupOverlayCtor } from './PopupOverlay';
@@ -35,19 +34,60 @@ const getLoader = (() => {
   let _loader: Loader | null = null;
   return (apiKey: string) => {
     if (_loader) return _loader;
-    _loader = new Loader({
-      apiKey,
-      libraries: ['places', 'marker'],
-    });
+    _loader = new Loader({ apiKey, libraries: ['places', 'marker'] });
     return _loader;
   };
 })();
 
 const Z = {
-  BASE: undefined as number | undefined, // 还原默认：按屏幕纵向排序
-  SELECTED: 2_000_000, // 选中时置顶
-  HOVERED: 2_000_001, // hover 比选中更靠前
+  BASE: undefined as number | undefined,
+  SELECTED: 2_000_000,
+  HOVERED: 2_000_001,
 };
+
+// —— 安全卸载：先 render(null)，再异步 unmount，避免“同步卸载”报错 ——
+function safeUnmountRoot(root: Root | null) {
+  if (!root) return;
+  try {
+    root.render(null);
+  } catch (e) {
+    void e;
+  }
+  setTimeout(() => {
+    try {
+      root.unmount();
+    } catch (e) {
+      void e;
+    }
+  }, 0);
+}
+
+const isDocHidden = () => (typeof document !== 'undefined' ? !!document.hidden : false);
+
+// 新建容器并挂一个 React Root（给 Google Maps 的 content 用）
+function mountReactToDiv(node: React.ReactNode) {
+  const containerEl = document.createElement('div');
+  const root = createRoot(containerEl);
+  root.render(node);
+  return { containerEl, root };
+}
+
+// 将 data-attr 写到 data-marker-root；若首帧找不到，做至多 2 次 rAF 重试
+function setDataAttrWithRetry(
+  getRootEl: () => HTMLElement | null,
+  name: string,
+  value: 'true' | 'false'
+) {
+  const trySet = (attempt: number) => {
+    const el = getRootEl();
+    if (el) {
+      el.setAttribute(name, value);
+    } else if (attempt < 2) {
+      requestAnimationFrame(() => trySet(attempt + 1));
+    }
+  };
+  trySet(0);
+}
 
 export const FrankGoogleMap = ({
   googleMapApiKey,
@@ -70,24 +110,33 @@ export const FrankGoogleMap = ({
   const geocoderRef = useRef<google.maps.Geocoder | null>(null);
   const animVersionRef = useRef(0);
 
+  const initialHoveredIdRef = useRef<string | null>(hoveredAddressId ?? null);
+  const initialSelectedIdRef = useRef<string | null>(selectedAddressId ?? null);
+
   type MarkerItem = {
     marker: google.maps.marker.AdvancedMarkerElement;
     position: google.maps.LatLng | google.maps.LatLngLiteral;
+    containerEl: HTMLElement; // 传给 Google 的 content 容器
+    getRootEl: () => HTMLElement | null; // 惰性获取 [data-marker-root]
     resetHover: () => void;
     hover: () => void;
     select: () => void;
     resetSelect: () => void;
     cleanup: () => void;
   };
+
   const markerIndexRef = useRef<Map<string, MarkerItem>>(new Map());
   const currentHoveredIdRef = useRef<string | null>(null);
   const currentSelectedIdRef = useRef<string | null>(null);
 
-  // Overlay（自定义弹窗）
+  // Overlay
   const overlayCtorRef = useRef<PopupOverlayCtor | null>(null);
   const overlayRef = useRef<InstanceType<PopupOverlayCtor> | null>(null);
   const overlayRootRef = useRef<Root | null>(null);
   const lastSelectionRef = useRef<{ id: string | null; tick: number }>({ id: null, tick: -1 });
+
+  // Map 级监听统一管理
+  const mapListenersRef = useRef<google.maps.MapsEventListener[]>([]);
 
   const mergedOptions = useMemo<google.maps.MapOptions>(() => {
     return {
@@ -101,25 +150,18 @@ export const FrankGoogleMap = ({
     };
   }, [center, zoom, mapOptions, googleMapId]);
 
-  // 把各种 LatLng 类型统一成 google.maps.LatLng
   const toLatLng = (pos: google.maps.LatLng | google.maps.LatLngLiteral) =>
     pos instanceof google.maps.LatLng ? pos : new google.maps.LatLng(pos.lat, pos.lng);
 
-  /** 判断一个点是否在当前视野；paddingPx > 0 时使用像素内边距 */
   const isPositionInViewport = useCallback(
     (pos: google.maps.LatLng | google.maps.LatLngLiteral, paddingPx = 0) => {
       const map = mapRef.current;
       if (!map) return false;
-
       const bounds = map.getBounds();
-      if (!bounds) return false; // 视野还没就绪时，认为不在视野内，触发一次 pan
-
+      if (!bounds) return false;
       const latLng = toLatLng(pos);
-
-      // 无 padding：直接用 bounds.contains
       if (paddingPx <= 0) return bounds.contains(latLng);
 
-      // 有 padding：用 OverlayView 的投影做像素级判断（fallback 到 contains）
       const projection = overlayRef.current?.getProjection?.();
       if (!projection) return bounds.contains(latLng);
 
@@ -130,63 +172,59 @@ export const FrankGoogleMap = ({
       const pt = projection.fromLatLngToDivPixel(latLng);
       if (!nePx || !swPx || !pt) return bounds.contains(latLng);
 
-      // 当前视窗的像素矩形（注意 y 轴向下增加）：
-      // left = sw.x, right = ne.x, top = ne.y, bottom = sw.y
       const left = swPx.x + paddingPx;
       const right = nePx.x - paddingPx;
       const top = nePx.y + paddingPx;
       const bottom = swPx.y - paddingPx;
-
       return pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom;
     },
     []
   );
 
-  /** 仅在超出（带 padding 的）视野时才 pan */
   const panIfNeeded = useCallback(
     (pos: google.maps.LatLng | google.maps.LatLngLiteral, paddingPx = 0) => {
       const map = mapRef.current;
       if (!map) return;
-
       const latLng = toLatLng(pos);
-      const inView = isPositionInViewport(latLng, paddingPx);
-      if (!inView) {
+      if (!isPositionInViewport(latLng, paddingPx)) {
         map.panTo(latLng);
       }
     },
     [isPositionInViewport]
   );
-  // ---------- Hover/Select 状态 ----------
+
+  // ---------- 仅操作 DOM 属性的状态切换（不重建地图） ----------
   const clearHoverOnly = useCallback(() => {
     const hoveredId = currentHoveredIdRef.current;
-    if (hoveredId) {
-      const item = markerIndexRef.current.get(hoveredId);
-      if (item) item.resetHover();
-      currentHoveredIdRef.current = null;
-    }
+    if (!hoveredId) return;
+    const item = markerIndexRef.current.get(hoveredId);
+    if (item) item.resetHover(); // => data-hovered="false"
+    currentHoveredIdRef.current = null;
   }, []);
 
   const clearSelectOnly = useCallback(() => {
     const selectedId = currentSelectedIdRef.current;
-    if (selectedId) {
-      const item = markerIndexRef.current.get(selectedId);
-      if (item) item.resetSelect();
-      currentSelectedIdRef.current = null;
-    }
+    if (!selectedId) return;
+    const item = markerIndexRef.current.get(selectedId);
+    if (item) item.resetSelect(); // => data-selected="false"
+    currentSelectedIdRef.current = null;
   }, []);
 
   const hoverHighLight = useCallback((id: string, pan = false) => {
-    const item = markerIndexRef.current.get(id);
     const map = mapRef.current;
-    if (!item || !map) return;
+    if (!map) return;
 
+    // 先把之前 hover 的恢复
     const prevId = currentHoveredIdRef.current;
     if (prevId && prevId !== id) {
       const prevItem = markerIndexRef.current.get(prevId);
-      if (prevItem) prevItem.resetHover();
+      if (prevItem) prevItem.resetHover(); // => data-hovered="false"
     }
 
-    item.hover();
+    const item = markerIndexRef.current.get(id);
+    if (!item) return;
+
+    item.hover(); // => data-hovered="true"
     if (pan) {
       const pos = item.marker.position as google.maps.LatLng | null;
       if (pos) map.panTo(pos);
@@ -196,25 +234,28 @@ export const FrankGoogleMap = ({
 
   const selectHighLight = useCallback(
     (id: string, pan = true) => {
-      // 清掉 hover，防止 hover 与 selected 同时变更导致过渡重复
+      const map = mapRef.current;
+      if (!map) return;
+
+      // 选中前清掉 hover（如果不是同一个 id）
       const hoveredId = currentHoveredIdRef.current;
       if (hoveredId && hoveredId !== id) {
-        const prev = markerIndexRef.current.get(hoveredId);
-        prev?.resetHover();
+        const prevHover = markerIndexRef.current.get(hoveredId);
+        if (prevHover) prevHover.resetHover();
         currentHoveredIdRef.current = null;
       }
 
-      const item = markerIndexRef.current.get(id);
-      const map = mapRef.current;
-      if (!item || !map) return;
-
-      const prevId = currentSelectedIdRef.current;
-      if (prevId && prevId !== id) {
-        const prevItem = markerIndexRef.current.get(prevId);
-        if (prevItem) prevItem.resetSelect();
+      // 取消旧选中
+      const prevSelId = currentSelectedIdRef.current;
+      if (prevSelId && prevSelId !== id) {
+        const prevSel = markerIndexRef.current.get(prevSelId);
+        if (prevSel) prevSel.resetSelect();
       }
 
-      item.select();
+      const item = markerIndexRef.current.get(id);
+      if (!item) return;
+
+      item.select(); // => data-selected="true"
       if (pan) {
         const pos = item.marker.position as google.maps.LatLng | null;
         if (pos) panIfNeeded(pos, 48);
@@ -224,7 +265,7 @@ export const FrankGoogleMap = ({
     [panIfNeeded]
   );
 
-  // ---------- Overlay 相关 ----------
+  // ---------- Overlay ----------
   const ensureOverlayCtor = useCallback(() => {
     if (!overlayCtorRef.current) {
       overlayCtorRef.current = createPopupOverlayClass();
@@ -242,32 +283,23 @@ export const FrankGoogleMap = ({
         if (map) {
           instance.attachToMap(map);
           instance.setOffset({ x: 0, y: 130 });
-          // root 只创建一次
           const inner = instance.getInnerContainer();
           if (!overlayRootRef.current) {
             overlayRootRef.current = createRoot(inner);
           }
         }
       }
-    } else {
-      // 如果已经有 overlay，但还没 root（极少数情况），补创建
+    } else if (!overlayRootRef.current) {
       const inner = overlayRef.current.getInnerContainer();
-      if (!overlayRootRef.current) {
-        overlayRootRef.current = createRoot(inner);
-      }
+      overlayRootRef.current = createRoot(inner);
     }
   }, [ensureOverlayCtor]);
 
-  // 清空 overlay 内容
   const clearOverlayContent = useCallback(() => {
     const root = overlayRootRef.current;
-    if (root) {
-      // 安全清空：不要在渲染过程中同步 unmount 根
-      root.render(null);
-    }
+    if (root) root.render(null);
   }, []);
 
-  // 显示新内容并淡入
   const showPopupFor = useCallback(
     (id: string) => {
       const map = mapRef.current;
@@ -282,16 +314,39 @@ export const FrankGoogleMap = ({
       overlay.setVisible(true);
 
       const inner = overlay.getInnerContainer() as HTMLElement;
-
       const item = markerIndexRef.current.get(id);
       if (!item) return;
 
-      // 1) 渲染“隐藏态”的卡片（selected={false}）
       const addr = addresses.find(a => a.id === id);
+
+      if (isDocHidden()) {
+        root.render(
+          <div className="w-[200px] h-[140px]">
+            <CustomPopup
+              selected
+              address={addr?.address}
+              label={addr?.label}
+              image={addr?.image}
+              link={addr?.link}
+              width={popupWindowWith}
+              height={popupWindowHeight}
+            />
+          </div>
+        );
+        const pos = (item.marker.position as google.maps.LatLng | null) ?? null;
+        if (pos) {
+          overlay.setPosition(pos);
+          panIfNeeded(pos, 48);
+        }
+        selectHighLight(id, true);
+        return;
+      }
+
+      // 先渲染 selected=false，再两帧后置 true（做淡入）
       root.render(
         <div className="w-[200px] h-[140px]">
           <CustomPopup
-            selected={false} // ★ 初始为 0（opacity:0, translate-y）
+            selected={false}
             address={addr?.address}
             label={addr?.label}
             image={addr?.image}
@@ -302,29 +357,20 @@ export const FrankGoogleMap = ({
         </div>
       );
 
-      // 2) 等新节点挂上去，再触发 0→1
       const myVer = ++animVersionRef.current;
-
       const waitForMount = () => {
         if (myVer !== animVersionRef.current) return;
         const popupRoot = inner.querySelector(POPUP_ROOT_SELECTOR) as HTMLElement | null;
         if (!popupRoot) {
-          // 这一帧还没插进来，下一帧再查
           requestAnimationFrame(waitForMount);
           return;
         }
-
-        // 明确处于 0 态（即使 React 已经写了，也再写一次），并强制 reflow
         popupRoot.setAttribute(POPUP_SELECTED_ATTR, 'false');
         void popupRoot.offsetWidth;
-
-        // 第一帧：什么都不做，让浏览器以 0 态真正绘制一次
         requestAnimationFrame(() => {
           if (myVer !== animVersionRef.current) return;
-          // 第二帧：切换到 1，触发 0.5s 过渡
           requestAnimationFrame(() => {
             if (myVer !== animVersionRef.current) return;
-            // 取一次最新节点（极端情况下节点被替换）
             const rootEl =
               (inner.querySelector(POPUP_ROOT_SELECTOR) as HTMLElement | null) ?? popupRoot;
             if (!rootEl) return;
@@ -332,10 +378,8 @@ export const FrankGoogleMap = ({
           });
         });
       };
-
       requestAnimationFrame(waitForMount);
 
-      // 定位与选中高亮照旧
       const pos = item.marker.position as google.maps.LatLng | null;
       if (pos) {
         overlay.setPosition(pos);
@@ -343,17 +387,23 @@ export const FrankGoogleMap = ({
       }
       selectHighLight(id, true);
     },
-    [addresses, ensureOverlayInstance, selectHighLight, panIfNeeded]
+    [
+      addresses,
+      ensureOverlayInstance,
+      selectHighLight,
+      panIfNeeded,
+      popupWindowHeight,
+      popupWindowWith,
+    ]
   );
+
   const closeOverlay = useCallback(() => {
-    clearOverlayContent(); // 直接清掉
+    clearOverlayContent();
     const overlay = overlayRef.current;
-    if (overlay) {
-      overlay.setVisible(false); // 立即隐藏
-    }
+    if (overlay) overlay.setVisible(false);
   }, [clearOverlayContent]);
 
-  // ---------- 初始化地图与标记 ----------
+  // ---------- 初始化（不会跟随 hovered/selected 变化重建） ----------
   useEffect(() => {
     let cancelled = false;
 
@@ -364,15 +414,23 @@ export const FrankGoogleMap = ({
       if (!el) return;
 
       const loader = getLoader(googleMapApiKey);
-      const mapsLib = await loader.importLibrary('maps').catch(() => null);
-      const markerLib = await loader.importLibrary('marker').catch(() => null);
-      const geocodeLib = await loader.importLibrary('geocoding').catch(() => null);
+      const mapsLib = await loader.importLibrary('maps').catch(e => {
+        void e;
+        return null;
+      });
+      const markerLib = await loader.importLibrary('marker').catch(e => {
+        void e;
+        return null;
+      });
+      const geocodeLib = await loader.importLibrary('geocoding').catch(e => {
+        void e;
+        return null;
+      });
       if (cancelled || !mapsLib || !markerLib || !geocodeLib) return;
 
       const { Map } = mapsLib as google.maps.MapsLibrary;
       const { AdvancedMarkerElement } = markerLib as google.maps.MarkerLibrary;
       const { Geocoder } = geocodeLib as google.maps.GeocodingLibrary;
-
       const CB = google.maps.CollisionBehavior;
 
       if (!mapRef.current) {
@@ -382,35 +440,46 @@ export const FrankGoogleMap = ({
         mapRef.current.setOptions(mergedOptions);
       }
 
-      // SDK 已就绪，提前挂 Overlay，确保首次点击不丢首帧
       ensureOverlayCtor();
       ensureOverlayInstance();
 
       const map = mapRef.current;
       const geocoder = geocoderRef.current;
-      if (!map || !geocoder) return;
+      if (!map || !geocoder || cancelled) return;
 
-      const mapListeners: google.maps.MapsEventListener[] = [];
+      // 移除旧监听
+      for (const l of mapListenersRef.current) {
+        try {
+          l.remove();
+        } catch (e) {
+          void e;
+        }
+      }
+      mapListenersRef.current = [];
 
-      mapListeners.push(
+      mapListenersRef.current.push(
         map.addListener('click', () => {
           clearHoverOnly();
           clearSelectOnly();
           closeOverlay();
         })
       );
-      mapListeners.push(map.addListener('dragstart', () => clearHoverOnly()));
-      mapListeners.push(map.addListener('zoom_changed', () => clearHoverOnly()));
+      mapListenersRef.current.push(map.addListener('dragstart', () => clearHoverOnly()));
+      mapListenersRef.current.push(map.addListener('zoom_changed', () => clearHoverOnly()));
 
       // 清旧标记
-      const prev = Array.from(markerIndexRef.current.values());
-      prev.forEach(({ marker }) => {
-        marker.map = null;
-      });
+      for (const v of markerIndexRef.current.values()) {
+        try {
+          v.marker.map = null;
+        } catch (e) {
+          void e;
+        }
+      }
       markerIndexRef.current.clear();
       currentHoveredIdRef.current = null;
+      currentSelectedIdRef.current = null;
 
-      if (!addresses || addresses.length === 0) return;
+      if (cancelled || !addresses?.length) return;
 
       const bounds = new google.maps.LatLngBounds();
       const geocodeResults = await Promise.allSettled(
@@ -418,42 +487,52 @@ export const FrankGoogleMap = ({
           geocoder.geocode({ address: a.address }).then(res => ({ input: a, res }))
         )
       );
+      if (cancelled) return;
+
+      const cleanedIds = new Set<string>();
 
       for (const result of geocodeResults) {
+        if (cancelled) return;
         if (result.status !== 'fulfilled') continue;
-        const value = result.value;
-        if (!value) continue;
-
-        const { input, res } = value;
+        const { input, res } = result.value;
         const first = res.results?.[0];
         if (!first) continue;
 
         const position = first.geometry.location;
         bounds.extend(position);
 
-        const markerNode = renderReactToElement(<CustomLocationMarker />);
-        const root = markerNode.el;
-        const host =
-          (root.matches('[data-marker-root]') ? root : root.querySelector('[data-marker-root]')) ||
-          (root.matches('.group') ? root : root.querySelector('.group'));
-        const hostEl = (host as HTMLElement) ?? root;
+        // 容器（作为 Google content） & React 根
+        const { containerEl, root: markerRoot } = mountReactToDiv(
+          <CustomLocationMarker image={input.image} />
+        );
+
+        // 惰性获取 data-marker-root（可能首帧还没挂载）
+        let cachedRootEl: HTMLElement | null = null;
+        const getRootEl = () => {
+          if (cachedRootEl && cachedRootEl.isConnected) return cachedRootEl;
+          const found =
+            (containerEl.querySelector('[data-marker-root]') as HTMLElement | null) ||
+            (containerEl.firstElementChild as HTMLElement | null) ||
+            null;
+          cachedRootEl = found;
+          return cachedRootEl;
+        };
 
         const marker = new AdvancedMarkerElement({
           map,
           position,
           title: input.label || input.address,
-          content: hostEl,
+          content: containerEl,
           collisionBehavior: CB.REQUIRED,
         });
 
+        // 点击 → 弹出卡片
         marker.addListener('click', () => {
-          // 点击与外部选择统一走 showPopupFor（瞬间替换→淡入）
           showPopupFor(input.id);
         });
 
         const setHover = (on: boolean) => {
-          if (!hostEl) return;
-          hostEl.setAttribute('data-hovered', on ? 'true' : 'false');
+          setDataAttrWithRetry(getRootEl, 'data-hovered', on ? 'true' : 'false');
           marker.zIndex = on
             ? Z.HOVERED
             : currentSelectedIdRef.current === input.id
@@ -461,8 +540,7 @@ export const FrankGoogleMap = ({
             : Z.BASE;
         };
         const setSelect = (on: boolean) => {
-          if (!hostEl) return;
-          hostEl.setAttribute('data-selected', on ? 'true' : 'false');
+          setDataAttrWithRetry(getRootEl, 'data-selected', on ? 'true' : 'false');
           marker.zIndex = on
             ? Z.SELECTED
             : currentHoveredIdRef.current === input.id
@@ -470,22 +548,36 @@ export const FrankGoogleMap = ({
             : Z.BASE;
         };
 
-        const disposers: Array<() => void> = [
-          markerNode.unmount,
-          () => {
-            mapListeners.forEach(l => l.remove());
-          },
-        ];
-
         markerIndexRef.current.set(input.id, {
           marker,
           position,
+          containerEl,
+          getRootEl,
           hover: () => setHover(true),
           resetHover: () => setHover(false),
           select: () => setSelect(true),
           resetSelect: () => setSelect(false),
           cleanup: () => {
-            disposers.forEach(fn => fn());
+            if (cleanedIds.has(input.id)) return;
+            cleanedIds.add(input.id);
+            try {
+              marker.map = null;
+            } catch (e) {
+              void e;
+            }
+            try {
+              (marker as any).content = null;
+            } catch (e) {
+              void e;
+            }
+            safeUnmountRoot(markerRoot);
+            setTimeout(() => {
+              try {
+                containerEl.remove();
+              } catch (e) {
+                void e;
+              }
+            }, 0);
           },
         });
       }
@@ -498,18 +590,26 @@ export const FrankGoogleMap = ({
           map.fitBounds(bounds);
         }
       }
+
+      // 初始化完成后，同步一次外部状态（不触发重建）
+      if (cancelled) return;
+      const initSel = initialSelectedIdRef.current;
+      const initHov = initialHoveredIdRef.current;
+      if (initSel && markerIndexRef.current.has(initSel)) {
+        selectHighLight(initSel, true);
+        showPopupFor(initSel);
+      } else if (initHov && markerIndexRef.current.has(initHov)) {
+        hoverHighLight(initHov, false);
+      }
     }
 
     init();
 
+    // 清理
     return () => {
       cancelled = true;
 
-      try {
-        if (overlayRootRef.current) overlayRootRef.current.unmount();
-      } catch {
-        /* ignore */
-      }
+      if (overlayRootRef.current) safeUnmountRoot(overlayRootRef.current);
       overlayRootRef.current = null;
 
       if (overlayRef.current) {
@@ -517,65 +617,104 @@ export const FrankGoogleMap = ({
         overlayRef.current = null;
       }
 
+      for (const l of mapListenersRef.current) {
+        try {
+          l.remove();
+        } catch (e) {
+          void e;
+        }
+      }
+      mapListenersRef.current = [];
+
       const snapshot = Array.from(mapForCleanup.values());
       snapshot.forEach(item => {
-        item.marker.map = null;
-        item.cleanup();
+        try {
+          item.marker.map = null;
+        } catch (e) {
+          void e;
+        }
+        try {
+          item.cleanup();
+        } catch (e) {
+          void e;
+        }
       });
       mapForCleanup.clear();
+      currentHoveredIdRef.current = null;
+      currentSelectedIdRef.current = null;
     };
+    // ⚠️ 不要把 hoveredAddressId / selectedAddressId 放到依赖里，避免重建地图
   }, [
     googleMapApiKey,
     mergedOptions,
     addresses,
     zoom,
-    clearHoverOnly,
-    clearSelectOnly,
-    showPopupFor,
     ensureOverlayCtor,
     ensureOverlayInstance,
+    showPopupFor,
+    clearHoverOnly,
+    clearSelectOnly,
     closeOverlay,
+    hoverHighLight,
+    selectHighLight,
   ]);
 
-  // ---------- 监听 hover ----------
+  // ---------- 外部驱动 Hover：先恢复旧的，再把新的设为 true ----------
   useEffect(() => {
-    if (!hoveredAddressId) {
-      const prevId = currentHoveredIdRef.current;
-      if (prevId) {
-        const prevItem = markerIndexRef.current.get(prevId);
-        if (prevItem) prevItem.resetHover();
-        currentHoveredIdRef.current = null;
-      }
-      return;
+    const prevId = currentHoveredIdRef.current;
+    if (prevId && prevId !== hoveredAddressId) {
+      const prevItem = markerIndexRef.current.get(prevId);
+      if (prevItem) prevItem.resetHover(); // => data-hovered="false"
     }
-    if (currentHoveredIdRef.current === hoveredAddressId) return;
-    hoverHighLight(hoveredAddressId, false);
-  }, [hoveredAddressId, hoverHighLight]);
 
-  // ---------- 监听 select（瞬间替换→淡入） ----------
+    if (hoveredAddressId) {
+      const item = markerIndexRef.current.get(hoveredAddressId);
+      if (item) item.hover(); // => data-hovered="true"
+      currentHoveredIdRef.current = hoveredAddressId;
+    } else {
+      currentHoveredIdRef.current = null;
+    }
+  }, [hoveredAddressId]);
+
+  // ---------- 外部驱动 Select：只改 data-selected，并弹窗 ----------
   useEffect(() => {
-    // 空：清理状态
     if (!selectedAddressId) {
       const prevId = currentSelectedIdRef.current;
       if (prevId) {
         const prevItem = markerIndexRef.current.get(prevId);
-        if (prevItem) prevItem.resetSelect();
-        currentSelectedIdRef.current = null;
+        if (prevItem) prevItem.resetSelect(); // => data-selected="false"
       }
+      currentSelectedIdRef.current = null;
       lastSelectionRef.current = { id: null, tick: -1 };
       closeOverlay();
       return;
     }
 
-    // ✅ 去重：同一 {id, tick} 已处理过就不再触发
     const last = lastSelectionRef.current;
-    if (last.id === selectedAddressId && last.tick === selectedTick) {
-      return;
-    }
+    if (last.id === selectedAddressId && last.tick === selectedTick) return;
     lastSelectionRef.current = { id: selectedAddressId, tick: selectedTick };
 
-    // 统一入口（点击与外部传入一致）
-    showPopupFor(selectedAddressId);
+    // 选中前清除与其不同的 hover
+    const hoveredId = currentHoveredIdRef.current;
+    if (hoveredId && hoveredId !== selectedAddressId) {
+      const prevHover = markerIndexRef.current.get(hoveredId);
+      if (prevHover) prevHover.resetHover();
+      currentHoveredIdRef.current = null;
+    }
+
+    // 取消旧选中
+    const prevSelId = currentSelectedIdRef.current;
+    if (prevSelId && prevSelId !== selectedAddressId) {
+      const prevSel = markerIndexRef.current.get(prevSelId);
+      if (prevSel) prevSel.resetSelect();
+    }
+
+    const item = markerIndexRef.current.get(selectedAddressId);
+    if (item) {
+      item.select(); // => data-selected="true"
+      currentSelectedIdRef.current = selectedAddressId;
+      showPopupFor(selectedAddressId);
+    }
   }, [selectedAddressId, selectedTick, showPopupFor, closeOverlay]);
 
   return (

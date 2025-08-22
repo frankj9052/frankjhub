@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AddressListMapView } from './AddressListMapView';
 import { useRuntimeConfig } from '@frankjhub/shared-ui-core';
+import { FrankTabs } from '../../navigation';
 
 const meta = {
   title: 'Shared-UI-Hero-Client/DataDisplay/GoogleMap/AddressListMapView',
@@ -63,4 +64,56 @@ export const Default: Story = {
       { id: '109', address: '155 Wellington St W, Toronto, ON', label: 'RBC Centre' },
     ],
   },
+};
+
+export const ExitTest: Story = {
+  args: {
+    addresses: [
+      { id: '101', address: '100 Queen St W, Toronto, ON', label: 'Toronto City Hall' },
+      { id: '102', address: '290 Bremner Blvd, Toronto, ON', label: 'CN Tower' },
+      { id: '103', address: '40 Bay St.Toronto, Toronto, ON', label: 'Scotiabank Arena' },
+      { id: '104', address: '288 Bremner Blvd, Toronto, ON', label: "Ripley's Aquarium of Canada" },
+      { id: '105', address: '294 Bremner Blvd, Toronto, ON', label: 'Bobbie Rosenfeld Park' },
+      { id: '106', address: '255 Bremner Blvd, Toronto, ON', label: 'Toronto Railway Museum' },
+      {
+        id: '107',
+        address: '75 Lower Simcoe St, Toronto, ON',
+        label: 'Char No.5 Whisky & Cocktail Lounge',
+      },
+      { id: '108', address: '255 Front St W, Toronto, ON', label: 'Second Cup Café' },
+      { id: '109', address: '155 Wellington St W, Toronto, ON', label: 'RBC Centre' },
+    ],
+  },
+  decorators: [
+    (Story, context) => {
+      const { googleMapApiKey, googleMapId } = useRuntimeConfig();
+      return (
+        <div>
+          <FrankTabs
+            ariaLable="test"
+            tabsData={[
+              {
+                key: 'map',
+                title: 'Map',
+                content: (
+                  <Story
+                    args={{
+                      ...context.args,
+                      googleMapApiKey: googleMapApiKey,
+                      googleMapId,
+                    }}
+                  />
+                ),
+              },
+              {
+                key: 'exit',
+                title: 'Exit',
+                content: <div className="bg-red-200">Map mock exit</div>,
+              },
+            ]}
+          />
+        </div>
+      );
+    },
+  ],
 };
