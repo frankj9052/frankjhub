@@ -1,6 +1,7 @@
 import { FrankGoogleMap, FrankGoogleMapAddress } from './FrankGoogleMap';
 import { useState } from 'react';
 import { AddressCard } from './AddressCard';
+import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 
 export interface AddressListMapViewProps {
   addresses: FrankGoogleMapAddress[];
@@ -57,6 +58,12 @@ export const AddressListMapView = ({
               </div>
             );
           })}
+        <FrankButtonBase
+          variant="ghost"
+          height={30}
+          radius="none"
+          customizeContent={<div>Load More</div>}
+        />
       </div>
       {/* map */}
       <div className="flex-1">

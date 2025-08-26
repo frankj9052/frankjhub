@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import { hover } from 'framer-motion';
 import Link from 'next/link';
 
 export interface AddressCardProps {
