@@ -7,14 +7,21 @@
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
-  "nx":{
+  "nx": {
     "projectType": "application",
     "targets": {
-      "dev": {   
+      "dev": {
         "defaultConfiguration": "development"
       },
       "start": {
         "defaultConfiguration": "production"
+      },
+      "start:only": {
+        "executor": "nx:run-commands",
+        "defaultConfiguration": "production",
+        "options": {
+          "command": "next start apps/portfolio"
+        }
       }
     }
   }
