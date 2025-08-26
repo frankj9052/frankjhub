@@ -36,9 +36,6 @@ export const CreateRoleForm = ({ onClose }: Props) => {
     label: String(s),
   }));
 
-  const orgTypeOptionList = useSelector(state => state.organizationType.options?.data);
-  const orgOptionList = useSelector(state => state.organization.options?.data);
-
   const {
     handleSubmit,
     control,

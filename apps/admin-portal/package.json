@@ -11,11 +11,18 @@
     "projectType": "application",
     "sourceRoot": "apps/admin-portal",
     "targets": {
-      "dev": {   
+      "dev": {
         "defaultConfiguration": "development"
       },
       "start": {
         "defaultConfiguration": "production"
+      },
+      "start:only": {
+        "executor": "nx:run-commands",
+        "defaultConfiguration": "production",
+        "options": {
+          "command": "next start apps/admin-portal"
+        }
       },
       "collect-source": {
         "executor": "nx:run-commands",
