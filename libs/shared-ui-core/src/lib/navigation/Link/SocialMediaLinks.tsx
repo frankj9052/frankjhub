@@ -31,7 +31,12 @@ export const SocialMediaLinks = ({
       {reactIcons &&
         reactIcons.map((icon, index) => {
           return (
-            <Link href={icon.href} key={`social-media-link-${index}`}>
+            <Link
+              href={icon.href}
+              key={`social-media-link-${index}`}
+              target="_black"
+              rel="noopener noreferrer"
+            >
               {icon.reactIcon}
             </Link>
           );

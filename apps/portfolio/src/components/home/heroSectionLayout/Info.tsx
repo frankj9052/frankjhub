@@ -1,6 +1,7 @@
 'use client';
 import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import { Spacer } from '@heroui/react';
+import Link from 'next/link';
 import { FaArrowAltCircleRight } from 'react-icons/fa';
 
 const data = {
@@ -34,11 +35,13 @@ export const Info = () => {
 
 function ButtonContent() {
   return (
-    <div className="flex text-white items-center justify-center gap-2">
-      <span>Contact Me</span>
-      <span>
-        <FaArrowAltCircleRight />
-      </span>
-    </div>
+    <Link href={'/contact'}>
+      <div className="flex text-white items-center justify-center gap-2">
+        <span>Contact Me</span>
+        <span>
+          <FaArrowAltCircleRight />
+        </span>
+      </div>
+    </Link>
   );
 }

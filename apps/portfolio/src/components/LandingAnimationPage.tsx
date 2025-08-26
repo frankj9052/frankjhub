@@ -12,7 +12,7 @@ export const LandingAnimationPage = () => {
     if (isFirstLoad) {
       timer = setTimeout(() => {
         dispatch(systemSlice.actions.markLandingSeen());
-      }, 1000);
+      }, 3000);
     }
 
     return () => clearTimeout(timer);

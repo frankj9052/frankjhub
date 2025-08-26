@@ -6,15 +6,15 @@ import { SiStorybook } from 'react-icons/si';
 const reactIcons = [
   {
     reactIcon: <FaGithub className="text-primary" size={24} />,
-    href: '#',
+    href: 'https://github.com/frankj9052',
   },
   {
     reactIcon: <FaLinkedin className="text-primary" size={24} />,
-    href: '#',
+    href: 'https://www.linkedin.com/in/frank-jia',
   },
   {
     reactIcon: <SiStorybook className="text-primary" size={24} />,
-    href: '#',
+    href: 'http://ec2-98-81-80-209.compute-1.amazonaws.com/shared-ui',
   },
 ];
 

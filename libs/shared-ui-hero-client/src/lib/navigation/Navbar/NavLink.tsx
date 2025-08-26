@@ -17,7 +17,7 @@ export const NavLink = ({ text, href }: NavLinkType) => {
       isActive={pathname === href}
       as={Link}
       href={href}
-      className="font-[500] hover:text-primary"
+      className="font-[500] hover:text-primary px-6 py-1"
     >
       {text}
     </NavbarItem>

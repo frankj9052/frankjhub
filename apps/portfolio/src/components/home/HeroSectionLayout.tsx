@@ -5,7 +5,7 @@ import { Info } from './heroSectionLayout/Info';
 import { MediaIcons } from './heroSectionLayout/MediaIcons';
 import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import { motion } from 'framer-motion';
-import { IoArrowDown } from 'react-icons/io5';
+import { FiArrowRight } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
 
 export const HeroSectionLayout = () => {
@@ -33,16 +33,16 @@ export const HeroSectionLayout = () => {
         <FrankButtonBase
           customizeContent={
             <div className="text-[#0E2431] font-[500] font-popins px-2 py-1 flex gap-2 items-center">
-              <span>Scroll Down</span>
+              <span>More</span>
               <motion.span
-                animate={{ y: [0, 5, 0] }}
+                animate={{ x: [0, 5, 0] }}
                 transition={{
                   duration: 1.5,
                   ease: 'easeInOut',
                   repeat: Infinity,
                 }}
               >
-                <IoArrowDown size={20} />
+                <FiArrowRight size={20} />
               </motion.span>
             </div>
           }

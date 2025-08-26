@@ -42,7 +42,7 @@ export const FrankTopNav = ({ navbarBrand, navLinks, navContentEnd }: FrankTopNa
         />
         <NavbarBrand>{navbarBrand && navbarBrand}</NavbarBrand>
       </NavbarContent>
-      <NavbarContent justify="center" className="gap-10 hidden md:flex">
+      <NavbarContent justify="center" className="gap-4 hidden md:flex">
         {navLinks &&
           navLinks.map((link, index) => (
             <NavLink key={`${link.text}-${index}`} text={link.text} href={link.href} />
