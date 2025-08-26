@@ -22,7 +22,7 @@ export function createPopupOverlayClass(): PopupOverlayCtor {
     private inner: HTMLDivElement;
     private position: google.maps.LatLng | google.maps.LatLngLiteral | null = null;
     private offset: PopupOffset = { x: 0, y: 0 };
-    private isVisible = false;
+    // private isVisible = false;
 
     constructor() {
       super();
