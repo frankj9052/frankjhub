@@ -5,6 +5,7 @@ import { Divider } from '@heroui/react';
 import Image from 'next/image';
 import { NumberRiserComponent } from './AboutSectionLayout/NumberRiserComponent';
 import { IoMdDownload } from 'react-icons/io';
+import Link from 'next/link';
 
 const data = {
   avatar: {
@@ -69,21 +70,28 @@ export const AboutSectionLayout = () => {
           </div>
           {/* download button */}
           <div className="flex justify-center items-center md:justify-start w-full">
-            <FrankButtonBase
-              variant="solid"
-              color="primary"
-              height={65}
-              width={196}
-              radius="sm"
-              customizeContent={
-                <div className="flex gap-1 font-[500]">
-                  <span>Download CV</span>
-                  <span>
-                    <IoMdDownload size={16} />
-                  </span>
-                </div>
-              }
-            />
+            <Link
+              href={`/cv/Frank-Jia-CV.pdf`}
+              download="Frank_Jia_CV.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <FrankButtonBase
+                variant="solid"
+                color="primary"
+                height={65}
+                width={196}
+                radius="sm"
+                customizeContent={
+                  <div className="flex gap-1 font-[500]">
+                    <span>Download CV</span>
+                    <span>
+                      <IoMdDownload size={16} />
+                    </span>
+                  </div>
+                }
+              />
+            </Link>
           </div>
         </div>
       </div>

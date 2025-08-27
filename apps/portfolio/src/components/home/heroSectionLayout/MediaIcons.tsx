@@ -14,7 +14,7 @@ const reactIcons = [
   },
   {
     reactIcon: <SiStorybook className="text-primary" size={24} />,
-    href: 'http://ec2-98-81-80-209.compute-1.amazonaws.com/shared-ui',
+    href: 'https://frankjhub.com/shared-ui',
   },
 ];
 
