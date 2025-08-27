@@ -1,7 +1,6 @@
 import express, { Router } from 'express';
 import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import { corsOptions } from './config/corsOptions';
+import { corsOptions, corsPreflight } from './config/corsOptions';
 import { registerRoutes } from './loaders/registerRoutes';
 import { requestId } from './middlewares/requestId';
 import { errorHandler } from './middlewares/errorHandler';
@@ -18,7 +17,8 @@ export async function createApp() {
 
   // ---- 全局中间件 ----
   app.use(cookieParser());
-  app.use(cors(corsOptions));
+  app.use(corsOptions);
+  app.options('*', corsPreflight);
   app.use(securityHeaders);
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
