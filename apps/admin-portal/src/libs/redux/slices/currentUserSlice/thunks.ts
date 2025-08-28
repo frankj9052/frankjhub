@@ -5,24 +5,24 @@ import { GetCurrentUserResponse, UserSingleResponse } from '@frankjhub/shared-sc
 
 export const getSessionAsync = createAppAsyncThunk<GetCurrentUserResponse>(
   'getCurrentUserSessionData',
-  async () => {
+  async (_, { rejectWithValue }) => {
     const result = await getSessionClient();
     if (result.status === 'success') {
       return result;
     } else {
-      throw result;
+      return rejectWithValue(result.message);
     }
   }
 );
 
 export const getUserProfileAsync = createAppAsyncThunk<UserSingleResponse>(
   'getUserProfileData',
-  async () => {
+  async (_, { rejectWithValue }) => {
     const result = await getUserProfileClient();
     if (result.status === 'success') {
       return result;
     } else {
-      throw result;
+      return rejectWithValue(result.message);
     }
   }
 );
