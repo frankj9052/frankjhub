@@ -7,15 +7,16 @@ import React from 'react';
 type Props = {
   href: string;
   label: string;
+  prefetch?: boolean;
 };
 
 const unreadCount = 0;
 
-export default function NavLink({ href, label }: Props) {
+export default function NavLink({ href, label, prefetch }: Props) {
   const pathname = usePathname();
   const basepath = '/' + pathname.split('/')[1];
   return (
-    <NavbarItem isActive={basepath === href} as={Link} href={href}>
+    <NavbarItem isActive={basepath === href} as={Link} href={href} prefetch={prefetch}>
       <span>{label}</span>
       {
         // 当message为0的时候，不显示0

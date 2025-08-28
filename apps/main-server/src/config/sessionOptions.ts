@@ -27,6 +27,7 @@ const decrypt = (hex: string) => {
 
 /* ---------- Session 配置构建器 ---------- */
 export const buildSessionOptions = (): SessionOptions => {
+  const isProd = env.NODE_ENV === 'production';
   const store = isRedisAvailable
     ? new RedisStore({
         client: redisClient,
@@ -49,8 +50,9 @@ export const buildSessionOptions = (): SessionOptions => {
     rolling: true,
     proxy: true,
     cookie: {
+      domain: env.SESSION_COOKIE_DOMAIN,
       httpOnly: true,
-      secure: env.NODE_ENV === 'production' ? ('auto' as const) : false,
+      secure: isProd ? ('auto' as const) : false,
       sameSite: (env.SESSION_COOKIE_SAMESITE as CookieOptions['sameSite']) ?? 'lax',
       maxAge: Number(env.SESSION_TTL_MS) || 1000 * 60 * 60 * 24 * 7,
     },

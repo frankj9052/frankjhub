@@ -24,6 +24,16 @@
           "command": "next start apps/admin-portal"
         }
       },
+      "build:only": {
+        "executor": "@nx/next:build",
+        "dependsOn": [],
+        "defaultConfiguration": "production",
+        "options": {
+          "root": "apps/admin-portal",
+          "outputPath": "apps/admin-portal/.next",
+          "buildLibsFromSource": true
+        }
+      },
       "collect-source": {
         "executor": "nx:run-commands",
         "options": {

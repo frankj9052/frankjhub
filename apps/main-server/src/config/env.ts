@@ -18,6 +18,7 @@ const baseSchema = z.object({
   ENABLE_SEEDERS: z.string().default('true'),
   REDIS_URL: z.string(),
   APP_VERSION: z.string().optional(),
+  SESSION_COOKIE_DOMAIN: z.string().optional(),
   // 新增：pg-pool 配置
   PG_POOL_MAX: z.string().default('50'),
   PG_IDLE_MS: z.string().default('3000'),

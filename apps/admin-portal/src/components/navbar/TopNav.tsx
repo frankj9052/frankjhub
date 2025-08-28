@@ -22,9 +22,9 @@ export default async function TopNav() {
         </div>
       </NavbarBrand>
       <NavbarContent justify="center" className="text-gray-200">
-        <NavLink href="/dashboard" label="Dashboard" />
-        <NavLink href="/lists" label="Lists" />
-        <NavLink href="/messages" label="Messages" />
+        <NavLink href="/dashboard" label="Dashboard" prefetch={false} />
+        <NavLink href="/lists" label="Lists" prefetch={false} />
+        <NavLink href="/messages" label="Messages" prefetch={false} />
       </NavbarContent>
       <NavbarContent justify="end">
         <AccountMenu />

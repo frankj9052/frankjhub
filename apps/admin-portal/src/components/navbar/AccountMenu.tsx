@@ -5,13 +5,13 @@ import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { useEffect } from 'react';
 import UserMenu from './UserMenu';
-// import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
+import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
 
 export default function AccountMenu() {
   const dispatch = useDispatch();
   const session = useSelector(state => state.currentUser.session);
   useEffect(() => {
-    // dispatch(getSessionAsync());
+    dispatch(getSessionAsync());
   }, [dispatch]);
   return (
     <div>

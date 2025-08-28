@@ -1,24 +1,16 @@
 'use server';
 
-import { serverAxios } from '@/libs/axios/server';
+import { get } from '@/libs/axios/client';
 import { ApiResponse, GetCurrentUserResponse } from '@frankjhub/shared-schema';
-import { headers } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export async function getSessionServer(): Promise<ApiResponse<GetCurrentUserResponse>> {
-  try {
-    const cookieHeader = (await headers()).get('cookie') ?? '';
-    const response = await serverAxios.get<GetCurrentUserResponse>('/api/auth/current-user', {
-      headers: {
-        cookie: cookieHeader,
-      },
-    });
-    return response.data;
-  } catch {
-    return {
-      status: 401,
-      code: 'NOT AUTHORIZED',
-      message: 'Invalid session',
-      timestamp: new Date().toISOString(),
-    };
-  }
+  const cookieStore = await cookies();
+  const sid = cookieStore.get('sid')?.value;
+  const response = await get<GetCurrentUserResponse>('/api/auth/current-user', {
+    headers: {
+      cookie: sid,
+    },
+  });
+  return response;
 }
