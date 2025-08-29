@@ -8,12 +8,7 @@ export async function getSessionServer(): Promise<ApiResponse<GetCurrentUserResp
   const cookieStore = await cookies();
   const sid = cookieStore.get('sid')?.value;
   if (!sid) {
-    return {
-      status: 401,
-      code: 'Unauthorized',
-      message: 'No cookies',
-      timestamp: new Date().toISOString(),
-    };
+    return null;
   }
   const headers = sid ? { Cookie: `sid=${sid}` } : undefined;
   const response = await get<GetCurrentUserResponse>('/api/auth/current-user', {

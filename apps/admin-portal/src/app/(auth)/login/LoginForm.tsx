@@ -30,6 +30,7 @@ export default function LoginForm() {
       toast.success(result.message);
       dispatch(getSessionAsync());
       router.replace('/dashboard'); // 不要用back, 和refresh打架
+      router.refresh();
     } else {
       toast.error(typeof result?.details === 'string' ? result.details : result.message);
     }

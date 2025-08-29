@@ -59,6 +59,7 @@ export default function UserMenu() {
             dispatch(currentUserSlice.actions.setUserProfile(null));
             toast.success('You have been logged out.');
             router.replace('/');
+            router.refresh();
           }}
           key={'logout'}
         >
