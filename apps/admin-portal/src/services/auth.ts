@@ -40,6 +40,6 @@ export async function getSessionClient(): Promise<ApiResponse<GetCurrentUserResp
 }
 
 export async function logoutClient(): Promise<ApiResponse<BaseResponse>> {
-  const response = await get<BaseResponse>(`/api/auth/logout`);
+  const response = await post<BaseResponse>(`/api/auth/logout`);
   return response;
 }

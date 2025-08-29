@@ -7,7 +7,7 @@ export const getSessionAsync = createAppAsyncThunk<GetCurrentUserResponse>(
   'getCurrentUserSessionData',
   async (_, { rejectWithValue }) => {
     const result = await getSessionClient();
-    if (result.status === 'success') {
+    if (result?.status === 'success' || result === null) {
       return result;
     } else {
       return rejectWithValue(result.message);

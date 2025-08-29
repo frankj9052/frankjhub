@@ -4,4 +4,4 @@ import {
 } from '../../../modules/common/response/sessionResponse.schema';
 
 export { sessionResponseSchema as getCurrentUserResponseSchema };
-export type GetCurrentUserResponse = SessionResponse;
+export type GetCurrentUserResponse = SessionResponse | null;

@@ -1,13 +1,14 @@
 import { ReactNode } from 'react';
-import { getSessionServer } from '../actions/auth';
 import { redirect } from 'next/navigation';
 import { Sidebar } from '@/components/sidebar/Sidebar';
+import { getSessionServer } from '../actions/auth';
 
-export default async function layout({ children }: { children: ReactNode }) {
+export default async function Layout({ children }: { children: ReactNode }) {
   const session = await getSessionServer();
-  if (session.status !== 'success') {
+  if (session?.status !== 'success') {
     redirect('/login');
   }
+
   return (
     <div className="bg-gray-100 h-screen-minus-64">
       <div className="flex h-full">

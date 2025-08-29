@@ -11,12 +11,14 @@ import {
   DropdownTrigger,
 } from '@heroui/react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { toast } from 'react-toastify';
 
 export default function UserMenu() {
   const dispatch = useDispatch();
   const userProfile = useSelector(state => state.currentUser.userProfile);
+  const router = useRouter();
   useEffect(() => {
     dispatch(getUserProfileAsync());
   }, [dispatch]);
@@ -54,7 +56,9 @@ export default function UserMenu() {
           onPress={async () => {
             await logoutClient();
             dispatch(currentUserSlice.actions.setSession(null));
+            dispatch(currentUserSlice.actions.setUserProfile(null));
             toast.success('You have been logged out.');
+            router.replace('/');
           }}
           key={'logout'}
         >

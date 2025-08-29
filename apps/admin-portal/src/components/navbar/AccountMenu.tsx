@@ -1,18 +1,19 @@
 'use client';
-
-import { useDispatch, useSelector } from '@/libs/redux';
 import { Button } from '@heroui/react';
 import Link from 'next/link';
-import { useEffect } from 'react';
 import UserMenu from './UserMenu';
+import { useDispatch, useSelector } from '@/libs/redux';
 import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
+import { useEffect } from 'react';
 
 export default function AccountMenu() {
-  const dispatch = useDispatch();
   const session = useSelector(state => state.currentUser.session);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(getSessionAsync());
   }, [dispatch]);
+
   return (
     <div>
       {session && session.status === 'success' ? (

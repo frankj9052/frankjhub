@@ -12,10 +12,20 @@ import {
   LoginResponse,
   UserPayload,
 } from '@frankjhub/shared-schema';
-import { Request } from 'express';
-import { InternalServerError } from '../common/errors/InternalServerError';
+import { Request, Response } from 'express';
+import { env } from '../../config/env';
+import { CookieOptions } from 'express-session';
 
 const logger = createLoggerWithContext('AuthService');
+const isProd = env.NODE_ENV === 'production';
+const clearOpts = {
+  path: '/',
+  sameSite: (env.SESSION_COOKIE_SAMESITE as CookieOptions['sameSite']) ?? 'lax',
+  secure: isProd,
+  httpOnly: true,
+  domain: env.SESSION_COOKIE_DOMAIN,
+};
+const cookieName = env.SESSION_COOKIE_NAME ?? 'sid';
 
 export class AuthService {
   private userRepo = AppDataSource.getRepository(User);
@@ -108,19 +118,21 @@ export class AuthService {
     return this.buildUserPayload(user);
   }
 
-  async logout(req: Request): Promise<BaseResponse> {
+  logout(req: Request, res: Response): BaseResponse {
     const log = logger.child({ method: 'logout', userId: req.session?.user?.id });
-
-    await new Promise<void>((resolve, reject) => {
+    // 始终先清浏览器 Cookie（幂等）
+    res.clearCookie(cookieName, clearOpts);
+    // 再销毁服务端会话（容错：没有也算成功）
+    if (req.session) {
+      // 保留当前 sessionID 以防后续需要 store.destroy
+      const sid = req.sessionID;
       req.session.destroy(err => {
         if (err) {
-          log.error('Session destroy failed', { error: err });
-          return reject(new InternalServerError('Logout failed'));
+          // 记录错误，但不影响返回；Cookie 已清，前端状态不会卡住
+          log.error('Session destroy failed', err, { sid });
         }
-        resolve();
       });
-    });
-
+    }
     return {
       status: 'success',
       message: 'Logout successful',
@@ -130,7 +142,7 @@ export class AuthService {
   async getCurrentUser(req: Request): Promise<GetCurrentUserResponse> {
     const user = req.currentUser;
     if (!user) {
-      throw new NotAuthorizedError('User not authenticated');
+      return null;
     }
     return {
       status: 'success',

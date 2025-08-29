@@ -29,9 +29,9 @@ export default function LoginForm() {
     if (result.status === 'success') {
       toast.success(result.message);
       dispatch(getSessionAsync());
-      router.back(); // 登录成功返回上一页
+      router.replace('/dashboard'); // 不要用back, 和refresh打架
     } else {
-      toast.error(result.message);
+      toast.error(typeof result?.details === 'string' ? result.details : result.message);
     }
   };
   return (

@@ -32,18 +32,9 @@ export const loginController: RequestHandler = async (
   }
 };
 
-export const logoutController: RequestHandler = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const result = await authService.logout(req);
-    res.clearCookie('connect.sid');
-    res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
+export const logoutController: RequestHandler = (req: Request, res: Response) => {
+  const result = authService.logout(req, res);
+  res.status(200).json(result);
 };
 
 export const currentUserController: RequestHandler = async (

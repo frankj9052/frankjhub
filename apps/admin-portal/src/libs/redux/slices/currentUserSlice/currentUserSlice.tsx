@@ -21,6 +21,9 @@ export const currentUserSlice = createSlice({
     setSession: (state, action: PayloadAction<GetCurrentUserResponse | null>) => {
       state.session = action.payload;
     },
+    setUserProfile: (state, action: PayloadAction<UserSingleResponse | null>) => {
+      state.userProfile = action.payload;
+    },
   },
   extraReducers(builder) {
     builder
