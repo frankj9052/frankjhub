@@ -1,5 +1,3 @@
-import React from 'react';
-
 const MockLink = ({ href, children, ...props }: any) => {
   return (
     <a href={href} {...props}>

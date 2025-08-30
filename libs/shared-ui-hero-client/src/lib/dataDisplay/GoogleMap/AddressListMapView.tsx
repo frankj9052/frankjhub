@@ -12,6 +12,7 @@ export interface AddressListMapViewProps {
   popupWindowWidth?: number;
   popupWindowHeight?: number;
   loadMore?: () => void;
+  isLoading?: boolean;
 }
 
 export const AddressListMapView = ({
@@ -23,6 +24,7 @@ export const AddressListMapView = ({
   popupWindowWidth,
   popupWindowHeight,
   loadMore,
+  isLoading,
 }: AddressListMapViewProps) => {
   const [hoveredAddressId, setHoveredAddressId] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -60,15 +62,18 @@ export const AddressListMapView = ({
               </div>
             );
           })}
-        <div className="mt-1">
-          <FrankButtonBase
-            variant="ghost"
-            height={30}
-            radius="none"
-            customizeContent={<div>Load More</div>}
-            onPress={loadMore}
-          />
-        </div>
+        {loadMore && (
+          <div className="mt-1">
+            <FrankButtonBase
+              variant="ghost"
+              height={30}
+              radius="none"
+              customizeContent={<div>Load More</div>}
+              onPress={loadMore}
+              isLoading={isLoading}
+            />
+          </div>
+        )}
       </div>
       {/* map */}
       <div className="flex-1">

@@ -160,7 +160,15 @@ export const ProjectListCarousel = ({ projects, width }: ProjectListCarouselProp
                     height={36}
                     radius="sm"
                     color="primary"
-                    customizeContent={<Link href={config?.link.href ?? ''}>Visit</Link>}
+                    customizeContent={
+                      <Link
+                        href={config?.link.href ?? ''}
+                        target="_black"
+                        rel="noopener noreferrer"
+                      >
+                        Visit
+                      </Link>
+                    }
                   />
                 </div>
               </div>

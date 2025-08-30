@@ -9,6 +9,7 @@ const require = createRequire(import.meta.url);
 
 const config: StorybookConfig = {
   stories: [
+    '../src/*.mdx',
     '../../shared-ui-core/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
     '../../shared-ui-client/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',
     '../../shared-ui-hero-ssr/src/lib/**/*.@(mdx|stories.@(js|jsx|ts|tsx))',

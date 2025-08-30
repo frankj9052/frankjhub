@@ -143,6 +143,7 @@ export const FrankGoogleMap = ({
       center: center ?? { lat: 43.6532, lng: -79.3832 },
       zoom,
       disableDefaultUI: false,
+      gestureHandling: 'greedy', // 允许直接滚轮缩放，无需ctrl
       mapId:
         (mapOptions && (mapOptions as unknown as { mapId?: string }).mapId) ||
         (typeof googleMapId === 'string' ? googleMapId : undefined),
