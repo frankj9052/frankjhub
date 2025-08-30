@@ -46,7 +46,7 @@ const projectData: ProjectData[] = [
       'An enterprise-grade backend-as-a-service platform featuring role-based access control, multi-tenant support, and modular architecture. Built for scalability, maintainability, and high security, with comprehensive documentation pipelines.',
     link: {
       label: 'Visit',
-      href: 'https://noqclinic.com',
+      href: 'https://server.frankjhub.com/api-docs',
     },
     techStack: [
       'Node.js',
@@ -72,18 +72,30 @@ const projectData: ProjectData[] = [
     image: {
       width: 600,
       height: 678,
-      alt: 'dmsolving',
-      src: '/images/dmsolving.png',
+      alt: 'AddressList Map View – Google Maps Integration',
+      src: '/images/address-list-map-view.png',
     },
-    title: 'DMSolving',
-    subTitle: 'Implemented the official DMSolving website from UI/UX design',
+    title: 'AddressList Map View',
+    subTitle: 'React + Google Maps with Advanced Markers & React-driven Popups',
     description:
-      'A modern corporate website developed from UI/UX design to deployment. Fully responsive across devices, featuring smooth animations, optimized performance, and a clean visual identity aligned with brand guidelines.',
+      'A production-grade Google Maps integration that geocodes address lists, renders AdvancedMarkerElement markers with React content, and drives animated popups via a custom OverlayView + React root. Hover/selection is handled by lightweight data-attrs without rebuilding the map, with viewport-aware panning, fitBounds, and robust cleanup.',
     link: {
       label: 'Visit',
-      href: 'https://dmsolving.com',
+      href: 'https://storybook.frankjhub.com/?path=/story/shared-ui-hero-client-datadisplay-googlemap-addresslistmapview--default',
     },
-    techStack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion', 'Vercel'],
+    techStack: [
+      'React',
+      'TypeScript',
+      'Tailwind CSS',
+      'Google Maps JavaScript API (Maps/Marker/Places/Geocoding)',
+      '@googlemaps/js-api-loader',
+      'AdvancedMarkerElement',
+      'Custom Overlay (OverlayView)',
+      'React Portals / createRoot',
+      'requestAnimationFrame Animations',
+      'LatLngBounds / fitBounds',
+      'CollisionBehavior',
+    ],
   },
   {
     image: {
@@ -104,20 +116,31 @@ const projectData: ProjectData[] = [
   },
   {
     image: {
-      width: 1094,
-      height: 501,
-      alt: 'claclaws',
-      src: '/images/claclaws.png',
+      width: 600,
+      height: 678,
+      alt: 'Noqclinic – Doctor Scheduling Calendar Component',
+      src: '/images/noqclinic-calendar.png',
     },
-    title: 'Claclaws',
-    subTitle: 'Implemented official arcade claw machine store website from design',
+    title: 'Doctor Scheduling Calendar',
+    subTitle: 'Multi-view calendar for shifts & bookings',
     description:
-      'E-commerce website for an arcade claw machine store, developed from design to launch. Includes responsive layout, intuitive navigation, and an engaging product showcase optimized for conversions.',
+      'A production-grade calendar for clinic scheduling that supports week grid, day grid, and list views. It renders provider shifts and patient bookings, with built-in navigation (Today/prev/next), controlled/uncontrolled state via a custom hook, and drag-and-drop interactions. Powered by date-fns for fast date math and designed as composable subcomponents (TimeGridWeek / TimeGridDay / ListDay) for easy reuse.',
     link: {
       label: 'Visit',
-      href: 'https://claclaws.com',
+      href: 'https://storybook.frankjhub.com/?path=/story/shared-ui-hero-client-datadisplay-calendar-frankbigcalendar--default',
     },
-    techStack: ['Next.js', 'TypeScript', 'Tailwind CSS'],
+    techStack: [
+      'React',
+      'TypeScript',
+      'Tailwind CSS',
+      'date-fns',
+      'react-dnd',
+      'react-dnd-html5-backend',
+      '@heroui/react',
+      'clsx',
+      'Composable Views: TimeGridWeek / TimeGridDay / ListDay',
+      'Storybook',
+    ],
   },
 ];
 
