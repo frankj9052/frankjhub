@@ -22,3 +22,7 @@ export * from './Time-Input';
 export * from './Select';
 
 export * from './Textarea';
+
+export * from './Forms';
+
+export * from './Base';
