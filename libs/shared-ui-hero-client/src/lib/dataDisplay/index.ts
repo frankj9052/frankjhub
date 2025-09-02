@@ -6,3 +6,5 @@ export * from './Carousel';
 export * from './Card';
 
 export * from './GoogleMap';
+
+export * from './Rating';

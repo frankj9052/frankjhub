@@ -11,6 +11,8 @@ export interface FrankGoogleMapAddress {
   label?: string;
   image?: string;
   link?: string;
+  rating?: number;
+  user_ratings_total?: number;
 }
 
 export interface FrankGoogleMapProps {
@@ -28,6 +30,7 @@ export interface FrankGoogleMapProps {
   selectedTick?: number;
   popupWindowWith?: number;
   popupWindowHeight?: number;
+  linkLabel?: string;
 }
 
 const getLoader = (() => {
@@ -104,6 +107,7 @@ export const FrankGoogleMap = ({
   selectedTick = 0,
   popupWindowWith,
   popupWindowHeight,
+  linkLabel,
 }: FrankGoogleMapProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -331,6 +335,9 @@ export const FrankGoogleMap = ({
               link={addr?.link}
               width={popupWindowWith}
               height={popupWindowHeight}
+              linkLabel={linkLabel}
+              rating={addr?.rating}
+              userRatingsTotal={addr?.user_ratings_total}
             />
           </div>
         );
@@ -354,6 +361,9 @@ export const FrankGoogleMap = ({
             link={addr?.link}
             width={popupWindowWith}
             height={popupWindowHeight}
+            linkLabel={linkLabel}
+            rating={addr?.rating}
+            userRatingsTotal={addr?.user_ratings_total}
           />
         </div>
       );
@@ -395,6 +405,7 @@ export const FrankGoogleMap = ({
       panIfNeeded,
       popupWindowHeight,
       popupWindowWith,
+      linkLabel,
     ]
   );
 

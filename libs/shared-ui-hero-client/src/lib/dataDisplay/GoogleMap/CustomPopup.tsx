@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
+import { FaStar } from 'react-icons/fa';
 
 export const POPUP_ROOT_SELECTOR = '[data-popup-root]';
 export const POPUP_ROOT_ATTR = 'data-popup-root';
@@ -14,8 +15,10 @@ type CustomPopupProps = {
   link?: string;
   width?: number;
   height?: number;
-  /** 仅 Storybook 或需要本地受控时用；Map 内可不传，走 group+data-open */
   selected?: boolean;
+  rating?: number;
+  userRatingsTotal?: number;
+  linkLabel?: string;
 };
 
 export function CustomPopup({
@@ -26,6 +29,9 @@ export function CustomPopup({
   selected,
   width,
   height,
+  rating,
+  userRatingsTotal,
+  linkLabel,
 }: CustomPopupProps) {
   return (
     <div
@@ -60,22 +66,42 @@ export function CustomPopup({
               className="object-cover w-full h-full"
             />
           </div>
-          <div className="px-3 pt-2 h-1/2 flex-1 flex items-center justify-center">
+          <div className="p-6 h-full overflow-hidden flex flex-col justify-between gap-3 text-[#303030]">
+            {/* Header */}
             <div>
-              <div className="font-semibold">{label ?? 'Location'}</div>
-              {address ? <div className="text-xs text-gray-600">{address}</div> : null}
-              <div className="mb-1" />
-              <Link href={link ?? ''}>
-                <FrankButtonBase
-                  width={36}
-                  height={24}
-                  radius="sm"
-                  variant="solid"
-                  color="primary"
-                  customizeContent={<div className="text-xs">Book</div>}
-                />
-              </Link>
+              <h1 className="font-semibold text-[18px] leading-[18px] mb-1">
+                {label ?? 'Location'}
+              </h1>
+              <div className="flex items-center gap-1">
+                <FaStar className="text-[#F3A504]" />
+                <div className="text-[13px] flex items-center gap-[1.5px]">
+                  <span>{rating}</span>
+                  <span>({userRatingsTotal})</span>
+                </div>
+              </div>
             </div>
+            {/* Address */}
+            <div>
+              {address ? <div className="text-[13px] leading-[13px]">{address}</div> : null}
+            </div>
+            {/* Link */}
+            {/* <Link href={link ?? ''} className='w-full bg-red-200'> */}
+            <FrankButtonBase
+              height={36}
+              radius="sm"
+              variant="solid"
+              color="primary"
+              fullWidth
+              customizeContent={
+                <Link
+                  href={link ?? ''}
+                  className="h-[36px] w-full flex items-center justify-center font-[550] text-[14px] text-[#E4FFE5]"
+                >
+                  {linkLabel}
+                </Link>
+              }
+            />
+            {/* </Link> */}
           </div>
         </div>
       </div>

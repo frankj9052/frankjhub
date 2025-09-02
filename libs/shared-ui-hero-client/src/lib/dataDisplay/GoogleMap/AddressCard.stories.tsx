@@ -28,5 +28,8 @@ export const Default: Story = {
     label: 'Toronto City Hall',
     selected: false,
     hovered: false,
+    rating: 4.9,
+    userRatingsTotal: 128,
+    linkLabel: 'View Clinic',
   },
 };

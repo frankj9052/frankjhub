@@ -89,7 +89,6 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    placeholder: ' ',
     labelPlacement: 'outside',
     label: (
       <div className="font-inter font-[500] text-[13px] text-[#303030]">

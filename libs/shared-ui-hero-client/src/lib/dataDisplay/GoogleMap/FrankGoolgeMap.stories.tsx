@@ -30,8 +30,8 @@ const meta = {
   args: {
     googleMapApiKey: '',
     googleMapId: '',
-    popupWindowHeight: 130,
-    popupWindowWith: 200,
+    popupWindowHeight: 287,
+    popupWindowWith: 329,
   },
   decorators: [
     (Story, context) => {
@@ -59,10 +59,29 @@ export const Default: Story = {
     width: 1000,
     height: 600,
     addresses: [
-      { id: '101', address: '100 Queen St W, Toronto, ON', label: 'Toronto City Hall' },
-      { id: '102', address: '290 Bremner Blvd, Toronto, ON', label: 'CN Tower' },
-      { id: '103', address: '40 Bay St.Toronto, Toronto, ON', label: 'Scotiabank Arena' },
+      {
+        id: '101',
+        address: '100 Queen St W, Toronto, ON',
+        label: 'Toronto City Hall',
+        rating: 4.3,
+        user_ratings_total: 99,
+      },
+      {
+        id: '102',
+        address: '290 Bremner Blvd, Toronto, ON',
+        label: 'CN Tower',
+        rating: 4.6,
+        user_ratings_total: 123,
+      },
+      {
+        id: '103',
+        address: '40 Bay St.Toronto, Toronto, ON',
+        label: 'Scotiabank Arena',
+        rating: 4.9,
+        user_ratings_total: 203,
+      },
     ],
     hoveredAddressId: '101',
+    linkLabel: 'View Clinic',
   },
 };

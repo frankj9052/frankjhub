@@ -1,5 +1,8 @@
 import clsx from 'clsx';
 import Link from 'next/link';
+import { MdArrowOutward } from 'react-icons/md';
+import { FaStar } from 'react-icons/fa';
+import { FrankTooltip } from '../../feedback/Tooltip/FrankTooltip';
 
 export interface AddressCardProps {
   onPress?: () => void;
@@ -8,8 +11,11 @@ export interface AddressCardProps {
   width?: number;
   address?: string;
   label?: string;
-  image?: string;
   link?: string;
+  linkLabel?: string;
+  linkTooltips?: string;
+  rating?: number;
+  userRatingsTotal?: number;
 }
 
 export const AddressCard = ({
@@ -20,30 +26,48 @@ export const AddressCard = ({
   link,
   selected,
   hovered,
+  rating = 0,
+  userRatingsTotal = 0,
+  linkLabel,
 }: AddressCardProps) => {
   return (
     <div
-      className={clsx('h-[95px] p-4 flex flex-items items-center cursor-pointer', {
-        'bg-primary text-white': !!selected,
-        'outline outline-1 outline-black': !!hovered,
-      })}
+      className={clsx(
+        'h-[105px] p-4 flex flex-items items-center cursor-pointer rounded-lg outline outline-[#E3E3E3] outline-1 overflow-hidden',
+        {
+          'outline-primary': !!selected || !!hovered,
+        }
+      )}
       style={{
         width: width ? `${width}px` : '100%',
       }}
       onClick={onPress}
     >
-      <div className="w-full">
-        <h1 className="font-semibold text-[16px]">{label}</h1>
-        <div className="flex justify-between text-xs">
-          <div>{address}</div>
-          <div
-            className={clsx('underline font-bold text-gray-400', {
-              'text-white': selected,
-            })}
-          >
-            <Link href={link ?? ''}>Visit</Link>
+      <div className="w-full h-full flex justify-between gap-4">
+        {/* content */}
+        <div className="w-full flex flex-col gap-3 justify-between text-[#303030]">
+          {/* header */}
+          <div className="h-full flex flex-col gap-1 justify-between">
+            <h1 className="font-semibold text-[18px] leading-none">{label}</h1>
+            <div className="flex items-center gap-1">
+              <FaStar className="text-[#F3A504]" />
+              <div className="text-[13px] flex items-center gap-[1.5px]">
+                <span>{rating}</span>
+                <span>({userRatingsTotal})</span>
+              </div>
+            </div>
+          </div>
+          {/* address */}
+          <div className="text-[13px]">
+            <div>{address}</div>
           </div>
         </div>
+        {/* Link */}
+        <FrankTooltip content={linkLabel}>
+          <Link href={link ?? ''} target="_black" rel="noopener noreferrer">
+            <MdArrowOutward size={24} className="text-[#4A4A4A]" />
+          </Link>
+        </FrankTooltip>
       </div>
     </div>
   );

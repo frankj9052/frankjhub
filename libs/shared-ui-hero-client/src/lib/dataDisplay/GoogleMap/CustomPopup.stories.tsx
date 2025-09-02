@@ -28,6 +28,9 @@ export const Default: Story = {
     label: 'Toronto City Hall',
     width: 288,
     height: 314,
+    rating: 3.3,
+    userRatingsTotal: 183,
+    linkLabel: 'View Clinic',
   },
 };
 
@@ -38,5 +41,8 @@ export const Small: Story = {
     label: 'Toronto City Hall',
     width: 200,
     height: 130,
+    rating: 3.3,
+    userRatingsTotal: 183,
+    linkLabel: 'View Clinic',
   },
 };

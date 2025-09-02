@@ -13,6 +13,7 @@ export interface AddressListMapViewProps {
   popupWindowHeight?: number;
   loadMore?: () => void;
   isLoading?: boolean;
+  linkLabel?: string;
 }
 
 export const AddressListMapView = ({
@@ -25,6 +26,7 @@ export const AddressListMapView = ({
   popupWindowHeight,
   loadMore,
   isLoading,
+  linkLabel = 'View Clinic',
 }: AddressListMapViewProps) => {
   const [hoveredAddressId, setHoveredAddressId] = useState<string | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -37,14 +39,14 @@ export const AddressListMapView = ({
 
   return (
     <div
-      className="flex outline outline-offset-1 outline-gray-400"
+      className="flex"
       style={{
         width: width ? `${width}px` : '100%',
         height: height ? `${height}px` : '100%',
       }}
     >
       {/* address list */}
-      <div className="flex-[0.3] p-1 overflow-y-scroll">
+      <div className="flex-[0.3] p-1 overflow-y-scroll flex flex-col gap-2">
         {addresses.length > 0 &&
           addresses.map(address => {
             return (
@@ -58,6 +60,9 @@ export const AddressListMapView = ({
                   link={address.link}
                   selected={address.id === selectedAddressId}
                   hovered={address.id === hoveredAddressId}
+                  rating={address.rating}
+                  userRatingsTotal={address.user_ratings_total}
+                  linkLabel={linkLabel}
                 />
               </div>
             );
@@ -86,6 +91,7 @@ export const AddressListMapView = ({
           selectedTick={selectedTick}
           popupWindowHeight={popupWindowHeight}
           popupWindowWith={popupWindowWidth}
+          linkLabel={linkLabel}
         />
       </div>
     </div>

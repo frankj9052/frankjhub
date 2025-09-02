@@ -1,17 +1,40 @@
+import {
+  EndContent,
+  ErrorMessage,
+  Height,
+  IsInvalid,
+  IsRequired,
+  Label,
+  LabelPlacement,
+  Name,
+  Placeholder,
+  Radius,
+  Size,
+  StringChangeHandler,
+  StringValue,
+  Type,
+  Variant,
+  Width,
+} from '@frankjhub/shared-ui-hero-ssr';
 import { Input } from '@heroui/react';
-import { ReactNode } from 'react';
 
 export interface FrankInputProps {
-  label?: ReactNode;
-  type?: string;
-  placeholder?: string;
-  size?: 'sm' | 'md' | 'lg';
-  isRequired?: boolean;
-  errorMessage?: ReactNode;
-  name?: string;
-  labelPlacement?: 'outside' | 'outside-left' | 'inside';
-  variant?: 'flat' | 'faded' | 'bordered' | 'underlined';
-  radius?: 'sm' | 'md' | 'lg' | 'none' | 'full';
+  label?: Label;
+  type?: Type;
+  placeholder?: Placeholder;
+  size?: Size;
+  isRequired?: IsRequired;
+  errorMessage?: ErrorMessage;
+  name?: Name;
+  labelPlacement?: LabelPlacement;
+  variant?: Variant;
+  radius?: Radius;
+  isInvalid?: IsInvalid;
+  endContent?: EndContent;
+  width?: Width;
+  height?: Height;
+  value?: StringValue;
+  onValueChange?: StringChangeHandler;
 }
 
 export const FrankInput = ({
@@ -25,6 +48,12 @@ export const FrankInput = ({
   labelPlacement,
   variant,
   radius,
+  isInvalid,
+  endContent,
+  width,
+  height,
+  value,
+  onValueChange,
 }: FrankInputProps) => {
   return (
     <Input
@@ -37,6 +66,13 @@ export const FrankInput = ({
       name={name}
       labelPlacement={labelPlacement}
       variant={variant}
+      radius={radius}
+      isInvalid={isInvalid}
+      endContent={endContent}
+      width={width}
+      height={height}
+      value={value}
+      onValueChange={onValueChange}
     />
   );
 };
