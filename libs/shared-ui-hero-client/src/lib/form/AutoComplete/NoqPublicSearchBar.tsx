@@ -1,10 +1,11 @@
 import FrankAutocomplete, { DefaultAutocompleteItemsType } from './FrankAutocomplete';
 import { IoIosSearch } from 'react-icons/io';
 import { GoLocation } from 'react-icons/go';
-import { Key } from 'react';
+import { FormEvent, Key } from 'react';
 import { FaArrowRight } from 'react-icons/fa6';
-import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
-// import FrankButtonBase from "../Button/FrankButtonBase";
+import { FrankButtonBase, FrankSpinner } from '@frankjhub/shared-ui-hero-ssr';
+import clsx from 'clsx';
+import { FrankForm } from '../Base';
 
 export type NoqPublicSearchBarProps = {
   height?: number;
@@ -21,7 +22,8 @@ export type NoqPublicSearchBarProps = {
     addressPlaceholder?: string;
     allowsCustomValue?: boolean;
   };
-  handleSearchSubmit?: () => void;
+  handleSearchSubmit?: (event: FormEvent<HTMLFormElement>) => void;
+  isLoading?: boolean;
 };
 
 /**
@@ -45,10 +47,11 @@ export function NoqPublicSearchBar({
   searchMainInput,
   searchAddressInput,
   handleSearchSubmit,
+  isLoading,
 }: NoqPublicSearchBarProps) {
   return (
-    <div className="">
-      <div className="lg:flex">
+    <FrankForm onSubmit={handleSearchSubmit}>
+      <div className="lg:flex w-full">
         {/* Main Search */}
         <div
           className="bg-[rgba(255,255,255,0.9)] py-[15px] px-0 rounded-tl-2xl rounded-tr-2xl border-l-1 border-t-1 border-r-1 border-[#E3E3E3] lg:rounded-tl-full lg:rounded-tr-none lg:rounded-bl-full lg:border-b-1 lg:border-r-0 lg:flex-[0.6]"
@@ -109,9 +112,18 @@ export function NoqPublicSearchBar({
               backgroundColor="#0C534F"
               disableRipple
               radius="full"
-              onPress={handleSearchSubmit}
+              type="submit"
+              isLoading={isLoading}
+              spinner={<FrankSpinner className="absolute" size="sm" />}
               customizeContent={
-                <div className="flex h-full items-center justify-center gap-[10px] font-inter text-white">
+                <div
+                  className={clsx(
+                    'flex h-full items-center justify-center gap-[10px] font-inter text-white',
+                    {
+                      hidden: isLoading,
+                    }
+                  )}
+                >
                   <span>
                     <FaArrowRight />
                   </span>
@@ -121,14 +133,22 @@ export function NoqPublicSearchBar({
           </div>
         </div>
       </div>
-      <div className="mt-4 lg:hidden">
+      <div className="mt-4 lg:hidden w-full">
         <FrankButtonBase
           height={48}
           backgroundColor="#0C534F"
           disableRipple
-          onPress={handleSearchSubmit}
+          type="submit"
+          isLoading={isLoading}
+          spinner={<div />}
           customizeContent={
             <div className="flex h-full items-center justify-center gap-[10px] font-inter text-white">
+              <FrankSpinner
+                className={clsx({
+                  hidden: !isLoading,
+                })}
+                size="sm"
+              />
               <span>Search Now</span>
               <span>
                 <FaArrowRight />
@@ -137,7 +157,7 @@ export function NoqPublicSearchBar({
           }
         />
       </div>
-    </div>
+    </FrankForm>
   );
 }
 

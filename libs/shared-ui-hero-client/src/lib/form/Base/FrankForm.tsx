@@ -1,10 +1,10 @@
 import { Form } from '@heroui/react';
-import { ReactNode } from 'react';
+import { FormEvent, ReactNode } from 'react';
 
 export interface FrankFormBaseProps {
   children: ReactNode;
   className?: string;
-  onSubmit?: () => void;
+  onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export const FrankForm = ({ children, className, onSubmit }: FrankFormBaseProps) => {

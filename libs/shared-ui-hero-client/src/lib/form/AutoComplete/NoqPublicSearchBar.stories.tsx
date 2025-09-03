@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NoqPublicSearchBar } from './NoqPublicSearchBar';
+import { useState } from 'react';
 
 const meta = {
   title: 'Shared-UI-Hero-Client/Form/AutoComplete/NoqPublicSearchBar',
@@ -35,11 +36,25 @@ const meta = {
   },
   args: {},
   decorators: [
-    Story => {
+    (Story, context) => {
+      const [isLoading, setIsLoading] = useState(false);
       return (
         <div className="w-[90vw] h-[300px] flex items-center justify-center">
           <div className="flex-1">
-            <Story />
+            <Story
+              args={{
+                ...context.args,
+                handleSearchSubmit: e => {
+                  e.preventDefault();
+                  setIsLoading(true);
+                  console.log('submit');
+                  setTimeout(() => {
+                    setIsLoading(false);
+                  }, 2000);
+                },
+                isLoading,
+              }}
+            />
           </div>
         </div>
       );
@@ -53,5 +68,11 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     height: 64,
+    searchAddressInput: {
+      allowsCustomValue: true,
+    },
+    searchMainInput: {
+      allowsCustomValue: true,
+    },
   },
 };

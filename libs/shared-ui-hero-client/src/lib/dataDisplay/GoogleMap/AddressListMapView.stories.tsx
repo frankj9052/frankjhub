@@ -29,7 +29,7 @@ const addresses: FrankGoogleMapAddress[] = [
   {
     id: '104',
     address: '288 Bremner Blvd, Toronto, ON',
-    label: "Ripley's Aquarium of Canada",
+    label: "Ripley's Aquarium of Canada xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
     rating: 4.7,
     user_ratings_total: 111,
   },
@@ -88,7 +88,7 @@ const meta = {
     googleMapApiKey: '',
     googleMapId: '',
     width: 1400,
-    height: 400,
+    height: 800,
     popupWindowHeight: 287,
     popupWindowWidth: 329,
   },

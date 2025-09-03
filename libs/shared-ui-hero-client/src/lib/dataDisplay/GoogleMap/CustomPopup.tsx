@@ -37,7 +37,7 @@ export function CustomPopup({
     <div
       {...{ [POPUP_ROOT_ATTR]: '' }}
       data-selected={selected === undefined ? undefined : selected ? 'true' : 'false'}
-      className="group"
+      className="group cursor-default"
     >
       <div
         className="relative pointer-events-auto"
@@ -96,6 +96,8 @@ export function CustomPopup({
                 <Link
                   href={link ?? ''}
                   className="h-[36px] w-full flex items-center justify-center font-[550] text-[14px] text-[#E4FFE5]"
+                  target="_black"
+                  rel="noopener noreferrer"
                 >
                   {linkLabel}
                 </Link>

@@ -57,8 +57,8 @@ export const AddressListMapView = ({
                     hanldeSelect(address.id);
                   }}
                   address={address.address}
-                  label={address.label}
-                  link={truncateString(address.link, 30) ?? ''}
+                  label={truncateString(address.label, 30) ?? ''}
+                  link={address.link}
                   selected={address.id === selectedAddressId}
                   hovered={address.id === hoveredAddressId}
                   rating={address.rating}
