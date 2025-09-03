@@ -2,6 +2,7 @@ import { FrankGoogleMap, FrankGoogleMapAddress } from './FrankGoogleMap';
 import { useState } from 'react';
 import { AddressCard } from './AddressCard';
 import { FrankButtonBase } from '@frankjhub/shared-ui-hero-ssr';
+import { truncateString } from '@frankjhub/shared-utils';
 
 export interface AddressListMapViewProps {
   addresses: FrankGoogleMapAddress[];
@@ -57,7 +58,7 @@ export const AddressListMapView = ({
                   }}
                   address={address.address}
                   label={address.label}
-                  link={address.link}
+                  link={truncateString(address.link, 30) ?? ''}
                   selected={address.id === selectedAddressId}
                   hovered={address.id === hoveredAddressId}
                   rating={address.rating}

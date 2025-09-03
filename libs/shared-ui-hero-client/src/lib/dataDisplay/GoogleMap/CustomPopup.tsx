@@ -66,7 +66,7 @@ export function CustomPopup({
               className="object-cover w-full h-full"
             />
           </div>
-          <div className="p-6 h-full overflow-hidden flex flex-col justify-between gap-3 text-[#303030]">
+          <div className="px-6 pb-6 pt-3 h-full overflow-hidden flex flex-col justify-between gap-3 text-[#303030]">
             {/* Header */}
             <div>
               <h1 className="font-semibold text-[18px] leading-[18px] mb-1">
