@@ -1,6 +1,6 @@
 {
   "name": "@frankjhub/shared-ui-hero-client",
-  "version": "0.0.15",
+  "version": "0.0.18",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",

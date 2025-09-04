@@ -51,7 +51,11 @@ export const AddressListMapView = ({
         {addresses.length > 0 &&
           addresses.map(address => {
             return (
-              <div key={address.id} onMouseEnter={() => setHoveredAddressId(address.id)}>
+              <div
+                key={address.id}
+                onMouseEnter={() => setHoveredAddressId(address.id)}
+                onMouseLeave={() => setHoveredAddressId(null)}
+              >
                 <AddressCard
                   onPress={() => {
                     hanldeSelect(address.id);

@@ -89,8 +89,8 @@ const meta = {
     googleMapId: '',
     width: 1400,
     height: 800,
-    popupWindowHeight: 287,
-    popupWindowWidth: 329,
+    popupWindowHeight: 329,
+    popupWindowWidth: 287,
   },
   decorators: [
     (Story, context) => {

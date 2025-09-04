@@ -25,6 +25,14 @@ const config: StorybookConfig = {
   viteFinal: async config =>
     mergeConfig(config, {
       plugins: [react(), nxViteTsPaths()],
+      // 解决“命名导出丢失”：排除预打包
+      optimizeDeps: {
+        ...(config.optimizeDeps ?? {}),
+        exclude: [
+          ...((config.optimizeDeps && config.optimizeDeps.exclude) ?? []),
+          '@frankjhub/shared-schema',
+        ],
+      },
       resolve: {
         alias: {
           '@styles/global': join(__dirname, '../src/styles/globals.css'),

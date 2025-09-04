@@ -3,3 +3,5 @@ export * from './FrankButtonBase';
 
 // Noq主题按钮
 export * from './NoqButton';
+
+export * from './FrankButton';

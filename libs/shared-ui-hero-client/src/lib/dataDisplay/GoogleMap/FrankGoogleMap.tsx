@@ -114,6 +114,7 @@ function computePlacementAndOffset(params: {
   gap?: number; // marker 与弹窗的间隙（默认 16）
   margin?: number; // 视口边缘保留（默认 8，仅用于计算“是否放得下”，不用于滑动）
   anchorBiasY?: number; // marker 视觉锚点微调（默认 0）
+  anchorBiasX?: number;
 }) {
   const {
     map,
@@ -124,6 +125,7 @@ function computePlacementAndOffset(params: {
     gap = 16,
     margin = 8,
     anchorBiasY = 0,
+    anchorBiasX = 0,
   } = params;
 
   // 拿不到像素坐标时，保底放到上方
@@ -132,41 +134,41 @@ function computePlacementAndOffset(params: {
     return {
       placement: 'top' as Placement,
       offsetX: -popupWidth / 2,
-      offsetY: -(popupHeight + gap + anchorBiasY),
+      offsetY: -popupHeight,
     };
   }
-  console.log('pt(marker 坐标) ===>', pt);
+  // console.log('pt(marker 坐标) ===>', pt);
 
   const mapDiv = map.getDiv() as HTMLElement;
   const W = mapDiv.clientWidth;
   const H = mapDiv.clientHeight;
-  console.log('W 地图宽===>', W);
-  console.log('H 地图高===>', H);
+  // console.log('W 地图宽===>', W);
+  // console.log('H 地图高===>', H);
 
   // 计算四向可用空间（扣掉 margin）
   const topSpace = H / 2 + pt.y - margin;
   const bottomSpace = H / 2 - pt.y - margin;
   const leftSpace = W / 2 + pt.x - margin;
   const rightSpace = W / 2 - pt.x - margin;
-  console.log('topSpace 高度空间 ===> ', topSpace);
-  console.log('bottomSpace 底部空间===> ', bottomSpace);
-  console.log('leftSpace 左侧空间===> ', leftSpace);
-  console.log('rightSpace 右侧空间===> ', rightSpace);
+  // console.log('topSpace 高度空间 ===> ', topSpace);
+  // console.log('bottomSpace 底部空间===> ', bottomSpace);
+  // console.log('leftSpace 左侧空间===> ', leftSpace);
+  // console.log('rightSpace 右侧空间===> ', rightSpace);
 
   // 各方向“需要”的尺寸（仅用于判定能否完整显示）
   const needVert = popupHeight + gap; // 上/下需要的垂直空间
   const needHorz = popupWidth + gap; // 左/右需要的水平空间
-  console.log('needVert 需要的垂直空间 ===> ', needVert);
-  console.log('needHorz 需要的水平空间===> ', needHorz);
-  console.log('popupHeight 窗口的高度===> ', popupHeight);
-  console.log('popupWidth 窗口的宽度===> ', popupWidth);
+  // console.log('needVert 需要的垂直空间 ===> ', needVert);
+  // console.log('needHorz 需要的水平空间===> ', needHorz);
+  // console.log('popupHeight 窗口的高度===> ', popupHeight);
+  // console.log('popupWidth 窗口的宽度===> ', popupWidth);
 
   // 1) 默认 bottom
   if (bottomSpace >= needVert && leftSpace >= needHorz / 2 && rightSpace >= needHorz / 2) {
     return {
       placement: 'bottom' as Placement,
       offsetX: -popupWidth / 6, // 居中，不做沿轴收敛
-      offsetY: gap - anchorBiasY + popupHeight / 2, // marker 下方
+      offsetY: gap + anchorBiasY + popupHeight / 3, // marker 下方
     };
   }
 
@@ -175,7 +177,7 @@ function computePlacementAndOffset(params: {
     return {
       placement: 'top' as Placement,
       offsetX: -popupWidth / 6,
-      offsetY: -(popupHeight * 0.85 + gap + anchorBiasY),
+      offsetY: -gap - anchorBiasY - popupHeight * (2 / 3),
     };
   }
 
@@ -183,14 +185,14 @@ function computePlacementAndOffset(params: {
   if (rightSpace >= needHorz && topSpace >= needVert / 2 && bottomSpace >= needVert / 2) {
     return {
       placement: 'right' as Placement,
-      offsetX: -(popupWidth / 6 + gap) + popupWidth / 1.75, // marker 右侧
+      offsetX: gap + anchorBiasX + popupWidth / 3, // marker 右侧
       offsetY: -popupHeight / 6, // 垂直居中
     };
   }
   if (leftSpace >= needHorz && topSpace >= needVert / 2 && bottomSpace >= needVert / 2) {
     return {
       placement: 'left' as Placement,
-      offsetX: -(popupWidth / 6 + gap) - popupWidth / 1.5, // marker 左侧
+      offsetX: -gap - anchorBiasX - popupWidth * (2 / 3), // marker 左侧
       offsetY: -popupHeight / 6,
     };
   }
@@ -468,8 +470,8 @@ export const FrankGoogleMap = ({
       markerPos: pos,
       popupWidth: width,
       popupHeight: height,
-      gap: 0,
-      margin: 0,
+      gap: 50,
+      margin: 16,
       anchorBiasY: 0,
     });
 

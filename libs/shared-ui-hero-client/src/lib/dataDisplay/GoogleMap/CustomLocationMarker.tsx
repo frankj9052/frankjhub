@@ -20,7 +20,7 @@ export const CustomLocationMarker = ({
       data-marker-root
       data-hovered={hovered ? 'true' : 'false'}
       data-selected={selected ? 'true' : 'false'}
-      className={clsx(['group -translate-y-4'])}
+      className={clsx(['group'])}
     >
       {/* location marker */}
       <div

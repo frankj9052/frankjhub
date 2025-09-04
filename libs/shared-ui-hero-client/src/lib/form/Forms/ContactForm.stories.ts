@@ -23,5 +23,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {},
+  args: {
+    width: 1000,
+    onSubmit: async (value, e) => {
+      e.preventDefault();
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log('Submited value ===> ', value);
+    },
+  },
 };

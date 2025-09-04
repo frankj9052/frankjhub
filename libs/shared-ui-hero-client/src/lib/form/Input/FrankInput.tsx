@@ -1,4 +1,6 @@
 import {
+  AutoComplete,
+  ClassName,
   EndContent,
   ErrorMessage,
   Height,
@@ -12,6 +14,7 @@ import {
   Size,
   StringChangeHandler,
   StringValue,
+  TabIndex,
   Type,
   Variant,
   Width,
@@ -35,6 +38,10 @@ export interface FrankInputProps {
   height?: Height;
   value?: StringValue;
   onValueChange?: StringChangeHandler;
+  onBlur?: () => void;
+  tabIndex?: TabIndex;
+  autoComplete?: AutoComplete;
+  className?: ClassName;
 }
 
 export const FrankInput = ({
@@ -54,6 +61,10 @@ export const FrankInput = ({
   height,
   value,
   onValueChange,
+  onBlur,
+  tabIndex,
+  autoComplete,
+  className,
 }: FrankInputProps) => {
   return (
     <Input
@@ -69,10 +80,14 @@ export const FrankInput = ({
       radius={radius}
       isInvalid={isInvalid}
       endContent={endContent}
+      onBlur={onBlur}
       width={width}
       height={height}
       value={value}
       onValueChange={onValueChange}
+      tabIndex={tabIndex}
+      autoComplete={autoComplete}
+      className={className}
     />
   );
 };

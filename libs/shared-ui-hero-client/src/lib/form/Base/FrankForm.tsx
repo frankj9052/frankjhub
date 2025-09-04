@@ -1,15 +1,16 @@
+import { Children, ClassName, OnSubmit, Style } from '@frankjhub/shared-ui-hero-ssr';
 import { Form } from '@heroui/react';
-import { FormEvent, ReactNode } from 'react';
 
 export interface FrankFormBaseProps {
-  children: ReactNode;
-  className?: string;
-  onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
+  children: Children;
+  className?: ClassName;
+  onSubmit?: OnSubmit;
+  style?: Style;
 }
 
-export const FrankForm = ({ children, className, onSubmit }: FrankFormBaseProps) => {
+export const FrankForm = ({ children, className, onSubmit, style }: FrankFormBaseProps) => {
   return (
-    <Form className={className} onSubmit={onSubmit}>
+    <Form className={className} onSubmit={onSubmit} style={style}>
       {children}
     </Form>
   );

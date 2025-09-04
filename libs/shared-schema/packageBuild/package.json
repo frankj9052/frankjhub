@@ -1,6 +1,6 @@
 {
   "name": "@frankjhub/shared-schema",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",
