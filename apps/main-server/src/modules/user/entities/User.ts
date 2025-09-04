@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Gender } from '../../common/enums/gender.enum';
 import { Honorific } from '../../common/enums/honorific.enum';
 import { BaseEntity } from '../../common/entities/BaseEntity';
-import { UserOrganizationRole } from '../../organization/entities/UserOrganizationRole';
+import { UserOrganizationRole } from '../../userOrganizationRole/entities/UserOrganizationRole';
 
 @Entity()
 export class User extends BaseEntity {

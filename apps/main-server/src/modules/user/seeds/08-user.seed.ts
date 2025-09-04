@@ -3,12 +3,12 @@ import { BaseSeeder } from '../../common/libs/BaseSeeder';
 import { User } from '../entities/User';
 import { SeederFactoryManager } from 'typeorm-extension';
 import { Organization } from '../../organization/entities/Organization';
-import { UserOrganizationRole } from '../../organization/entities/UserOrganizationRole';
 import { SYSTEM_ORGANIZATIONS } from '../../common/constants/system-organizations';
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
 import { NotFoundError } from '../../common/errors/NotFoundError';
 import { Role } from '../../role/entities/Role';
+import { UserOrganizationRole } from '../../userOrganizationRole/entities/UserOrganizationRole';
 
 const totalUsers = 10;
 // 如果数据库处理速度有要求，调低这个属性

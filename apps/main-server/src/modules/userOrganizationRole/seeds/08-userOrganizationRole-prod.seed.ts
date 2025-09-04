@@ -1,7 +1,6 @@
 import { DataSource } from 'typeorm';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
 import { User } from '../../user/entities/User';
-import { Organization } from '../entities/Organization';
 import { UserOrganizationRole } from '../entities/UserOrganizationRole';
 import { waitForEntity } from '../../common/utils/waitForEntity';
 import { SYSTEM_ORGANIZATIONS } from '../../common/constants/system-organizations';
@@ -9,6 +8,7 @@ import { env } from '../../../config/env';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Role } from '../../role/entities/Role';
+import { Organization } from '../../organization/entities/Organization';
 
 export default class UserOrganizationRoleProdSeed extends BaseSeeder {
   private readonly email = env.SUPER_ADMIN_EMAIL;

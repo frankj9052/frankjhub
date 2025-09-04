@@ -1,5 +1,5 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne } from 'typeorm';
-import { Organization } from './Organization';
+import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { User } from '../../user/entities/User';
 import { buildFullUserOrgRoleName } from '../../codecs/permissionCodec';
