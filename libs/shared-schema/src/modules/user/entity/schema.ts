@@ -43,4 +43,18 @@ export const userSchema = z.object({
   deletedBy: z.string().nullable(),
 });
 
+export const userRefSchema = userSchema.pick({
+  id: true,
+  userName: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  middleName: true,
+  gender: true,
+  dateOfBirth: true,
+  honorific: true,
+  avatarImage: true,
+});
+
 export type UserDto = zInfer<typeof userSchema>;
+export type UserRef = zInfer<typeof userRefSchema>;

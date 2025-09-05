@@ -4,7 +4,7 @@ import { createLoggerWithContext } from '../common/libs/logger';
 import { User } from '../user/entities/User';
 import AppDataSource from '../../config/data-source';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
-import { UserOrganizationRole } from '../organization/entities/UserOrganizationRole';
+import { UserOrganizationRole } from '../userOrganizationRole/entities/UserOrganizationRole';
 import {
   BaseResponse,
   GetCurrentUserResponse,
@@ -34,7 +34,8 @@ export class AuthService {
   private async buildUserPayload(user: User): Promise<UserPayload> {
     // 1. 查询用户在所有组织中的角色
     const orgRoles = await this.userOrgRoleRepo.find({
-      where: { user: { id: user.id } },
+      where: { user: { id: user.id }, isActive: true },
+      withDeleted: false,
       // relations: ['organization', 'role', 'organization.orgType'],
       relations: {
         organization: {

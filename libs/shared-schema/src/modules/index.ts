@@ -9,3 +9,4 @@ export * from './permission-action';
 export * from './permission';
 export * from './role';
 export * from './contact';
+export * from './userOrganizationRole';
