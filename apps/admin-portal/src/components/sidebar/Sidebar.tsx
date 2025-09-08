@@ -26,6 +26,11 @@ const sidebarData: SidebarDataType[] = [
         label: 'Users',
         src: '/dashboard/users',
       },
+      {
+        icon: <div>1</div>,
+        label: "User's organization & roles",
+        src: '/dashboard/organization-roles',
+      },
     ],
   },
   {

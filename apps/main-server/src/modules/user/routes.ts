@@ -5,6 +5,7 @@ import {
   getCurrentUserController,
   getUserByIdController,
   getUserListController,
+  getUserOptionListController,
   hardDeleteUserController,
   restoreSoftDeletedUserController,
   softDeleteUserController,
@@ -16,6 +17,7 @@ import { validateRequest } from '../common/middlewares/validateRequest';
 import {
   idParamsSchema,
   userListRequestSchema,
+  userOptionListRequestSchema,
   userUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
@@ -28,6 +30,14 @@ router.get(
   validateRequest({ query: userListRequestSchema }),
   getUserListController
 );
+
+router.get(
+  '/user/options',
+  requirePermission(buildPermissionName('user', ['read'])),
+  validateRequest({ query: userOptionListRequestSchema }),
+  getUserOptionListController
+);
+
 router.get(
   '/user/:id',
   requirePermission(buildPermissionName('user', ['read'])),

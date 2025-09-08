@@ -4,6 +4,7 @@ import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import {
   idParamsSchema,
   userListRequestSchema,
+  userOptionListRequestSchema,
   userUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
 
@@ -124,6 +125,21 @@ export const updateUserController: RequestHandler = async (
     }
     const response = await userService.updateUser(parsed, userName);
     res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserOptionListController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsed = userOptionListRequestSchema.parse(req.query);
+
+    const result = await userService.getUserOptionList(parsed.keyword);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }

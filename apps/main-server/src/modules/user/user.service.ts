@@ -1,4 +1,4 @@
-import { Not } from 'typeorm';
+import { Brackets, Not } from 'typeorm';
 import AppDataSource from '../../config/data-source';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { createLoggerWithContext } from '../common/libs/logger';
@@ -7,6 +7,7 @@ import {
   UserListPageData,
   UserListRequest,
   UserListResponse,
+  UserOptionListResponse,
   UserSingleResponse,
   UserUpdateRequest,
 } from '@frankjhub/shared-schema';
@@ -14,6 +15,7 @@ import { User } from './entities/User';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { normalizeDate } from '@frankjhub/shared-utils';
 import { applyFilters } from '../common/utils/applyFilters';
+import { validate as isUuid } from 'uuid';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -237,6 +239,51 @@ export class UserService {
       status: 'success',
       message: `User ${user.userName} updated by ${performedBy}`,
       data: this.buildUser(user),
+    };
+  }
+
+  async getUserOptionList(keyword?: string): Promise<UserOptionListResponse> {
+    const normalized = (keyword ?? '').trim();
+    const hasKw = normalized.length > 0;
+
+    const qb = this.userRepo
+      .createQueryBuilder('u')
+      .select(['u.id', 'u.email', 'u.userName', 'u.avatarImage'])
+      .withDeleted() // 等价于 withDeleted: true
+      .orderBy('u.userName', 'ASC');
+
+    if (hasKw) {
+      const kw = `%${normalized}%`;
+      qb.where(
+        new Brackets(b => {
+          if (isUuid(normalized)) {
+            // 合法 UUID：用等值命中
+            b.where('u.id = :id', { id: normalized });
+          } else {
+            // 非 UUID：允许按 id 文本模糊
+            b.where('u.id::text ILIKE :kw', { kw });
+          }
+          // 其它可模糊的文本列
+          b.orWhere('u.email ILIKE :kw', { kw });
+          b.orWhere('u.userName ILIKE :kw', { kw });
+        })
+      );
+    } else {
+      // 没关键词时的兜底策略（取前 N 条）
+      qb.take(20);
+    }
+
+    const users = await qb.getMany();
+
+    return {
+      status: 'success',
+      message: 'Get user option list successful',
+      data: users.map(u => ({
+        id: u.id,
+        email: u.email ?? '',
+        userName: u.userName,
+        avatarImage: u.avatarImage,
+      })),
     };
   }
 }

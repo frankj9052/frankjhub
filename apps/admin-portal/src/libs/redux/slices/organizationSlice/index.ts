@@ -1,2 +1,2 @@
-export * from './orgnizationSlice';
+export * from './organizationSlice';
 export * from './thunk';

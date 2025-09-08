@@ -1,6 +1,12 @@
-import { getUserAllProfileById, getUsersAllProfile } from '@/services/user';
+import { getUserAllProfileById, getUserOptionList, getUsersAllProfile } from '@/services/user';
 import { createAppAsyncThunk } from '../../createAppAsyncThunk';
-import { UserListRequest, UserListResponse, UserSingleResponse } from '@frankjhub/shared-schema';
+import {
+  UserListRequest,
+  UserListResponse,
+  UserOptionListRequest,
+  UserOptionListResponse,
+  UserSingleResponse,
+} from '@frankjhub/shared-schema';
 
 export const getUsersAllProfileAsync = createAppAsyncThunk<
   UserListResponse,
@@ -25,3 +31,16 @@ export const getUserAllProfileByIdAsync = createAppAsyncThunk<UserSingleResponse
     }
   }
 );
+
+export const getUserOptionListAsync = createAppAsyncThunk<
+  UserOptionListResponse,
+  { data: UserOptionListRequest }
+>('user/options', async ({ data }, { rejectWithValue }) => {
+  const result = await getUserOptionList(data);
+  if (result.status === 'success') {
+    console.log('user option list check ===> ', result);
+    return result;
+  } else {
+    return rejectWithValue(result.message);
+  }
+});

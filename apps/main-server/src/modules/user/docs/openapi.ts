@@ -6,6 +6,8 @@ import {
   userListPageDataExample,
   userListRequestSchema,
   userListResponseSchema,
+  userOptionListRequestSchema,
+  userOptionListResponseSchema,
   userSingleResponseSchema,
   userUpdateRequestDataExample,
   userUpdateRequestSchema,
@@ -299,6 +301,47 @@ registry.registerPath({
     ...buildErrorResponses({
       401: 'UnauthorizedError',
       404: 'NotFoundError',
+    }),
+  },
+});
+
+// get user option list
+registry.registerPath({
+  method: 'get',
+  path: '/user/options',
+  tags: ['User'],
+  summary: 'Get all user options (id, userName, email, avatarImage)',
+  description: 'Returns a simplified list of users for dropdown selection.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    query: userOptionListRequestSchema.openapi({
+      example: { keyword: 'Thomas' },
+    }),
+  },
+  responses: {
+    200: {
+      description: 'List of user options',
+      content: {
+        'application/json': {
+          schema: userOptionListResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Get user option list successful',
+              data: [
+                {
+                  userName: 'Testuser',
+                  email: 'testUser@test.com',
+                  avatarImage: 'https://cloudinary/abc',
+                  id: 'uuid-user-id',
+                },
+              ],
+            },
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
     }),
   },
 });

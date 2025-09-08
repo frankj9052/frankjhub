@@ -5,6 +5,9 @@ import {
   UserListRequest,
   userListRequestSchema,
   UserListResponse,
+  UserOptionListRequest,
+  userOptionListRequestSchema,
+  UserOptionListResponse,
   UserSingleResponse,
   UserUpdateRequest,
   userUpdateRequestSchema,
@@ -26,6 +29,20 @@ export async function getUsersAllProfile(
     return error;
   }
   const response = await get<UserListResponse>(`/api/user/list`, {
+    params: parsedInput.data,
+  });
+  return response;
+}
+
+export async function getUserOptionList(
+  data: UserOptionListRequest
+): Promise<ApiResponse<UserOptionListResponse>> {
+  const parsedInput = userOptionListRequestSchema.safeParse(data);
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error)).toJSON();
+    return error;
+  }
+  const response = await get<UserOptionListResponse>(`/api/user/options`, {
     params: parsedInput.data,
   });
   return response;

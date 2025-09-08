@@ -56,6 +56,7 @@ export type FrankAutocompleteProps = {
   };
   width?: number;
   height?: number;
+  isLoading?: boolean;
 };
 
 export function FrankAutocomplete({
@@ -79,6 +80,7 @@ export function FrankAutocomplete({
   customizeStyles,
   width,
   height,
+  isLoading,
 }: FrankAutocompleteProps) {
   return (
     <div
@@ -88,6 +90,7 @@ export function FrankAutocomplete({
       }}
     >
       <Autocomplete
+        isLoading={isLoading}
         label={label}
         onBlur={onBlur}
         isInvalid={!!isInvalid}

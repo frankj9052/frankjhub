@@ -8,9 +8,14 @@ import {
   UserListResponse,
   UserListRequest,
   UserSingleResponse,
+  UserOptionList,
 } from '@frankjhub/shared-schema';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { getUserAllProfileByIdAsync, getUsersAllProfileAsync } from './thunk';
+import {
+  getUserAllProfileByIdAsync,
+  getUserOptionListAsync,
+  getUsersAllProfileAsync,
+} from './thunk';
 import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
 import { Key } from 'react';
 
@@ -52,6 +57,8 @@ export interface UsersSliceState {
   visibleColumns: Key[] | 'all';
   statusOptions: LabeledEnumItem[];
   targetUser?: UserSingleResponse;
+  userOptionList?: UserOptionList;
+  selectedKey?: string;
 }
 
 const initialState: UsersSliceState = {
@@ -69,6 +76,8 @@ const initialState: UsersSliceState = {
   visibleColumns: INITIAL_VISIBLE_COLUMNS,
   statusOptions: filters,
   targetUser: undefined,
+  userOptionList: [],
+  selectedKey: '',
 };
 
 export const usersSlice = createSlice({
@@ -117,6 +126,9 @@ export const usersSlice = createSlice({
     cleanTargetUser: state => {
       state.targetUser = undefined;
     },
+    setSelectedKey: (state, action: PayloadAction<string>) => {
+      state.selectedKey = action.payload;
+    },
   },
   extraReducers(builder) {
     builder
@@ -138,6 +150,16 @@ export const usersSlice = createSlice({
       })
       .addCase(getUserAllProfileByIdAsync.fulfilled, (state, action) => {
         state.targetUser = action.payload;
+        state.status = 'idle';
+      })
+      .addCase(getUserOptionListAsync.pending, state => {
+        state.status = 'loading';
+      })
+      .addCase(getUserOptionListAsync.rejected, state => {
+        state.status = 'failed';
+      })
+      .addCase(getUserOptionListAsync.fulfilled, (state, action) => {
+        state.userOptionList = action.payload.data;
         state.status = 'idle';
       });
   },
