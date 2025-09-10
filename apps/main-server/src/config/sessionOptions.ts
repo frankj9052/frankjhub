@@ -25,8 +25,12 @@ const decrypt = (hex: string) => {
   return buf.toString();
 };
 
+type BuildParams = {
+  cookieDomain?: string | undefined;
+};
+
 /* ---------- Session 配置构建器 ---------- */
-export const buildSessionOptions = (): SessionOptions => {
+export const buildSessionOptions = (params: BuildParams = {}): SessionOptions => {
   const isProd = env.NODE_ENV === 'production';
   const store = isRedisAvailable
     ? new RedisStore({
@@ -50,7 +54,7 @@ export const buildSessionOptions = (): SessionOptions => {
     rolling: true,
     proxy: true,
     cookie: {
-      domain: env.SESSION_COOKIE_DOMAIN,
+      domain: params.cookieDomain ?? undefined,
       httpOnly: true,
       secure: isProd ? ('auto' as const) : false,
       sameSite: (env.SESSION_COOKIE_SAMESITE as CookieOptions['sameSite']) ?? 'lax',

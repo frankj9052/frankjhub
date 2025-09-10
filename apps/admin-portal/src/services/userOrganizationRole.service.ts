@@ -3,7 +3,6 @@ import { ValidationError } from '@frankjhub/shared-errors';
 import {
   ApiResponse,
   idParamsSchema,
-  OrganizationSingleResponse,
   UserOrganizationRoleSingleResponse,
   UserOrganizationRoleUpdateRequest,
   userOrganizationRoleUpdateRequestSchema,
@@ -33,5 +32,9 @@ export async function updateUserOrganizationRoleByUserId(
     const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error));
     return error.toJSON();
   }
-  const response = await patch<OrganizationSingleResponse>('/api/user-organization-role/update');
+  const response = await patch<UserOrganizationRoleSingleResponse>(
+    '/api/user-organization-role/update',
+    parsedInput.data
+  );
+  return response;
 }

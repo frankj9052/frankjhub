@@ -1,20 +1,29 @@
 'use client';
 
-import { useDispatch, usersSlice, useSelector } from '@/libs/redux';
+import {
+  getUserOrganizationRoleByUserIdAsync,
+  useDispatch,
+  userOrganizationRoleSlice,
+  usersSlice,
+  useSelector,
+} from '@/libs/redux';
 import { getUserOptionListAsync } from '@/libs/redux/slices/usersSlice/thunk';
 import { useDebouncedCallback } from '@frankjhub/shared-hooks';
+import { UserOrganizationRoleUpdateRequest } from '@frankjhub/shared-schema';
 import { DefaultAutocompleteItemsType, FrankAutocomplete } from '@frankjhub/shared-ui-hero-client';
 import { UserListItem } from '@frankjhub/shared-ui-hero-ssr';
 import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 export const UserSelection = () => {
   const dispatch = useDispatch();
   const userOptionList = useSelector(state => state.users.userOptionList);
   const selectedKey = useSelector(state => state.users.selectedKey);
+  const userOrganizationRole = useSelector(state => state.userOrganizationRole.userOrgRole);
   const [inputValue, setInputValue] = useState('');
+  const { setValue, reset } = useFormContext<UserOrganizationRoleUpdateRequest>();
 
   useEffect(() => {
-    console.log('check ===> initial');
     dispatch(getUserOptionListAsync({ data: { keyword: '' } }));
   }, [dispatch]);
 
@@ -38,6 +47,7 @@ export const UserSelection = () => {
       dispatch(getUserOptionListAsync({ data: { keyword: value } }));
     } else {
       dispatch(getUserOptionListAsync({ data: { keyword: '' } }));
+      dispatch(usersSlice.actions.setSelectedKey(''));
     }
   }, 500);
 
@@ -45,6 +55,42 @@ export const UserSelection = () => {
   useEffect(() => {
     debouncedSearchChange(inputValue);
   }, [inputValue, debouncedSearchChange]);
+
+  // get user organization role data
+  useEffect(() => {
+    if (selectedKey) {
+      dispatch(getUserOrganizationRoleByUserIdAsync({ id: selectedKey }));
+    } else {
+      dispatch(userOrganizationRoleSlice.actions.cleanUserOrgRole());
+    }
+  }, [selectedKey, dispatch]);
+
+  // fill form value
+  useEffect(() => {
+    if (userOrganizationRole) {
+      setValue('id', userOrganizationRole.id, {
+        shouldValidate: false,
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+      const organizationRoles = userOrganizationRole.organizations.map(org => ({
+        id: org.id,
+        roles: org.roles.map(role => ({
+          id: role.id,
+        })),
+      }));
+      setValue('organizations', organizationRoles, {
+        shouldValidate: false,
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+    } else {
+      reset({
+        id: undefined,
+        organizations: undefined,
+      });
+    }
+  }, [setValue, reset, userOrganizationRole]);
 
   return (
     <div>

@@ -38,7 +38,6 @@ export const getUserOptionListAsync = createAppAsyncThunk<
 >('user/options', async ({ data }, { rejectWithValue }) => {
   const result = await getUserOptionList(data);
   if (result.status === 'success') {
-    console.log('user option list check ===> ', result);
     return result;
   } else {
     return rejectWithValue(result.message);

@@ -8,3 +8,5 @@ export * from './Card';
 export * from './GoogleMap';
 
 export * from './Rating';
+
+export * from './Dropdown';

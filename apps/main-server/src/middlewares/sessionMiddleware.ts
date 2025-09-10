@@ -1,4 +1,3 @@
-import session from 'express-session';
-import { buildSessionOptions } from '../config/sessionOptions';
+import { createSessionByHost } from '../config/sessionByHost';
 
-export const sessionMiddleware = session(buildSessionOptions());
+export const sessionMiddleware = createSessionByHost();

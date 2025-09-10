@@ -1,3 +1,4 @@
+import { IsDisabled, Size } from '@frankjhub/shared-ui-hero-ssr';
 import { Autocomplete, AutocompleteItem } from '@heroui/react';
 import clsx from 'clsx';
 import { Key, ReactNode } from 'react';
@@ -57,6 +58,8 @@ export type FrankAutocompleteProps = {
   width?: number;
   height?: number;
   isLoading?: boolean;
+  size?: Size;
+  isDisabled?: IsDisabled;
 };
 
 export function FrankAutocomplete({
@@ -81,6 +84,8 @@ export function FrankAutocomplete({
   width,
   height,
   isLoading,
+  size,
+  isDisabled,
 }: FrankAutocompleteProps) {
   return (
     <div
@@ -90,6 +95,8 @@ export function FrankAutocomplete({
       }}
     >
       <Autocomplete
+        isDisabled={isDisabled}
+        size={size}
         isLoading={isLoading}
         label={label}
         onBlur={onBlur}

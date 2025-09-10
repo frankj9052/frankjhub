@@ -15,3 +15,5 @@ export * from './resourceSlice';
 export * from './permissionSlice';
 
 export * from './roleSlice';
+
+export * from './userOrganizationRoleSlice';
