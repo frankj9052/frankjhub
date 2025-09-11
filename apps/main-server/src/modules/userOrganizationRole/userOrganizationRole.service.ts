@@ -4,6 +4,7 @@ import {
   UserOrganizationRoleCreateRequest,
   UserOrganizationRoleSingleResponse,
   UserOrganizationRoleUpdateRequest,
+  RoleSource,
 } from '@frankjhub/shared-schema';
 import AppDataSource from '../../config/data-source';
 import { User } from '../user/entities/User';
@@ -164,6 +165,8 @@ export class UserOrganizationRoleService {
     return await AppDataSource.transaction(async manager => {
       const userRepo = manager.withRepository(this.userRepo);
       const uorRepo = manager.withRepository(this.userOrganizationRoleRepo);
+      const orgRepo = manager.withRepository(this.organizationRepo);
+      const roleRepo = manager.withRepository(this.roleRepo);
 
       // 基础校验：用户存在
       const user = await userRepo.exists({ where: { id: userId } });
@@ -207,6 +210,76 @@ export class UserOrganizationRoleService {
       const toDeleteTuples = replaceAll
         ? existing.filter(e => !newSet.has(`${e.organization.id}::${e.role.id}`))
         : [];
+
+      // orgType / org 约束
+      if (toInsertTuples.length > 0) {
+        const orgIds = Array.from(new Set(toInsertTuples.map(t => t.organizationId)));
+        const roleIds = Array.from(new Set(toInsertTuples.map(t => t.roleId)));
+
+        // 取organization
+        const orgs = await orgRepo
+          .createQueryBuilder('o')
+          .leftJoinAndSelect('o.orgType', 'ot')
+          .where('o.id IN (:...ids)', { ids: orgIds })
+          .getMany();
+        const orgMap = new Map(orgs.map(o => [o.id, o]));
+
+        // 取 role（含 organizationType / organization）
+        const roles = await roleRepo
+          .createQueryBuilder('r')
+          .leftJoinAndSelect('r.organizationType', 'rot')
+          .leftJoinAndSelect('r.organization', 'ro')
+          .where('r.id IN (:...ids)', { ids: roleIds })
+          .getMany();
+        const roleMap = new Map(roles.map(r => [r.id, r]));
+
+        const errors: string[] = [];
+
+        for (const t of toInsertTuples) {
+          const org = orgMap.get(t.organizationId);
+          const role = roleMap.get(t.roleId);
+
+          if (!org) {
+            errors.push(`Organization not found: ${t.organizationId}`);
+            continue;
+          }
+          if (!role) {
+            errors.push(`Role not found: ${t.roleId}`);
+            continue;
+          }
+
+          const source = role.roleSource;
+          if (source === RoleSource.TYPE) {
+            const orgTypeId = org.orgType.id;
+            const roleOrgTypeId = role.organizationType?.id;
+            if (!orgTypeId || !roleOrgTypeId || orgTypeId !== roleOrgTypeId) {
+              errors.push(
+                `Role(${role.id}) requires organizationType match (role.organizationType=${
+                  roleOrgTypeId ?? 'NULL'
+                } vs org.orgType=${orgTypeId ?? 'NULL'}) on organization ${org.id}`
+              );
+            }
+          } else if (source === RoleSource.ORG) {
+            const roleOrgId = role.organization?.id;
+            if (!roleOrgId || roleOrgId !== org.id) {
+              errors.push(
+                `Role(${
+                  role.id
+                }) is org-scoped and must be assigned only to its bound organization (role.organization=${
+                  roleOrgId ?? 'NULL'
+                } vs org=${org.id})`
+              );
+            }
+          } else {
+            // 若有其它种类，按需扩展；这里先严格报错
+            errors.push(`Unsupported roleSource for role ${role.id}: ${String(source)}`);
+          }
+        }
+
+        if (errors.length > 0) {
+          throw new BadRequestError(`Role validation failed: ${errors.join('; ')}`);
+        }
+      }
 
       // 按差异批量删除
       if (toDeleteTuples.length > 0) {
