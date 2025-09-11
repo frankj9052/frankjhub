@@ -16,7 +16,7 @@ export const organizationRoleRefSchema = z.object({
         roleSource: true,
       })
       .extend({
-        userOrganizationRole: baseEntitySchema,
+        userOrganizationRole: baseEntitySchema.optional(),
       })
   ),
 });

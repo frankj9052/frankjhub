@@ -11,6 +11,7 @@ import { UserSelection } from './UserSelection';
 import clsx from 'clsx';
 import { OrganizationSelection } from './OrganizationSelection';
 import { FrankButton } from '@frankjhub/shared-ui-hero-ssr';
+import { RoleSelection } from './RoleSelection';
 
 export const OrganizationRoleForm = () => {
   const methods = useForm<UserOrganizationRoleUpdateRequest>({
@@ -33,9 +34,17 @@ export const OrganizationRoleForm = () => {
           <div className={clsx(['', ''])}>
             <OrganizationSelection />
           </div>
-          <div className="bg-pink-200">role selection area</div>
+          <div className="">
+            <RoleSelection />
+          </div>
         </div>
-        <FrankButton type="submit">Apply Change</FrankButton>
+        <FrankButton
+          type="submit"
+          isDisabled={!methods.formState.isDirty}
+          isLoading={methods.formState.isSubmitting}
+        >
+          Apply Change
+        </FrankButton>
       </FrankForm>
     </FormProvider>
   );

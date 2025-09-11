@@ -1,8 +1,12 @@
 'use client';
-import { getOrganizationOptionListAsync, useDispatch, useSelector } from '@/libs/redux';
-import { OrganizationRoleRef } from '@frankjhub/shared-schema';
 import {
-  ActionsDropdown,
+  getOrganizationOptionListAsync,
+  useDispatch,
+  userOrganizationRoleSlice,
+  useSelector,
+} from '@/libs/redux';
+import { OrganizationRoleRef, UserOrganizationRoleUpdateRequest } from '@frankjhub/shared-schema';
+import {
   DefaultAutocompleteItemsType,
   FrankActionsDropdown,
   FrankAutocomplete,
@@ -11,6 +15,7 @@ import {
 import { FrankButton, GeneralTableColumn } from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 const columns: GeneralTableColumn[] = [
   {
@@ -35,8 +40,14 @@ const columns: GeneralTableColumn[] = [
 export const OrganizationSelection = () => {
   const dispatch = useDispatch();
   const organizationOptionList = useSelector(state => state.organization.options);
+  const { setValue, watch } = useFormContext<UserOrganizationRoleUpdateRequest>();
   const userOrganizationRole = useSelector(state => state.userOrganizationRole.userOrgRole);
+  const createOrgInput = useSelector(state => state.userOrganizationRole.createOrgInput);
+  const selectedOrg = useSelector(state => state.userOrganizationRole.selectedOrg);
   const [orgList, setOrgList] = useState(userOrganizationRole?.organizations ?? []);
+  const [createOrg, setCreateOrg] = useState<OrganizationRoleRef | undefined>(undefined);
+  const watchedOrg = watch('organizations');
+
   const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
     const data = organizationOptionList?.data ?? [];
     // avoid exist org display in add new area
@@ -60,18 +71,17 @@ export const OrganizationSelection = () => {
     dispatch(getOrganizationOptionListAsync());
   }, [dispatch]);
 
-  const handleDelete = () => {
-    console.log('delete record');
+  const handleDelete = (id: string) => {
+    dispatch(userOrganizationRoleSlice.actions.removeOrgFromUser(id));
+    setValue(
+      'organizations',
+      watchedOrg.filter(org => org.id !== id),
+      {
+        shouldDirty: true,
+        shouldTouch: true,
+      }
+    );
   };
-  // actions
-  const actions: ActionsDropdown[] = [
-    {
-      key: 'delete',
-      label: <div className="text-danger">Delete</div>,
-      onPress: handleDelete,
-      textValue: 'delete',
-    },
-  ];
 
   return (
     <div
@@ -80,7 +90,7 @@ export const OrganizationSelection = () => {
         'outline outline-1 outline-gray-400 h-full rounded-lg p-4',
       ])}
     >
-      <h1 className={clsx(['text-xl font-semibold'])}>Organization:</h1>
+      <h1 className={clsx(['text-xl font-semibold'])}>Organizations:</h1>
       {/* autocomplete */}
       <div className={clsx(['flex gap-3 items-center'])}>
         <FrankAutocomplete
@@ -91,9 +101,52 @@ export const OrganizationSelection = () => {
           variant="bordered"
           radius="md"
           size="sm"
-          isDisabled={!userOrganizationRole}
+          onSelectionChange={key => {
+            if (organizationOptionList && key) {
+              const org = organizationOptionList.data.find(org => org.id === key);
+              if (org) {
+                const newOrg: OrganizationRoleRef = {
+                  ...org,
+                  roles: [],
+                };
+                setCreateOrg(newOrg);
+              }
+            } else {
+              setCreateOrg(undefined);
+            }
+          }}
+          inputValue={createOrgInput}
+          onInputChange={value => {
+            dispatch(userOrganizationRoleSlice.actions.setCreateOrgInput(value));
+          }}
+          isDisabled={!orgList || orgList.length === 0}
         />
-        <FrankButton variant="solid" size="md" color="secondary">
+        <FrankButton
+          variant="solid"
+          size="md"
+          color="secondary"
+          onPress={() => {
+            if (createOrg) {
+              dispatch(userOrganizationRoleSlice.actions.addNewOrgToUser(createOrg));
+              dispatch(userOrganizationRoleSlice.actions.cleanCreateOrgInput());
+              setValue(
+                'organizations',
+                [
+                  ...watchedOrg,
+                  {
+                    id: createOrg.id,
+                    roles: [],
+                  },
+                ],
+                {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                }
+              );
+            }
+          }}
+          isDisabled={!createOrg}
+        >
           Add
         </FrankButton>
       </div>
@@ -103,11 +156,33 @@ export const OrganizationSelection = () => {
           ariaLabel="use organization list"
           columns={columns}
           data={orgList}
+          selectedKey={new Set([selectedOrg])}
+          onSelectionChange={keys => {
+            const value = Array.from(keys)[0];
+            if (value) {
+              dispatch(userOrganizationRoleSlice.actions.setSelectedOrg(String(value)));
+            } else {
+              dispatch(userOrganizationRoleSlice.actions.setSelectedOrg(''));
+            }
+          }}
           renderCell={(org, columnKey): ReactNode => {
             const cellValue = org[columnKey as keyof OrganizationRoleRef];
             switch (columnKey) {
               case 'actions':
-                return <FrankActionsDropdown actions={actions} />;
+                return (
+                  <FrankActionsDropdown
+                    actions={[
+                      {
+                        key: 'delete',
+                        label: <div className="text-danger">Delete</div>,
+                        onPress: () => {
+                          handleDelete(org.id);
+                        },
+                        textValue: 'delete',
+                      },
+                    ]}
+                  />
+                );
               default:
                 return String(cellValue);
             }

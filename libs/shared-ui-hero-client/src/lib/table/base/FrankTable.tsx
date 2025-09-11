@@ -3,12 +3,14 @@ import {
   BottomContent,
   BottomContentPlacement,
   IsCompact,
+  OnSelectionChange,
   OnSortChange,
   RemoveWrapper,
   SelectionMode,
   TableChildren,
   TableClassNames,
   TableColor,
+  SelectedKey,
   TopContent,
   TopContentPlacement,
 } from '@frankjhub/shared-ui-hero-ssr';
@@ -29,6 +31,8 @@ export interface FrankTableProps {
   bottomContentPlacement?: BottomContentPlacement;
   classNames?: TableClassNames;
   onSortChange?: OnSortChange;
+  selectedKey?: SelectedKey;
+  onSelectionChange?: OnSelectionChange;
 }
 
 export const FrankTable = ({
@@ -44,6 +48,8 @@ export const FrankTable = ({
   bottomContentPlacement,
   classNames,
   onSortChange,
+  selectedKey,
+  onSelectionChange,
 }: FrankTableProps) => {
   return (
     <Table
@@ -58,6 +64,8 @@ export const FrankTable = ({
       bottomContentPlacement={bottomContentPlacement}
       classNames={classNames}
       onSortChange={onSortChange}
+      selectedKeys={selectedKey}
+      onSelectionChange={onSelectionChange}
     >
       {children}
     </Table>

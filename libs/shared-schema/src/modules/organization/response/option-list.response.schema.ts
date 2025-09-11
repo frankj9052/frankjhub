@@ -7,6 +7,7 @@ export const organizationOptionSchema = organizationSchema.pick({
   name: true,
   orgTypeId: true,
   orgTypeName: true,
+  description: true,
 });
 
 export const organizationOptionListSchema = z.array(organizationOptionSchema);

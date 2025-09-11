@@ -52,6 +52,7 @@ export class OrganizationService {
       name: org.name,
       orgTypeId: org.orgType.id,
       orgTypeName: org.orgType.name,
+      description: org.description,
     };
   }
 
@@ -140,7 +141,7 @@ export class OrganizationService {
       .createQueryBuilder('org')
       .leftJoinAndSelect('org.orgType', 'orgType')
       .where('org.isActive = :active', { active: true })
-      .select(['org.id', 'org.name', 'orgType.id', 'orgType.name'])
+      .select(['org.id', 'org.name', 'org.description', 'orgType.id', 'orgType.name'])
       .orderBy('org.name', 'ASC')
       .getMany();
 

@@ -62,6 +62,7 @@ export const UserSelection = () => {
       dispatch(getUserOrganizationRoleByUserIdAsync({ id: selectedKey }));
     } else {
       dispatch(userOrganizationRoleSlice.actions.cleanUserOrgRole());
+      dispatch(userOrganizationRoleSlice.actions.cleanCreateOrgInput());
     }
   }, [selectedKey, dispatch]);
 

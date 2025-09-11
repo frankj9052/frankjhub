@@ -10,6 +10,7 @@ import {
   TableRow,
 } from '@heroui/react';
 import { ComponentProps, CSSProperties, FormEvent, ReactNode } from 'react';
+import { Key, Selection } from '@react-types/shared';
 
 export type Label = ReactNode | undefined;
 export type Type = string | undefined;
@@ -217,6 +218,8 @@ export type GeneralTableColumn = {
   sortable?: boolean;
   align?: Align;
 };
+export type SelectedKey = 'all' | Iterable<Key> | undefined;
+export type OnSelectionChange = (keys: Selection) => void;
 
 // dropdown
 export type DropdownItemKey = string | number;

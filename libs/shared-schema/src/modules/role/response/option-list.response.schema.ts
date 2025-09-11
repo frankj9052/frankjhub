@@ -6,6 +6,8 @@ export const roleOptionSchema = roleSchema.pick({
   id: true,
   name: true,
   code: true,
+  roleSource: true,
+  description: true,
 });
 
 export const roleOptionListSchema = z.array(roleOptionSchema);

@@ -10,6 +10,7 @@ import {
   Radius,
   Size,
   IsIconOnly,
+  IsDisabled,
 } from '../../../types/props.types';
 
 export interface FrankButtonProps {
@@ -23,6 +24,7 @@ export interface FrankButtonProps {
   isLoading?: IsLoading;
   color?: ButtonColor;
   isIconOnly?: IsIconOnly;
+  isDisabled?: IsDisabled;
 }
 
 export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
@@ -38,6 +40,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
       isLoading,
       color,
       isIconOnly,
+      isDisabled,
       ...props
     },
     ref
@@ -55,6 +58,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
         isLoading={isLoading}
         color={color}
         isIconOnly={isIconOnly}
+        isDisabled={isDisabled}
       >
         {children}
       </Button>

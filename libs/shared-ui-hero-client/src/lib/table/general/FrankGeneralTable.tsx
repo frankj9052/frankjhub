@@ -4,7 +4,9 @@ import {
   FrankSpinner,
   GeneralTableColumn,
   LoadingState,
+  OnSelectionChange,
   OnSortChange,
+  SelectedKey,
 } from '@frankjhub/shared-ui-hero-ssr';
 import {
   FrankTableBody,
@@ -24,6 +26,8 @@ export interface FrankGeneralTableProps<T extends { id: string }> {
   loadingState?: LoadingState;
   emptyContent?: EmptyContent;
   renderCell: (item: T, columnKey: Key) => ReactNode;
+  selectedKey?: SelectedKey;
+  onSelectionChange?: OnSelectionChange;
 }
 export const FrankGeneralTable = <T extends { id: string }>({
   columns,
@@ -33,6 +37,8 @@ export const FrankGeneralTable = <T extends { id: string }>({
   emptyContent,
   renderCell,
   ariaLabel,
+  selectedKey,
+  onSelectionChange,
 }: FrankGeneralTableProps<T>) => {
   return (
     <FrankTable
@@ -42,6 +48,8 @@ export const FrankGeneralTable = <T extends { id: string }>({
       selectionMode="single"
       color="secondary"
       onSortChange={onSortChange}
+      selectedKey={selectedKey}
+      onSelectionChange={onSelectionChange}
     >
       <FrankTableHeader columns={columns}>
         {column => (
