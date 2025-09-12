@@ -1,4 +1,13 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  Unique,
+} from 'typeorm';
 import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { User } from '../../user/entities/User';
@@ -6,22 +15,26 @@ import { buildFullUserOrgRoleName } from '../../codecs/permissionCodec';
 import { Role } from '../../role/entities/Role';
 
 @Entity()
+@Unique('uq_uor_user_org_role', ['user', 'organization', 'role'])
 @Index('IDX_uor_name', ['name'], { unique: true })
+@Index('ix_uor_user', ['user'])
+@Index('ix_uor_org', ['organization'])
+@Index('ix_uor_role', ['role'])
 export class UserOrganizationRole extends BaseEntity {
   @Column({ type: 'varchar', length: 512, nullable: false })
   name!: string;
 
   /* 外键 */
-  @ManyToOne(() => User, org => org.userOrganizationRoles, { nullable: false, onDelete: 'CASCADE' })
-  @Index()
+  @ManyToOne(() => User, u => u.userOrganizationRoles, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @ManyToOne(() => Organization, { nullable: false })
-  @Index()
+  @ManyToOne(() => Organization, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'organizationId' })
   organization!: Organization;
 
-  @ManyToOne(() => Role, { nullable: false })
-  @Index()
+  @ManyToOne(() => Role, { nullable: false, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'roleId' })
   role!: Role;
 
   @Column({ type: 'boolean', default: true })

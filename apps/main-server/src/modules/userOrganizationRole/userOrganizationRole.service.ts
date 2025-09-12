@@ -15,6 +15,7 @@ import { Role } from '../role/entities/Role';
 import { Organization } from '../organization/entities/Organization';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { NotFoundError } from '../common/errors/NotFoundError';
+import { buildFullUserOrgRoleName } from '../codecs/permissionCodec';
 
 export class UserOrganizationRoleService {
   private userRepo = AppDataSource.getRepository(User);
@@ -211,6 +212,7 @@ export class UserOrganizationRoleService {
         ? existing.filter(e => !newSet.has(`${e.organization.id}::${e.role.id}`))
         : [];
 
+      const roleMap = new Map();
       // orgType / org 约束
       if (toInsertTuples.length > 0) {
         const orgIds = Array.from(new Set(toInsertTuples.map(t => t.organizationId)));
@@ -283,27 +285,24 @@ export class UserOrganizationRoleService {
 
       // 按差异批量删除
       if (toDeleteTuples.length > 0) {
-        await uorRepo
-          .createQueryBuilder()
-          .delete()
-          .where('userId = :userId', { userId })
-          .andWhere('(organizationId, roleId) IN (:...pairs)', {
-            pairs: toDeleteTuples.map(e => [e.organization.id, e.role.id]),
-          })
-          .execute();
+        await uorRepo.delete(toDeleteTuples.map(e => e.id));
       }
 
       // 按差异批量upsert/insert
       if (toInsertTuples.length > 0) {
         await uorRepo.upsert(
-          toInsertTuples.map(x => ({
-            user: { id: userId },
-            organization: { id: x.organizationId },
-            role: { id: x.roleId },
-            updatedBy,
-          })),
+          toInsertTuples.map(x => {
+            const role = 123;
+            return {
+              user: { id: userId },
+              organization: { id: x.organizationId },
+              role: { id: x.roleId },
+              name: buildFullUserOrgRoleName(userId, x.organizationId, x.roleId),
+              updatedBy,
+            };
+          }),
           {
-            conflictPaths: ['userId', 'organizationId', 'roleId'],
+            conflictPaths: ['user', 'organization', 'role'],
             skipUpdateIfNoValuesChanged: true,
           }
         );

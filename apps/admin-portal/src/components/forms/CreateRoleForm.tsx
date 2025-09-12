@@ -9,13 +9,24 @@ import {
   getOrganizationOptionListAsync,
 } from '@/libs/redux';
 import { createRole } from '@/services/role.service';
-import { RoleCreateRequest, roleCreateRequestSchema, RoleSource } from '@frankjhub/shared-schema';
+import {
+  OrganizationOptionList,
+  OrganizationTypeOptionList,
+  RoleCreateRequest,
+  roleCreateRequestSchema,
+  RoleSource,
+} from '@frankjhub/shared-schema';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
-import { FrankSelect, SelectItemType } from '@frankjhub/shared-ui-hero-client';
+import {
+  DefaultAutocompleteItemsType,
+  FrankAutocomplete,
+  FrankSelect,
+  SelectItemType,
+} from '@frankjhub/shared-ui-hero-client';
 import { Button, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
 
@@ -41,6 +52,7 @@ export const CreateRoleForm = ({ onClose }: Props) => {
     control,
     reset,
     setError,
+    watch,
     formState: { isDirty, isSubmitting, errors },
   } = useForm<RoleCreateRequest>({
     resolver: zodResolver(roleCreateRequestSchema),
@@ -73,6 +85,23 @@ export const CreateRoleForm = ({ onClose }: Props) => {
     }
   };
 
+  // 选择resource id
+  const roleSource = watch('roleSource');
+  const orgOptionList = useSelector(state => state.organization.options?.data);
+  const orgTypeOptionList = useSelector(state => state.organizationType.options?.data);
+  const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
+    let list: OrganizationOptionList | OrganizationTypeOptionList = [];
+    if (roleSource === RoleSource.ORG && orgOptionList?.length) {
+      list = orgOptionList;
+    } else if (roleSource === RoleSource.TYPE && orgTypeOptionList?.length) {
+      list = orgTypeOptionList;
+    }
+    return list.map(item => ({
+      key: item.id,
+      label: item.name,
+      textValue: item.name,
+    }));
+  }, [orgOptionList, orgTypeOptionList, roleSource]);
   return (
     <div className="p-4 flex flex-col gap-3">
       {/* Top */}
@@ -134,6 +163,12 @@ export const CreateRoleForm = ({ onClose }: Props) => {
                         ? Object.values(sharedSelection)
                         : Array.from(sharedSelection);
                     field.onChange(selection[0]);
+                    if (selection[0] === RoleSource.ORG) {
+                      dispatch(getOrganizationOptionListAsync());
+                    }
+                    if (selection[0] === RoleSource.TYPE) {
+                      dispatch(getOrganizationTypeOptionsAsync());
+                    }
                   }}
                 />
               )}
@@ -141,7 +176,29 @@ export const CreateRoleForm = ({ onClose }: Props) => {
           </div>
 
           {/* Role Source Id */}
-
+          <div className="h-[70px] w-full">
+            <Controller
+              name="sourceId"
+              control={control}
+              render={({ field, fieldState }) => (
+                <FrankAutocomplete
+                  ariaLabel="Select resource id"
+                  label="Select where the role belong to"
+                  defaultFilter={true}
+                  defaultItems={defaultItems}
+                  variant="bordered"
+                  size="sm"
+                  isDisabled={!roleSource || !!fieldState.error}
+                  onBlur={field.onBlur}
+                  errorMessage={fieldState.error?.message}
+                  height={48}
+                  onSelectionChange={key => {
+                    field.onChange(key);
+                  }}
+                />
+              )}
+            />
+          </div>
           {/* Description */}
           <div className="h-[70px] w-full">
             <Controller

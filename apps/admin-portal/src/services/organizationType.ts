@@ -116,7 +116,7 @@ export async function hardDeleteOrganizationType(
     return error;
   }
   const response = await del<OrganizationTypeSingleResponse>('/api/organization-type/hard-delete', {
-    params: parsedInput.data.id,
+    params: parsedInput.data,
   });
   return response;
 }

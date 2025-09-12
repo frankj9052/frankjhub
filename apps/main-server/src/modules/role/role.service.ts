@@ -343,7 +343,16 @@ export class RoleService {
 
   async getRoleOptionList(): Promise<RoleOptionListResponse> {
     const roles = await this.roleRepo.find({
-      select: ['id', 'name', 'code', 'roleSource', 'description'],
+      select: [
+        'id',
+        'name',
+        'code',
+        'roleSource',
+        'description',
+        'organization',
+        'organizationType',
+      ],
+      relations: ['organization', 'organizationType'],
       order: { name: 'ASC' },
     });
     return {
@@ -355,6 +364,8 @@ export class RoleService {
         code: r.code,
         roleSource: r.roleSource,
         description: r.description,
+        organizationId: r.organization?.id,
+        organizationTypeId: r.organizationType?.id,
       })),
     };
   }

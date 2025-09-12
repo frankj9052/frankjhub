@@ -3,10 +3,15 @@ import { Router } from 'express';
 import { requirePermission } from '../common/middlewares/requirePermission';
 import { buildPermissionName } from '../codecs/permissionCodec';
 import { validateRequest } from '../common/middlewares/validateRequest';
-import { idParamsSchema, userOrganizationRoleCreateRequestSchema } from '@frankjhub/shared-schema';
+import {
+  idParamsSchema,
+  userOrganizationRoleCreateRequestSchema,
+  userOrganizationRoleUpdateRequestSchema,
+} from '@frankjhub/shared-schema';
 import {
   createUserOrganizationRoleController,
   getUserOrganizationRoleByUserIdController,
+  updateUserOrganizationRoleController,
 } from './userOrganizationRole.controller';
 
 const router = Router();
@@ -20,7 +25,9 @@ router.post(
 
 router.patch(
   '/user-organization-role/update',
-  requirePermission(buildPermissionName('userOrganizationRole', ['update']))
+  requirePermission(buildPermissionName('userOrganizationRole', ['update'])),
+  validateRequest({ body: userOrganizationRoleUpdateRequestSchema }),
+  updateUserOrganizationRoleController
 );
 
 router.get(

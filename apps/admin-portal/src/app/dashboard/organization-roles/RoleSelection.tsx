@@ -67,11 +67,28 @@ export const RoleSelection = () => {
     }
   }, [selectedOrg, userOrgRole?.organizations]);
 
+  const selectedIds = useMemo(() => {
+    return new Set<string>(roleList?.map(r => r.id) ?? []);
+  }, [roleList]);
+
+  const selectedOrgTypeId = useMemo(() => {
+    return userOrgRole?.organizations.find(o => o.id === selectedOrg)?.orgTypeId ?? null;
+  }, [userOrgRole, selectedOrg]);
+
   const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
-    const data = roleOptionList ?? [];
-    const excludeIds = new Set(roleList?.map(r => r.id));
-    return data
-      .filter(role => !excludeIds.has(role.id))
+    if (!roleOptionList?.length) return [];
+    return roleOptionList
+      .filter(role => {
+        // 已选过的在roleList里的排除
+        if (selectedIds.has(role.id)) return false;
+
+        // 只保留属于当前org或属于当前orgType的
+        const isBelongSelectedOrg = role.organizationId === selectedOrg;
+        const isBelongSelectedOrgType =
+          selectedOrgTypeId !== null && role.organizationTypeId === selectedOrgTypeId;
+
+        return isBelongSelectedOrg || isBelongSelectedOrgType;
+      })
       .map(role => ({
         label: (
           <div>
@@ -79,9 +96,9 @@ export const RoleSelection = () => {
           </div>
         ),
         key: role.id,
-        textValue: role.code,
+        textValue: `${role.name} ${role.code}`,
       }));
-  }, [roleList, roleOptionList]);
+  }, [roleOptionList, selectedIds, selectedOrg, selectedOrgTypeId]);
 
   // fetch role option list
   useEffect(() => {
@@ -99,6 +116,7 @@ export const RoleSelection = () => {
       shouldTouch: true,
     });
   };
+
   return (
     <div
       className={clsx([
@@ -130,7 +148,7 @@ export const RoleSelection = () => {
           onInputChange={value => {
             dispatch(userOrganizationRoleSlice.actions.setCreateRoleInput(value));
           }}
-          isDisabled={!roleList || roleList.length === 0}
+          isDisabled={!selectedOrg}
         />
         <FrankButton
           variant="solid"
