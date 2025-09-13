@@ -212,7 +212,7 @@ export class UserOrganizationRoleService {
         ? existing.filter(e => !newSet.has(`${e.organization.id}::${e.role.id}`))
         : [];
 
-      const roleMap = new Map();
+      let roleMap = new Map();
       // orgType / org 约束
       if (toInsertTuples.length > 0) {
         const orgIds = Array.from(new Set(toInsertTuples.map(t => t.organizationId)));
@@ -233,7 +233,7 @@ export class UserOrganizationRoleService {
           .leftJoinAndSelect('r.organization', 'ro')
           .where('r.id IN (:...ids)', { ids: roleIds })
           .getMany();
-        const roleMap = new Map(roles.map(r => [r.id, r]));
+        roleMap = new Map(roles.map(r => [r.id, r]));
 
         const errors: string[] = [];
 
@@ -292,12 +292,13 @@ export class UserOrganizationRoleService {
       if (toInsertTuples.length > 0) {
         await uorRepo.upsert(
           toInsertTuples.map(x => {
-            const role = 123;
+            const role = roleMap.get(x.roleId);
+            const code = role?.code ?? 'UNKNOWN';
             return {
               user: { id: userId },
               organization: { id: x.organizationId },
               role: { id: x.roleId },
-              name: buildFullUserOrgRoleName(userId, x.organizationId, x.roleId),
+              name: buildFullUserOrgRoleName(userId, x.organizationId, code),
               updatedBy,
             };
           }),
@@ -320,7 +321,7 @@ export class UserOrganizationRoleService {
           },
         },
       });
-      log.info('Roles assigned (replace=%s) by user %s', replaceAll, updatedBy);
+      log.info(`Roles assigned (replace=${replaceAll}) by user ${updatedBy}`);
       return {
         status: 'success',
         message: 'Roles assigned successfully!',
