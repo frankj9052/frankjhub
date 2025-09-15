@@ -92,6 +92,8 @@
             "-r",
             "tsconfig-paths/register",
             "-r",
+            "./apps/main-server/scripts/register-pgvector.cjs",
+            "-r",
             "reflect-metadata",
             "./node_modules/typeorm/cli.js",
             "-d",

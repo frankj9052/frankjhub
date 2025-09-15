@@ -2,3 +2,8 @@ export * from './gender.enum';
 export * from './honorific.enum';
 export * from './order.enum';
 export * from './roleSource.enum';
+export * from './phone_type.enum';
+export * from './email_type.enum';
+export * from './languages.enum';
+export * from './amenities.enum';
+export * from './data_source.enum';
