@@ -94,11 +94,11 @@ export class Clinic extends BaseEntity {
   @Column('text', { name: 'formatted_address', nullable: true })
   formattedAddress?: string | null;
 
-  //   地图平台的Place/Location ID(google: place_id)
+  // 地图平台的Place/Location ID(google: place_id)
   @Column('varchar', { name: 'place_id', length: 120, nullable: true })
   placeId?: string | null;
 
-  //   时区
+  // 时区
   @Column('varchar', { name: 'timezone', length: 60, nullable: true })
   timezone?: string | null;
 
@@ -181,7 +181,7 @@ export class Clinic extends BaseEntity {
     default: 0,
     comment: '0.00 ~ 5.00',
   })
-  ratingAve!: string;
+  ratingAvg!: string;
 
   @Column('integer', { name: 'review_count', default: 0 })
   reviewCount!: number;
@@ -217,7 +217,22 @@ export class Clinic extends BaseEntity {
 
   // ====== 向量检索(pgvector) ======
   // 1536 维向量(pgvector扩展)
-  @Column({ type: 'vector' as any, length: 1536, name: 'embedding', nullable: true })
+  @Column({
+    type: 'vector' as any,
+    length: 1536,
+    name: 'embedding',
+    nullable: true,
+    transformer: {
+      to: (value: number[] | null) => (value ? `[${value.join(',')}]` : null),
+      from: (value: string | null) =>
+        value
+          ? value
+              .replace(/^\[|\]$/g, '')
+              .split(',')
+              .map(Number)
+          : null,
+    },
+  })
   embedding?: number[] | null;
 
   // ====== 数据治理 ======

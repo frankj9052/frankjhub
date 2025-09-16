@@ -66,7 +66,7 @@ export const clinicSchema = z.object({
   specialties: z.array(clinicSpecialtySchema),
 
   /** —— 评分与口碑 —— */
-  ratingAve: z.string(), // 实体 numeric(3,2) → string
+  ratingAvg: z.string(), // 实体 numeric(3,2) → string
   reviewCount: z.number(),
 
   /** —— 媒体与内容 —— */
@@ -99,7 +99,7 @@ export const clinicRefSchema = clinicSchema.pick({
   city: true,
   province: true,
   postalCode: true,
-  ratingAve: true,
+  ratingAvg: true,
   reviewCount: true,
   services: true,
   languages: true,

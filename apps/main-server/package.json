@@ -55,10 +55,12 @@
         },
         "configurations": {
           "development": {
-            "buildTarget": "@frankjhub/main-server:build:development"
+            "buildTarget": "@frankjhub/main-server:build:development",
+            "runtimeArgs": ["--require", "./apps/main-server/scripts/register-pgvector.cjs"]
           },
           "production": {
-            "buildTarget": "@frankjhub/main-server:build:production"
+            "buildTarget": "@frankjhub/main-server:build:production",
+            "runtimeArgs": ["--require", "./apps/main-server/scripts/register-pgvector.cjs"]
           }
         }
       },

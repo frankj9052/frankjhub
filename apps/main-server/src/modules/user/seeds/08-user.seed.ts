@@ -38,7 +38,7 @@ export default class UserSeed extends BaseSeeder {
 
     const organization = await orgRepo.findOne({
       where: { name: SYSTEM_ORGANIZATIONS.PUBLIC.name },
-    }); // 你可以换成特定的组织或创建一个新的
+    }); // 可以换成特定的组织或创建一个新的
     const role = await roleRepo.findOne({
       where: {
         code: buildRoleCode(

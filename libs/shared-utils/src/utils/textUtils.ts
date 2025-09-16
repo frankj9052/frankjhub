@@ -16,9 +16,16 @@ const truncateString = (text?: string | null, num = 50): string | null => {
  * hello => Hello;
  * WORLD => World
  */
-function capitalize(word: string): string {
-  if (!word) return '';
-  return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+function capitalize(str: string): string {
+  if (!str) return '';
+
+  return str
+    .split(' ')
+    .map(word => {
+      if (!word) return ''; // 防止连续空格导致空字符串报错
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
 }
 
 /**

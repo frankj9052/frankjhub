@@ -6,7 +6,6 @@ import { baseEntitySchema } from '../../../modules/common';
 
 export const organizationRoleRefSchema = z.object({
   ...organizationRefSchema.shape,
-  id: z.string().uuid(),
   roles: z.array(
     roleRefSchema
       .pick({
@@ -17,10 +16,14 @@ export const organizationRoleRefSchema = z.object({
         roleSource: true,
       })
       .extend({
-        userOrganizationRole: baseEntitySchema.optional(),
+        userOrganizationRole: baseEntitySchema
+          .extend({
+            id: z.string().uuid(),
+            isActive: z.boolean().default(true).optional(),
+          })
+          .optional(),
       })
   ),
-  isActive: z.boolean().default(true).optional(),
 });
 
 export const userOrganizationRoleSchema = z.object({
