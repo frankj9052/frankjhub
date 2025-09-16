@@ -1,4 +1,13 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm';
+import {
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { buildPermissionName } from '../../codecs/permissionCodec';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Resource } from '../../resource/entities/Resource';
@@ -7,6 +16,9 @@ import { PermissionAction } from './PermissionAction';
 @Entity()
 @Index(['name'], { unique: true })
 export class Permission extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   // 命名规则：buildPermissionName
   @Column({ type: 'varchar', length: 512 })
   name!: string;

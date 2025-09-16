@@ -1,3 +1,5 @@
+import { z } from '../libs/z';
+
 export const LANGUAGES = {
   // 官方语言
   ENGLISH: 'english',
@@ -23,3 +25,4 @@ export const LANGUAGES = {
 } as const;
 
 export type Language = (typeof LANGUAGES)[keyof typeof LANGUAGES];
+export const languageSchema = z.nativeEnum(LANGUAGES);

@@ -1,4 +1,6 @@
-export const SPECIALTIES = {
+import { z } from '../../../libs/z';
+
+export const CLINIC_SPECIALTIES = {
   ALLERGY_IMMUNOLOGY: 'allergy_immunology',
   ANESTHESIOLOGY: 'anesthesiology',
   CARDIOLOGY: 'cardiology',
@@ -41,4 +43,5 @@ export const SPECIALTIES = {
   CLINICAL_GENETICS: 'clinical_genetics',
 } as const;
 
-export type Specialty = (typeof SPECIALTIES)[keyof typeof SPECIALTIES];
+export type ClinicSpecialty = (typeof CLINIC_SPECIALTIES)[keyof typeof CLINIC_SPECIALTIES];
+export const clinicSpecialtySchema = z.nativeEnum(CLINIC_SPECIALTIES);

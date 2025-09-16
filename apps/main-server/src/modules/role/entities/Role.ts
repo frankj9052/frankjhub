@@ -7,6 +7,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Organization } from '../../organization/entities/Organization';
@@ -19,6 +20,9 @@ import { RolePermission } from './RolePermission';
 @Index(['name', 'roleSource', 'organizationType', 'organization'], { unique: true })
 @Index(['code'], { unique: true })
 export class Role extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   @Column({ type: 'varchar', length: 255 })
   code!: string;
 

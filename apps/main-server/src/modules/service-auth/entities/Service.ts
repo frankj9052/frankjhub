@@ -1,9 +1,12 @@
-import { BeforeInsert, BeforeUpdate, Column, Entity } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import * as argon2 from 'argon2';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 export class Service extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   @Column({ type: 'varchar', length: 100, unique: true })
   serviceId!: string;
 

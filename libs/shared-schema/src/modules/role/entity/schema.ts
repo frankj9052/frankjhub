@@ -7,6 +7,7 @@ import { permissionRefSchema } from '../../../modules/permission';
 
 export const roleSchema = z.object({
   ...baseEntitySchema.shape,
+  id: z.string().uuid(),
   code: z.string().max(255),
   name: z.string().max(50),
   description: z.string().max(255).default('').optional(),
@@ -14,6 +15,7 @@ export const roleSchema = z.object({
   organizationType: organizationTypeRefSchema.optional(),
   organization: organizationRefSchema.optional(),
   permissions: z.array(permissionRefSchema).optional(),
+  isActive: z.boolean().default(true).optional(),
 });
 
 export const roleRefSchema = roleSchema.pick({

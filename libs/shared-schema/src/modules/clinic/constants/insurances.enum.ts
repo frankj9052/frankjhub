@@ -1,4 +1,6 @@
-export const INSURANCES = {
+import { z } from '../../../libs/z';
+
+export const HEALTH_INSURANCES = {
   // 政府医保
   OHIP: 'ohip',
 
@@ -16,4 +18,5 @@ export const INSURANCES = {
   COWAN: 'cowan',
 } as const;
 
-export type Insurance = (typeof INSURANCES)[keyof typeof INSURANCES];
+export type HealthInsurance = (typeof HEALTH_INSURANCES)[keyof typeof HEALTH_INSURANCES];
+export const healthInsuranceSchema = z.nativeEnum(HEALTH_INSURANCES);

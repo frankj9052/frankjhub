@@ -3,6 +3,7 @@ import { baseEntitySchema } from '../../../modules/common';
 
 export const contactSchema = z.object({
   ...baseEntitySchema.shape,
+  id: z.string().uuid(),
   name: z.string().trim().max(80).optional().or(z.literal('')),
   email: z
     .string()

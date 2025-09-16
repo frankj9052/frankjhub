@@ -1,3 +1,5 @@
+import { z } from '../../../libs/z';
+
 export const CLINIC_SERVICES = {
   // 眼科
   EYE_CARE: 'eye_care',
@@ -57,3 +59,4 @@ export const CLINIC_SERVICES = {
 } as const;
 
 export type ClinicService = (typeof CLINIC_SERVICES)[keyof typeof CLINIC_SERVICES];
+export const clinicServiceSchema = z.nativeEnum(CLINIC_SERVICES);

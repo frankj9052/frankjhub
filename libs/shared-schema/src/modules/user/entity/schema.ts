@@ -1,8 +1,10 @@
 import { z, zInfer } from '../../../libs/z';
 import { Gender } from '../../../enums/gender.enum';
 import { Honorific } from '../../../enums/honorific.enum';
+import { baseEntitySchema } from '../../../modules/common';
 
 export const userSchema = z.object({
+  ...baseEntitySchema.shape,
   /** 主键 UUID */
   id: z.string().uuid(),
 
@@ -33,14 +35,6 @@ export const userSchema = z.object({
   profileCompleted: z.boolean(),
   refreshToken: z.string().nullable(),
   sessionVersion: z.string(),
-
-  /** 审计时间字段（来自 BaseEntity） */
-  createdAt: z.string(),
-  createdBy: z.string().nullable(),
-  updatedAt: z.string(),
-  updatedBy: z.string().nullable(),
-  deletedAt: z.string().nullable(),
-  deletedBy: z.string().nullable(),
 });
 
 export const userRefSchema = userSchema.pick({

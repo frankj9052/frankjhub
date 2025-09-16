@@ -1,9 +1,12 @@
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 
 @Entity()
 export class Organization extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   @Column({ type: 'varchar', length: 255, unique: true })
   name!: string;
 

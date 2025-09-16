@@ -1,3 +1,5 @@
+import { z } from '../libs/z';
+
 export const DATA_SOURCE = {
   MANUAL: 'manual', // 手动录入
   GOOGLE: 'google', // Google 数据
@@ -9,3 +11,4 @@ export const DATA_SOURCE = {
 } as const;
 
 export type DataSource = (typeof DATA_SOURCE)[keyof typeof DATA_SOURCE];
+export const dataSourceSchema = z.nativeEnum(DATA_SOURCE);

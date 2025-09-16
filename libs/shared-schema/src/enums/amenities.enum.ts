@@ -1,3 +1,5 @@
+import { z } from '../libs/z';
+
 export const AMENITIES = {
   PARKING: 'parking', // 停车
   WHEELCHAIR_ACCESS: 'wheelchair_access', // 无障碍通道
@@ -14,3 +16,4 @@ export const AMENITIES = {
 } as const;
 
 export type Amenity = (typeof AMENITIES)[keyof typeof AMENITIES];
+export const amenitySchema = z.nativeEnum(AMENITIES);

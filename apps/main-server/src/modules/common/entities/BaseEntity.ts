@@ -1,15 +1,6 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, DeleteDateColumn, UpdateDateColumn } from 'typeorm';
 
 export abstract class BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
-
   /** 审计字段 —— 自动写入 */
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;

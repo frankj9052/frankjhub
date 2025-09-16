@@ -5,12 +5,14 @@ import { actionRefSchema } from '../../../modules/action';
 
 export const permissionSchema = z.object({
   ...baseEntitySchema.shape,
+  id: z.string().uuid(),
   name: z.string().max(512),
   description: z.string().max(255).optional().nullable(),
   fields: z.array(z.string()).optional().nullable(),
   condition: z.record(z.unknown()).optional().nullable(),
   resource: resourceRefSchema,
   actions: z.array(actionRefSchema),
+  isActive: z.boolean().default(true).optional(),
 });
 
 export const permissionRefSchema = permissionSchema.pick({

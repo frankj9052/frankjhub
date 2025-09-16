@@ -1,4 +1,12 @@
-import { Entity, Column, Index, BeforeInsert, BeforeUpdate, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  Index,
+  BeforeInsert,
+  BeforeUpdate,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 import { Gender } from '../../common/enums/gender.enum';
@@ -8,6 +16,9 @@ import { UserOrganizationRole } from '../../userOrganizationRole/entities/UserOr
 
 @Entity()
 export class User extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   @Index({ unique: true })
   @Column({ type: 'varchar', length: 100 })
   userName!: string;

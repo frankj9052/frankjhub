@@ -6,6 +6,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { Organization } from '../../organization/entities/Organization';
@@ -21,6 +22,9 @@ import { Role } from '../../role/entities/Role';
 @Index('ix_uor_org', ['organization'])
 @Index('ix_uor_role', ['role'])
 export class UserOrganizationRole extends BaseEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
   @Column({ type: 'varchar', length: 512, nullable: false })
   name!: string;
 
