@@ -1,4 +1,3 @@
-// apps/main-server/scripts/register-pgvector.cjs
 const { createRequire } = require('module');
 const path = require('node:path');
 const fs = require('node:fs');
@@ -47,7 +46,7 @@ const fs = require('node:fs');
           if (!this.withLengthColumnTypes.includes('vector')) {
             this.withLengthColumnTypes.push('vector');
           }
-        } catch (e) {
+        } catch {
           // 忽略
         }
       }
