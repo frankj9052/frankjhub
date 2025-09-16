@@ -6,9 +6,10 @@
  * 注：TypeORM 对 pgvector 没有内置类型守护，注意这样写法
  */
 
-import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { CLINIC_STATUS, ClinicStatus, EmailType, PhoneType } from '@frankjhub/shared-schema';
+import { Organization } from '../../organization/entities/Organization';
 
 @Entity()
 @Index('uq_clinic_slug', ['slug'], { unique: true })
@@ -19,6 +20,10 @@ export class Clinic extends BaseEntity {
   // 作为主键，外键指向organization
   @PrimaryColumn('uuid', { name: 'org_id' })
   orgId!: string;
+
+  @OneToOne(() => Organization, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'org_id' })
+  organization!: Organization;
 
   // 展示名（对外）
   @Column('varchar', { name: 'display_name', length: 255 })
@@ -42,7 +47,7 @@ export class Clinic extends BaseEntity {
     type: PhoneType;
     number: string;
     ext?: string;
-    contry_code?: string;
+    country_code?: string;
     is_public?: boolean;
   }> | null;
 
@@ -84,7 +89,7 @@ export class Clinic extends BaseEntity {
 
   // ISO-3166-1 alpha-2
   @Column('char', { name: 'country_code', length: 2, default: 'CA' })
-  contryCode!: string;
+  countryCode!: string;
 
   @Column('text', { name: 'formatted_address', nullable: true })
   formattedAddress?: string | null;
@@ -154,7 +159,7 @@ export class Clinic extends BaseEntity {
   @Column('boolean', { name: 'walk_in', default: false })
   walkIn!: boolean;
 
-  @Column('boolean', { name: 'teleHealth', default: false })
+  @Column('boolean', { name: 'telehealth', default: false })
   telehealth!: boolean;
 
   @Column('boolean', { name: 'emergency', default: false })

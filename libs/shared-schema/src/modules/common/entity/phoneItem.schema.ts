@@ -5,7 +5,7 @@ export const phoneItemSchema = z.object({
   type: phoneTypeSchema,
   number: z.string(),
   ext: z.string().optional(),
-  contry_code: z.string().optional(),
+  country_code: z.string().optional(),
   is_public: z.boolean().optional(),
 });
 
