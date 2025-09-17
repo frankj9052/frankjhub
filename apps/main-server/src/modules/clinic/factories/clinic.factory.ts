@@ -27,17 +27,7 @@ function randomNorthYorkLat() {
   return 43.73 + Math.random() * (43.82 - 43.73);
 }
 function randomNorthYorkLng() {
-  return -79.51 + Math.random() * (-79.32 + 79.51); // 注意：负数加法
-}
-
-/** 生成 6 位小数的字符串 */
-function to6Decimals(n: number) {
-  return n.toFixed(6);
-}
-
-/** 生成 PostGIS WKT（geography(Point,4326)） */
-function toWkt(lng: number, lat: number) {
-  return `SRID=4326;POINT(${lng.toFixed(6)} ${lat.toFixed(6)})`;
+  return -79.51 + Math.random() * (-79.32 + 79.51);
 }
 
 const serviceBuckets = Object.values(CLINIC_SERVICES).map(service => [service]);
@@ -129,9 +119,12 @@ export default setSeederFactory(Clinic, () => {
   clinic.timezone = 'America/Toronto';
 
   //   地理
-  clinic.lat = to6Decimals(lat);
-  clinic.lng = to6Decimals(lng);
-  clinic.location = toWkt(lng, lat); // SRID=4326;POINT(lng lat)
+  clinic.lat = lat.toFixed(6);
+  clinic.lng = lng.toFixed(6);
+  clinic.location = {
+    type: 'Point',
+    coordinates: [lng, lat],
+  };
 
   // 营业时间
   clinic.openHours = {

@@ -2,6 +2,7 @@ import {
   amenityItemSchema,
   baseEntitySchema,
   emailItemSchema,
+  geoJSONPointSchema,
   openHoursSchema,
   phoneItemSchema,
 } from '../../../modules/common';
@@ -47,7 +48,7 @@ export const clinicSchema = z.object({
   /** —— 地理位置 —— */
   lat: z.string().nullable().optional(), // 实体里 numeric 映射 string
   lng: z.string().nullable().optional(),
-  location: z.any().nullable().optional(), // geography(Point,4326)，视实现可换成 GeoJSON Schema
+  location: geoJSONPointSchema.nullable().optional(),
 
   /** —— 营业时间/能力 —— */
   openHours: openHoursSchema.nullable().optional(),

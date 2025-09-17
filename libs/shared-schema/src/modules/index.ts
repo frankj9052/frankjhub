@@ -11,3 +11,4 @@ export * from './role';
 export * from './contact';
 export * from './userOrganizationRole';
 export * from './clinic';
+export * from './invitation';
