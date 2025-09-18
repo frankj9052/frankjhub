@@ -11,6 +11,7 @@ import { Organization } from '../../organization/entities/Organization';
 import { Role } from '../../role/entities/Role';
 import { INVITATION_STATUS, InvitationStatus } from '@frankjhub/shared-schema';
 import { User } from '../../user/entities/User';
+import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 @Index('ix_inv_org', ['organization'])
@@ -19,7 +20,7 @@ import { User } from '../../user/entities/User';
 @Index('ix_inv_expires_at', ['expiresAt'])
 @Index('ix_inv_token_hash', ['tokenHash']) // 验证时快速定位
 @Unique('uq_inv_pending_org_email_role', ['organization', 'email', 'targetRole']) // 防止重复发相同邀请
-export class Invitation {
+export class Invitation extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -60,7 +61,7 @@ export class Invitation {
   acceptedUser?: User | null;
 
   @Column({ type: 'uuid', nullable: true })
-  acceptedUserId?: string | null;
+  acceptedUserId!: string | null;
 
   // 过期时间,3天
   @Column({ type: 'timestamptz' })
@@ -69,4 +70,8 @@ export class Invitation {
   // token 只存哈希, 明文 token 通过邮件链接下发
   @Column({ type: 'varchar', length: 255 })
   tokenHash!: string;
+
+  // 附加信息（发起原因，来源系统等）
+  @Column({ type: 'jsonb', nullable: true })
+  meta?: Record<string, unknown> | null;
 }

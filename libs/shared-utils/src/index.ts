@@ -15,3 +15,4 @@ export * from './utils/validationUtils';
 export * from './utils/updateEntityUtils';
 export * from './utils/cookieDomain.util';
 export * from './utils/heroui.utils';
+export * from './utils/token.util';

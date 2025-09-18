@@ -5,7 +5,7 @@ import { z, zInfer } from '../../../libs/z';
 export const baseEntitySchema = z.object({
   createdAt: z.string(),
   createdBy: z.string().max(255).nullable().optional(),
-  updatedAt: z.string(),
+  updatedAt: z.string().nullable().optional(),
   updatedBy: z.string().max(255).nullable().optional(),
   deletedAt: z.string().nullable().optional(),
   deletedBy: z.string().max(255).nullable().optional(),

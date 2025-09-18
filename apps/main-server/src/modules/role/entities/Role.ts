@@ -12,9 +12,9 @@ import {
 import { buildRoleCode } from '../../codecs/permissionCodec';
 import { Organization } from '../../organization/entities/Organization';
 import { BaseEntity } from '../../common/entities/BaseEntity';
-import { RoleSource } from '../../common/enums/roleSource.enum';
 import { OrganizationType } from '../../organizationType/entities/OrganizationType';
 import { RolePermission } from './RolePermission';
+import { RoleSource } from '@frankjhub/shared-schema';
 
 @Entity()
 @Index(['name', 'roleSource', 'organizationType', 'organization'], { unique: true })
