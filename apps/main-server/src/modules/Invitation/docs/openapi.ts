@@ -266,35 +266,3 @@ registry.registerPath({
     }),
   },
 });
-
-// expire-pending (internal/ops)
-registry.registerPath({
-  method: 'post',
-  path: '/invitation/expire-pending',
-  tags: ['Invitation'],
-  summary: 'Mark expired pending invitations',
-  description:
-    'Marks pending invitations as expired when their expiration time has passed. Typically triggered by a scheduled task or ops endpoint.',
-  security: [{ bearerAuth: [] }],
-  responses: {
-    200: {
-      description: 'Pending invitations expired if needed',
-      content: {
-        'application/json': {
-          schema: {
-            type: 'object',
-            properties: {
-              status: { type: 'string', example: 'success' },
-              message: { type: 'string', example: 'Pending invitations expired if needed' },
-            },
-            required: ['status', 'message'],
-          },
-        },
-      },
-    },
-    ...buildErrorResponses({
-      401: 'UnauthorizedError',
-      403: 'ForbiddenError',
-    }),
-  },
-});

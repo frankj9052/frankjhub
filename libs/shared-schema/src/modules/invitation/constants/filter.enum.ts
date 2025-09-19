@@ -1,4 +1,4 @@
-import { createFiltersSchema } from 'src/factories';
+import { createFiltersSchema } from '../../../factories';
 import { INVITATION_STATUS } from './status.enum';
 
 export const invitationFiltersSchema = createFiltersSchema({

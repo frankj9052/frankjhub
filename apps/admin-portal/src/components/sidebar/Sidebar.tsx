@@ -46,6 +46,11 @@ const sidebarData: SidebarDataType[] = [
         label: 'Organizations',
         src: '/dashboard/organizations',
       },
+      {
+        icon: <div>4</div>,
+        label: 'Invitations',
+        src: '/dashboard/invitations',
+      },
     ],
   },
   {

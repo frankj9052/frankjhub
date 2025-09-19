@@ -1,10 +1,11 @@
+import { Children, ClassName } from '@frankjhub/shared-ui-hero-ssr';
 import { DropdownTrigger } from '@heroui/react';
-import { ReactNode } from 'react';
 
 export interface FrankDropdownTriggerProps {
-  children: ReactNode;
+  children: Children;
+  className?: ClassName;
 }
 
-export const FrankDropdownTrigger = ({ children }: FrankDropdownTriggerProps) => {
-  return <DropdownTrigger>{children}</DropdownTrigger>;
+export const FrankDropdownTrigger = ({ children, className }: FrankDropdownTriggerProps) => {
+  return <DropdownTrigger className={className}>{children}</DropdownTrigger>;
 };

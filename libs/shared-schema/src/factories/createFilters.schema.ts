@@ -194,3 +194,15 @@ export function makeFiltersToolkit(filterDefs?: FilterDefsInput) {
     parse: (input: unknown) => (schema ? schema.parse(input) : input),
   };
 }
+
+// 小工具：只更新某个 key 的某个分组（any/all）
+export function upsertClause(
+  f: StructuredFilters,
+  group: 'any' | 'all',
+  key: 'status' | 'source',
+  values: string[]
+) {
+  const list = (f[group] ?? []).filter(c => c.key !== key);
+  if (values.length > 0) list.push({ key, values });
+  f[group] = list.length ? list : undefined;
+}

@@ -46,6 +46,9 @@ const baseSchema = z.object({
   JWT_SERVICE_ISSUER: z.string().default('jurong-auth'),
   SERVICE_AUTH_JWKS_URL: z.string().default('http://localhost:3100/api//.well-known/jwks.json'),
   SERVICE_AUTH_ISSUER: z.string().default('jurong-auth'),
+  // schedule jobs
+  ENABLE_SCHEDULERS: z.string().default('false').optional(),
+  ENABLE_INVITATION_EXPIRE: z.string().default('true').optional(),
 });
 
 // 如果没有 DATABASE_URL，就强制要求 host + user + db

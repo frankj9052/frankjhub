@@ -7,7 +7,9 @@ import { connectDatabase } from './infrastructure/database';
 import AppDataSource from './config/data-source';
 import { closeRedisConnection, connectRedis, redisClient } from './infrastructure/redis';
 import * as Sentry from '@sentry/node';
+import { registerAllJobs } from './jobs';
 
+const jobRunners: Array<{ close: () => Promise<void> }> = []; // 保存所有 runner 以便关闭
 let server: Server;
 let isShuttingDown = false;
 
@@ -27,6 +29,12 @@ async function startServer() {
 
     // 2. 初始化 Redis
     await connectRedis();
+
+    // 2.5 注册 BullMQ 计划任务
+    if (redisClient) {
+      const runners = await registerAllJobs(redisClient);
+      jobRunners.push(...runners);
+    }
 
     // 3. 创建并配置 Express 应用
     const app = await createApp();
@@ -77,6 +85,11 @@ async function shutdown(exitCode: number) {
         server.close(err => (err ? reject(err) : resolve()));
       });
       serverLogger.info('🛑 HTTP server closed.');
+    }
+    // 关闭 BullMQ（先关 worker/queue，再断开 redis）
+    if (jobRunners.length) {
+      await Promise.allSettled(jobRunners.map(r => r.close()));
+      serverLogger.info('🛑 Job runners closed.');
     }
     if (redisClient) {
       await closeRedisConnection();

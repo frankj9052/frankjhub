@@ -6,7 +6,6 @@ import {
   revokeInvitationController,
   getInvitationListController,
   hardDeleteInvitationController,
-  expirePendingInvitationsController,
 } from './invitation.controller';
 
 import {
@@ -88,17 +87,6 @@ router.delete(
   ),
   validateRequest({ query: idParamsSchema }),
   hardDeleteInvitationController
-);
-
-/**
- * 过期处理（通常后台任务调用）
- */
-router.post(
-  '/invitation/expire-pending',
-  requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.UPDATE.name])
-  ),
-  expirePendingInvitationsController
 );
 
 // Exported register function

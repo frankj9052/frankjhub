@@ -85,6 +85,7 @@
     "argon2": "0.43.0",
     "autoprefixer": "10.4.13",
     "axios": "1.9.0",
+    "bullmq": "5.58.7",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "connect-redis": "8.1.0",

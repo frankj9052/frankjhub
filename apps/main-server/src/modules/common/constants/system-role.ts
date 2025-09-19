@@ -1,4 +1,4 @@
-import { RoleSource } from '../enums/roleSource.enum';
+import { RoleSource } from '@frankjhub/shared-schema';
 import { SYSTEM_ORGANIZATION_TYPES } from './system-organizationTypes';
 import { SYSTEM_ORGANIZATIONS } from './system-organizations';
 

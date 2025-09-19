@@ -4,14 +4,18 @@ import {
   EndContent,
   ErrorMessage,
   Height,
+  InputClassNames,
+  IsClearable,
   IsInvalid,
   IsRequired,
   Label,
   LabelPlacement,
   Name,
+  OnClear,
   Placeholder,
   Radius,
   Size,
+  StartContent,
   StringChangeHandler,
   StringValue,
   TabIndex,
@@ -42,6 +46,10 @@ export interface FrankInputProps {
   tabIndex?: TabIndex;
   autoComplete?: AutoComplete;
   className?: ClassName;
+  isClearable?: IsClearable;
+  classNames?: InputClassNames;
+  startContent?: StartContent;
+  onClear?: OnClear;
 }
 
 export const FrankInput = ({
@@ -65,6 +73,10 @@ export const FrankInput = ({
   tabIndex,
   autoComplete,
   className,
+  isClearable,
+  classNames,
+  startContent,
+  onClear,
 }: FrankInputProps) => {
   return (
     <Input
@@ -88,6 +100,10 @@ export const FrankInput = ({
       tabIndex={tabIndex}
       autoComplete={autoComplete}
       className={className}
+      isClearable={isClearable}
+      classNames={classNames}
+      startContent={startContent}
+      onClear={onClear}
     />
   );
 };

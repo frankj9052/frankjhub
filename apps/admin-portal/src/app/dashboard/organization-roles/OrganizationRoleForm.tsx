@@ -50,9 +50,12 @@ export const OrganizationRoleForm = () => {
   };
 
   const onSubmit = methods.handleSubmit(async data => {
-    console.log('submit ===> ', data);
     const result = await updateUserOrganizationRoleByUserId(data);
-    console.log('result check ===> ', result);
+    if (result.status === 'success') {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
+    }
     router.refresh();
   }, onError);
 

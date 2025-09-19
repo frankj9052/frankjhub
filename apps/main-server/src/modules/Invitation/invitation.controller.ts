@@ -137,23 +137,3 @@ export const hardDeleteInvitationController: RequestHandler = async (
     next(error);
   }
 };
-
-/**
- * 触发过期标记：可供内部任务/管理台触发（也可以用 cron/队列执行）
- * - 仅平台/管理员可用（这里只校验登录；更细权限由路由/中间件把控）
- */
-export const expirePendingInvitationsController: RequestHandler = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    await invitationService.expirePendingInvitations();
-    res.status(200).json({
-      status: 'success',
-      message: 'Pending invitations expired if needed',
-    });
-  } catch (error) {
-    next(error);
-  }
-};

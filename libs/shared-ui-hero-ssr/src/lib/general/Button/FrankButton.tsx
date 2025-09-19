@@ -11,6 +11,7 @@ import {
   Size,
   IsIconOnly,
   IsDisabled,
+  EndContent,
 } from '../../../types/props.types';
 
 export interface FrankButtonProps {
@@ -25,6 +26,7 @@ export interface FrankButtonProps {
   color?: ButtonColor;
   isIconOnly?: IsIconOnly;
   isDisabled?: IsDisabled;
+  endContent?: EndContent;
 }
 
 export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
@@ -41,6 +43,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
       color,
       isIconOnly,
       isDisabled,
+      endContent,
       ...props
     },
     ref
@@ -59,6 +62,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
         color={color}
         isIconOnly={isIconOnly}
         isDisabled={isDisabled}
+        endContent={endContent}
       >
         {children}
       </Button>

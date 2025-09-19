@@ -164,14 +164,32 @@ export type InputType =
   | 'image'
   | 'hidden'
   | undefined;
+export type InputClassNames =
+  | SlotsToClasses<
+      | 'label'
+      | 'errorMessage'
+      | 'input'
+      | 'base'
+      | 'description'
+      | 'mainWrapper'
+      | 'inputWrapper'
+      | 'innerWrapper'
+      | 'clearButton'
+      | 'helperWrapper'
+    >
+  | undefined;
 export type ButtonType = 'button' | 'submit' | 'reset' | undefined;
 export type IsLoading = boolean | undefined;
 export type Status = 'idle' | 'loading' | 'failed';
 export type AriaLabel = string | undefined;
+export type CloseOnSelect = boolean | undefined;
 export type IsDisabled = boolean | undefined;
 export type IsIconOnly = boolean | undefined;
 export type TextValue = string | undefined;
-
+export type IsClearable = boolean | undefined;
+export type StartContent = ReactNode | undefined;
+export type OnClear = () => void | undefined;
+export type DisallowEmptySelection = boolean | undefined;
 // Table
 export type IsCompact = boolean | undefined;
 export type RemoveWrapper = boolean | undefined;

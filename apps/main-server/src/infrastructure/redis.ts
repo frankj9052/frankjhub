@@ -7,6 +7,7 @@ export let isRedisAvailable = true;
 
 export const redisClient = new Redis(env.REDIS_URL, {
   tls: {},
+  maxRetriesPerRequest: null,
   retryStrategy(times) {
     const delay = Math.min(times * 3000, 10000);
     logger.warn(`⚠️ Reconnect attempt #${times}, retrying in ${delay} ms`);

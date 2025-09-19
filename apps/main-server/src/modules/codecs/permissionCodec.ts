@@ -1,7 +1,5 @@
 // 它不是通用工具，而是一个DSL 构造器（领域专用语言的编码器）
-// src/modules/rbac/utils/permissionCodec.ts
-
-import { RoleSource } from '../common/enums/roleSource.enum';
+import { RoleSource } from '@frankjhub/shared-schema';
 
 /** -----------------------------
  * Permission Name <==> Parsed Form

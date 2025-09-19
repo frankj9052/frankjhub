@@ -1,6 +1,7 @@
 import {
   actionSlice,
   currentUserSlice,
+  invitationSlice,
   organizationSlice,
   organizationTypeSlice,
   permissionSlice,
@@ -22,4 +23,5 @@ export const reducer = {
   permission: permissionSlice.reducer,
   role: roleSlice.reducer,
   userOrganizationRole: userOrganizationRoleSlice.reducer,
+  invitation: invitationSlice.reducer,
 };
