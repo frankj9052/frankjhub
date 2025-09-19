@@ -1,4 +1,3 @@
-// NotAuthorizedError.ts
 import { ErrorDetails } from '@frankjhub/shared-schema';
 import { BaseError } from './BaseError';
 import { StatusCodes } from 'http-status-codes';

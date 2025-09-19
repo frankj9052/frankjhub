@@ -4,6 +4,7 @@ import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import {
   acceptInvitationRequestSchema,
   idParamsSchema,
+  invitationListRequestSchema,
   issueInvitationRequestSchema,
 } from '@frankjhub/shared-schema';
 
@@ -92,6 +93,66 @@ export const revokeInvitationController: RequestHandler = async (
 
     const result = await invitationService.revokeInvitation(parsed.id);
     res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 邀请列表：支持搜索、筛选、分页、排序
+ */
+export const getInvitationListController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const raw = req.method === 'GET' ? req.query : req.body;
+    const parsed = invitationListRequestSchema.parse(raw);
+
+    const result = await invitationService.getInvitationList(parsed);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 硬删除邀请：物理删除（仅用于数据纠错/合规清理）
+ */
+export const hardDeleteInvitationController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const performedBy = req.currentUser?.userName;
+    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
+
+    const parsed = idParamsSchema.parse(req.query);
+
+    const result = await invitationService.hardDeleteInvitation(parsed.id);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 触发过期标记：可供内部任务/管理台触发（也可以用 cron/队列执行）
+ * - 仅平台/管理员可用（这里只校验登录；更细权限由路由/中间件把控）
+ */
+export const expirePendingInvitationsController: RequestHandler = async (
+  _req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    await invitationService.expirePendingInvitations();
+    res.status(200).json({
+      status: 'success',
+      message: 'Pending invitations expired if needed',
+    });
   } catch (error) {
     next(error);
   }

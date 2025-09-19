@@ -35,6 +35,22 @@ export const SYSTEM_RESOURCES = {
     name: 'rolePermission',
     description: 'Link roles to their allowed permissions',
   },
+  CLINIC: {
+    name: 'clinic',
+    description: 'Manage clinics, their details, and settings',
+  },
+  SERVICE: {
+    name: 'service',
+    description: 'Define and manage services offered by clinics or organizations',
+  },
+  SERVICE_ROLE: {
+    name: 'serviceRole',
+    description: 'Assign roles and permissions specific to services',
+  },
+  INVITATION: {
+    name: 'invitation',
+    description: 'Handle user invitations to organizations, clinics, or services',
+  },
 } as const;
 
 export type SystemResourceName = (typeof SYSTEM_RESOURCES)[keyof typeof SYSTEM_RESOURCES]['name'];
