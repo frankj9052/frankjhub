@@ -23,12 +23,17 @@ import { UserService } from '../user/user.service';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { applyFilters } from '../common/utils/applyFilters';
+import { Role } from '../role/entities/Role';
+import { Organization } from '../organization/entities/Organization';
+import { ForbiddenError } from '../common/errors/ForbiddenError';
 
 const userOrgRoleService = new UserOrganizationRoleService();
 const userService = new UserService();
 
 export class InvitationService {
   private invitationRepo = AppDataSource.getRepository(Invitation);
+  private orgRepo = AppDataSource.getRepository(Organization);
+  private roleRepo = AppDataSource.getRepository(Role);
 
   buildInvitation(inv: Invitation): InvitationDto {
     return {
@@ -61,6 +66,24 @@ export class InvitationService {
   /** 生成明文token, 返回给调用放用于发邮件，与其哈希入库 */
   async issueInvitation(data: IssueInvitationRequest): Promise<IssueInvitationResponse> {
     const { organizationId, targetRoleId, email, inviterUserId, ttlHours, meta } = data;
+    if (!inviterUserId)
+      throw new ForbiddenError('Missing inviter user identity — cannot issue invitation');
+
+    // 确保role属于org或者orgType类
+    const org = await this.orgRepo.findOne({
+      where: { id: organizationId, isActive: true },
+      select: { id: true, orgType: true },
+      relations: { orgType: true },
+    });
+    if (!org) throw new NotFoundError('Organization does not exist!');
+    const role = await this.roleRepo.findOne({
+      where: { id: targetRoleId, isActive: true },
+      select: { organization: true, organizationType: true },
+      relations: { organization: true, organizationType: true },
+    });
+    if (!role) throw new NotFoundError('Role does not exist!');
+    if (role.organization?.id !== org.id && role.organizationType?.id !== org.orgType.id)
+      throw new BadRequestError('Role cannot be issued in this organization');
 
     const normalizedEmail = email.trim().toLowerCase();
 
@@ -72,10 +95,13 @@ export class InvitationService {
 
     const inv = this.invitationRepo.create({
       organizationId,
+      organization: { id: organizationId },
       targetRoleId,
+      targetRole: { id: targetRoleId },
       email: normalizedEmail,
       status: INVITATION_STATUS.PENDING,
       inviterUserId,
+      inviterUser: { id: inviterUserId },
       acceptedUserId: null,
       expiresAt: addHours(new Date(), ttlHours ?? 72),
       tokenHash,
@@ -196,7 +222,7 @@ export class InvitationService {
       .createQueryBuilder()
       .update(Invitation)
       .set({ status: INVITATION_STATUS.EXPIRED })
-      .where(`status = :pending AND "expire_at" <= now()`, { pending: INVITATION_STATUS.PENDING })
+      .where(`status = :pending AND "expires_at" <= now()`, { pending: INVITATION_STATUS.PENDING })
       .execute();
   }
 

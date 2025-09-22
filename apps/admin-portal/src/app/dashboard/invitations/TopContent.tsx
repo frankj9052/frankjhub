@@ -112,6 +112,33 @@ export const TopContent = () => {
                 ))}
               </FrankDropdownMenu>
             </FrankDropdown>
+
+            {/* columns selection */}
+            <FrankDropdown>
+              <FrankDropdownTrigger className="hidden sm:flex">
+                <FrankButton
+                  endContent={<MdKeyboardArrowDown className="text-small" />}
+                  size="sm"
+                  variant="flat"
+                >
+                  Columns
+                </FrankButton>
+              </FrankDropdownTrigger>
+              <FrankDropdownMenu
+                disallowEmptySelection
+                ariaLabel="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={new Set(visibleColumns) as SharedSelection}
+                selectionMode="multiple"
+                onSelectionChange={handleColumnSelectionChange}
+              >
+                {columns.map(column => (
+                  <FrankDropdownItem key={column.uid} textValue={column.uid} className="capitalize">
+                    {column.name}
+                  </FrankDropdownItem>
+                ))}
+              </FrankDropdownMenu>
+            </FrankDropdown>
           </div>
         </div>
 

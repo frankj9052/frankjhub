@@ -4,6 +4,7 @@ import {
   invitationDataExample,
   InvitationListPageData,
   InvitationListRequest,
+  InvitationOrderByFIelds,
   InvitationStatus,
   LabeledEnumItem,
   makeFiltersToolkit,
@@ -25,6 +26,7 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'inviterUserName',
   'acceptedUserName',
   'expiresAt',
+  'actions',
 ];
 
 const sortableFields = new Set(Object.values(INVITATION_ORDER_BY_FIELDS));
@@ -37,6 +39,7 @@ const columns = generateColumnsFromData(invitationDataExample, {
       sortable: false,
     },
   ],
+  exclude: ['organizationId'],
 });
 const statusFilters = getLabeledEnumList(INVITATION_STATUS);
 const initialStatusFilter = {
@@ -127,6 +130,12 @@ export const invitationSlice = createSlice({
     },
     cleanLimit: state => {
       state.pagination.limit = 10;
+    },
+    setOrder: (state, action: PayloadAction<OrderEnum>) => {
+      state.pagination.order = action.payload;
+    },
+    setOrderBy: (state, action: PayloadAction<InvitationOrderByFIelds>) => {
+      state.pagination.orderBy = action.payload;
     },
   },
   extraReducers: builder => {

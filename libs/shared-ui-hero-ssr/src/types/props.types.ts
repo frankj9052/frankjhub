@@ -30,6 +30,7 @@ export type ButtonVariant =
   | 'shadow'
   | 'ghost'
   | undefined;
+export type PaginationVariant = 'flat' | 'faded' | 'bordered' | 'light' | undefined;
 export type Radius = 'sm' | 'md' | 'lg' | 'none' | 'full' | undefined;
 export type IsInvalid = boolean | undefined;
 export type EndContent = ReactNode | undefined;
@@ -63,6 +64,7 @@ export const TABLE_COLORS = BUTTON_COLORS;
 
 export type ButtonColor = (typeof BUTTON_COLORS)[number] | undefined;
 export type TableColor = ButtonColor;
+export type GeneralColor = ButtonColor;
 export type Placement =
   | 'bottom'
   | 'bottom-end'
@@ -246,3 +248,22 @@ export type OnPress = (e: PressEvent) => void | undefined;
 // value & value change
 export type StringValue = string | undefined;
 export type StringChangeHandler = (value: string) => void | undefined;
+
+// pagination
+export type Total = number;
+export type ShowControls = boolean | undefined;
+export type PaginationClassNames =
+  | SlotsToClasses<
+      | 'base'
+      | 'wrapper'
+      | 'item'
+      | 'prev'
+      | 'next'
+      | 'cursor'
+      | 'forwardIcon'
+      | 'ellipsis'
+      | 'chevronNext'
+    >
+  | undefined;
+export type Page = number | undefined;
+export type PaginationOnChange = (page: number) => void | undefined;

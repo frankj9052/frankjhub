@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AutoMigration1758051637779 implements MigrationInterface {
-  name = 'AutoMigration1758051637779';
+export class AutoMigration1758567235807 implements MigrationInterface {
+  name = 'AutoMigration1758567235807';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -80,6 +80,17 @@ export class AutoMigration1758051637779 implements MigrationInterface {
     await queryRunner.query(`CREATE INDEX "ix_clinic_city" ON "clinic" ("city") `);
     await queryRunner.query(`CREATE UNIQUE INDEX "uq_clinic_slug" ON "clinic" ("slug") `);
     await queryRunner.query(
+      `CREATE TYPE "public"."invitation_status_enum" AS ENUM('pending', 'accepted', 'revoked', 'expired')`
+    );
+    await queryRunner.query(
+      `CREATE TABLE "invitation" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "organization_id" uuid NOT NULL, "target_role_id" uuid NOT NULL, "email" character varying(320) NOT NULL, "status" "public"."invitation_status_enum" NOT NULL DEFAULT 'pending', "inviter_user_id" uuid, "accepted_user_id" uuid, "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL, "token_hash" character varying(255) NOT NULL, "meta" jsonb, "organizationId" uuid NOT NULL, "targetRoleId" uuid NOT NULL, "inviterUserId" uuid NOT NULL, "acceptedUserId" uuid, CONSTRAINT "uq_inv_pending_org_email_role" UNIQUE ("organizationId", "email", "targetRoleId"), CONSTRAINT "PK_beb994737756c0f18a1c1f8669c" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(`CREATE INDEX "ix_inv_token_hash" ON "invitation" ("token_hash") `);
+    await queryRunner.query(`CREATE INDEX "ix_inv_expires_at" ON "invitation" ("expires_at") `);
+    await queryRunner.query(`CREATE INDEX "ix_inv_status" ON "invitation" ("status") `);
+    await queryRunner.query(`CREATE INDEX "ix_inv_email" ON "invitation" ("email") `);
+    await queryRunner.query(`CREATE INDEX "ix_inv_org" ON "invitation" ("organizationId") `);
+    await queryRunner.query(
       `ALTER TABLE "organization" ADD CONSTRAINT "FK_32a98b1f3966745ebfd18f7955d" FOREIGN KEY ("org_type_id") REFERENCES "organization_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
@@ -121,9 +132,33 @@ export class AutoMigration1758051637779 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "clinic" ADD CONSTRAINT "FK_d7f10e5499997eba0b14b785d58" FOREIGN KEY ("org_id") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" ADD CONSTRAINT "FK_5c00d7d515395f91bd1fee19f32" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" ADD CONSTRAINT "FK_6deb506a16c06dba549aabdabdc" FOREIGN KEY ("targetRoleId") REFERENCES "role"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" ADD CONSTRAINT "FK_9f587ec4753f1625058a9eb1c0b" FOREIGN KEY ("inviterUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" ADD CONSTRAINT "FK_c9adb0eb2ac2f96013551dd7dbb" FOREIGN KEY ("acceptedUserId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE NO ACTION`
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "invitation" DROP CONSTRAINT "FK_c9adb0eb2ac2f96013551dd7dbb"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" DROP CONSTRAINT "FK_9f587ec4753f1625058a9eb1c0b"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" DROP CONSTRAINT "FK_6deb506a16c06dba549aabdabdc"`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "invitation" DROP CONSTRAINT "FK_5c00d7d515395f91bd1fee19f32"`
+    );
     await queryRunner.query(
       `ALTER TABLE "clinic" DROP CONSTRAINT "FK_d7f10e5499997eba0b14b785d58"`
     );
@@ -162,6 +197,13 @@ export class AutoMigration1758051637779 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "organization" DROP CONSTRAINT "FK_32a98b1f3966745ebfd18f7955d"`
     );
+    await queryRunner.query(`DROP INDEX "public"."ix_inv_org"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_inv_email"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_inv_status"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_inv_expires_at"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_inv_token_hash"`);
+    await queryRunner.query(`DROP TABLE "invitation"`);
+    await queryRunner.query(`DROP TYPE "public"."invitation_status_enum"`);
     await queryRunner.query(`DROP INDEX "public"."uq_clinic_slug"`);
     await queryRunner.query(`DROP INDEX "public"."ix_clinic_city"`);
     await queryRunner.query(`DROP INDEX "public"."ix_clinic_postal_code"`);
