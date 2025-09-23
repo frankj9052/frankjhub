@@ -300,4 +300,8 @@ export class InvitationService {
       data: this.buildInvitation(inv),
     };
   }
+
+  async sendInvitationEmail(id: string) {
+    console.log('hello');
+  }
 }

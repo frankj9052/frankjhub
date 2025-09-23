@@ -79,7 +79,6 @@ export const InvitationTable = () => {
   // revoke
   const handleRevoke = useCallback(
     async (id: string) => {
-      console.log('revoke the invitation', id);
       const result = await revokeInvitation(id);
       if (result.status === 'success') {
         toast.success(result.message);

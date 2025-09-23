@@ -49,6 +49,19 @@ const baseSchema = z.object({
   // schedule jobs
   ENABLE_SCHEDULERS: z.string().default('false').optional(),
   ENABLE_INVITATION_EXPIRE: z.string().default('true').optional(),
+  // resend
+  RESEND_API_KEY: z.string(),
+  RESEND_FROM_DEFAULT: z.string().default('Frankjhub <no-reply@frankjhub.com>').optional(),
+  RESEND_REPLY_TO_DEFAULT: z.string().default('support@frankjhub.com').optional(),
+  RESEND_WEBHOOK_SECRET: z.string().optional(),
+  EMAIL_ENABLE_QUEUE: z.string().default('true').optional(),
+  EMAIL_MAX_RETRY: z.string().default('3').optional(),
+  EMAIL_RATE_LIMIT_PER_MINUTE: z.string().default('120').optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().optional(),
+  SMTP_SECURE: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
 });
 
 // 如果没有 DATABASE_URL，就强制要求 host + user + db
