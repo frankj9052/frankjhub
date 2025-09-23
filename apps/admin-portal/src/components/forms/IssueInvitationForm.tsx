@@ -62,7 +62,6 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
 
   // submit
   const onSubmit = handleSubmit(async data => {
-    console.log('submit ===> ', data);
     const result = await issueInvitation(data);
     if (result.status === 'success') {
       toast.success(result.message ?? 'Invitation issued');

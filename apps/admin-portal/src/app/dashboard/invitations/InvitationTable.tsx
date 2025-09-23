@@ -22,7 +22,7 @@ import { InvitationDto, InvitationOrderByFIelds, OrderEnum } from '@frankjhub/sh
 import { formatShortDateTime } from '@frankjhub/shared-utils';
 import { HiDotsVertical } from 'react-icons/hi';
 import { getInvitationListAsync } from '@/libs/redux/slices/invitationSlice/thunk';
-import { hardDeleteInvitation } from '@/services/invitation.service';
+import { hardDeleteInvitation, revokeInvitation } from '@/services/invitation.service';
 import { toast } from 'react-toastify';
 
 export const InvitationTable = () => {
@@ -40,6 +40,7 @@ export const InvitationTable = () => {
         id: string;
         header: string;
         body: string;
+        onPress: () => void;
       }
     | undefined
   >(undefined);
@@ -62,9 +63,9 @@ export const InvitationTable = () => {
   };
 
   // 删除
-  const handleSoftDeleteClick = async () => {
-    if (openModal) {
-      const result = await hardDeleteInvitation(openModal.id);
+  const handleSoftDelete = useCallback(
+    async (id: string) => {
+      const result = await hardDeleteInvitation(id);
       if (result.status === 'success') {
         toast.success(result.message);
         setOpenModal(undefined);
@@ -72,60 +73,121 @@ export const InvitationTable = () => {
       } else {
         toast.error(String(result.message));
       }
-    }
+    },
+    [dispatch, pagination]
+  );
+  // revoke
+  const handleRevoke = useCallback(
+    async (id: string) => {
+      console.log('revoke the invitation', id);
+      const result = await revokeInvitation(id);
+      if (result.status === 'success') {
+        toast.success(result.message);
+        setOpenModal(undefined);
+        dispatch(getInvitationListAsync({ data: pagination }));
+      } else {
+        toast.error(String(result.message));
+      }
+    },
+    [dispatch, pagination]
+  );
+  // send
+  const handleSend = async (id: string) => {
+    console.log('send email', id);
   };
   // 渲染
-  const renderCell = useCallback((inv: InvitationDto, columnKey: Key): ReactNode => {
-    const cellValue = inv[columnKey as keyof InvitationDto];
+  const renderCell = useCallback(
+    (inv: InvitationDto, columnKey: Key): ReactNode => {
+      const cellValue = inv[columnKey as keyof InvitationDto];
 
-    switch (columnKey) {
-      case 'createdAt':
-      case 'updatedAt':
-      case 'deletedAt':
-      case 'expiresAt':
-        if (cellValue) {
-          return <div>{formatShortDateTime(new Date(String(cellValue)))}</div>;
-        }
-        return cellValue;
-      case 'meta':
-        return JSON.stringify(cellValue);
-      case 'actions':
-        return (
-          <div>
-            <div className="relative flex justify-end items-center gap-2">
-              <FrankDropdown className="bg-background border-1 border-default-200">
-                <FrankDropdownTrigger>
-                  <FrankButton isIconOnly radius="full" size="sm" variant="light">
-                    <HiDotsVertical className="text-default-400" />
-                  </FrankButton>
-                </FrankDropdownTrigger>
-                <FrankDropdownMenu>
-                  <FrankDropdownItem
-                    key="delete"
-                    textValue="delete"
-                    onPress={() => {
-                      setOpenModal({
-                        name: inv.email,
-                        id: inv.id,
-                        header: 'Delete',
-                        body: `Are you sure you want to delete invitation to: ${inv.email}?`,
-                      });
-                    }}
-                  >
-                    Delete
-                  </FrankDropdownItem>
-                </FrankDropdownMenu>
-              </FrankDropdown>
+      switch (columnKey) {
+        case 'createdAt':
+        case 'updatedAt':
+        case 'deletedAt':
+        case 'expiresAt':
+          if (cellValue) {
+            return <div>{formatShortDateTime(new Date(String(cellValue)))}</div>;
+          }
+          return cellValue;
+        case 'meta':
+          return JSON.stringify(cellValue);
+        case 'actions':
+          return (
+            <div>
+              <div className="relative flex justify-center items-center gap-2">
+                <FrankDropdown className="bg-background border-1 border-default-200">
+                  <FrankDropdownTrigger>
+                    <FrankButton isIconOnly radius="full" size="sm" variant="light">
+                      <HiDotsVertical className="text-default-400" />
+                    </FrankButton>
+                  </FrankDropdownTrigger>
+                  <FrankDropdownMenu>
+                    <FrankDropdownItem
+                      key="send_email"
+                      textValue="send_email"
+                      onPress={() => {
+                        setOpenModal({
+                          name: 'Send',
+                          id: inv.id,
+                          header: 'Send Email',
+                          body: `Are you sure you want to invite ${inv.email} as the role of ${inv.targetRoleName}?`,
+                          onPress: () => {
+                            handleSend(inv.id);
+                          },
+                        });
+                      }}
+                    >
+                      Send Email
+                    </FrankDropdownItem>
+                    <FrankDropdownItem
+                      key="revoke"
+                      textValue="revoke"
+                      onPress={() => {
+                        setOpenModal({
+                          name: 'Revoke',
+                          id: inv.id,
+                          header: 'revoke',
+                          body: `Are you sure you want to revoke invitation to: ${inv.email}?`,
+                          onPress: () => {
+                            handleRevoke(inv.id);
+                          },
+                        });
+                      }}
+                    >
+                      Revoke
+                    </FrankDropdownItem>
+                    <FrankDropdownItem
+                      className="text-danger"
+                      key="delete"
+                      textValue="delete"
+                      onPress={() => {
+                        setOpenModal({
+                          name: 'Delete',
+                          id: inv.id,
+                          header: 'Delete',
+                          body: `Are you sure you want to delete invitation to: ${inv.email}?`,
+                          onPress: () => {
+                            handleSoftDelete(inv.id);
+                          },
+                        });
+                      }}
+                    >
+                      Delete
+                    </FrankDropdownItem>
+                  </FrankDropdownMenu>
+                </FrankDropdown>
+              </div>
             </div>
-          </div>
-        );
-      default:
-        if (typeof cellValue === 'object' && cellValue !== null) {
-          return <span>{JSON.stringify(cellValue)}</span>;
-        }
-        return <span>{String(cellValue ?? '')}</span>;
-    }
-  }, []);
+          );
+        default:
+          if (typeof cellValue === 'object' && cellValue !== null) {
+            return <span>{JSON.stringify(cellValue)}</span>;
+          }
+          return <span>{String(cellValue ?? '')}</span>;
+      }
+    },
+    [handleSoftDelete, handleRevoke]
+  );
 
   // 初次拿数据
   useEffect(() => {
@@ -151,7 +213,7 @@ export const InvitationTable = () => {
           {column => (
             <FrankTableColumn
               key={column.uid}
-              align={column.uid === 'action' ? 'center' : 'start'}
+              align={column.uid === 'actions' ? 'center' : 'start'}
               allowsSorting={column.sortable}
             >
               {column.name}
@@ -188,10 +250,16 @@ export const InvitationTable = () => {
             },
           },
           {
-            color: 'danger',
+            color: 'secondary',
             variant: 'solid',
-            customizeContent: <div className="h-8 flex items-center justify-center">Delete</div>,
-            onPress: handleSoftDeleteClick,
+            customizeContent: (
+              <div className="h-8 flex items-center justify-center">{openModal?.name}</div>
+            ),
+            onPress: () => {
+              if (openModal) {
+                openModal.onPress();
+              }
+            },
           },
         ]}
       />

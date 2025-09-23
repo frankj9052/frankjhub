@@ -15,6 +15,12 @@ export const SYSTEM_ROLES = {
     roleSource: RoleSource.TYPE,
     orgNameOrType: SYSTEM_ORGANIZATION_TYPES.PUBLIC.name,
   },
+  ROOT: {
+    name: 'root',
+    description: 'Clinic root user with',
+    roleSource: RoleSource.TYPE,
+    orgNameOrType: SYSTEM_ORGANIZATION_TYPES.CLINIC.name,
+  },
   PLATFORM_CUSTOMIZED_ROLE: {
     name: 'platformCustomizedRole',
     description: 'Test role',

@@ -34,7 +34,7 @@ const columns = generateColumnsFromData(invitationDataExample, {
   sortableFields,
   extraColumns: [
     {
-      name: 'Actions',
+      name: 'ACTIONS',
       uid: 'actions',
       sortable: false,
     },
