@@ -13,6 +13,7 @@ declare module 'express' {
       serviceId: string;
       scopes: string[];
     };
+    rawBody?: string;
   }
 }
 

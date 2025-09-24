@@ -8,6 +8,7 @@ import { generateSwaggerDocs } from './swagger/swagger';
 import { sessionMiddleware } from './middlewares/sessionMiddleware';
 import { securityHeaders } from './middlewares/securityHeaders';
 import { currentUser } from './middlewares/currentUser';
+import { rawBodyOption } from './config/rawBodyOption';
 
 export async function createApp() {
   const app = express();
@@ -20,8 +21,12 @@ export async function createApp() {
   app.use(corsOptions);
   app.options('*', corsPreflight);
   app.use(securityHeaders);
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+  app.use(
+    express.json({
+      verify: rawBodyOption,
+    })
+  );
+  app.use(express.urlencoded({ extended: true, verify: rawBodyOption }));
 
   // 其它中间件
   app.use(requestId);
