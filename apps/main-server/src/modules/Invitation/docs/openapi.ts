@@ -13,6 +13,7 @@ import {
   OrderEnum,
   invitationSingleResponseSchema,
   invitationDataExample,
+  simpleResponseSchema,
 } from '@frankjhub/shared-schema';
 import { registry } from '../../../config/openapiRegistry';
 
@@ -254,6 +255,42 @@ registry.registerPath({
               status: 'success',
               message: 'Invitation permanetly deleted',
               data: invitationDataExample,
+            },
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
+    }),
+  },
+});
+
+// resend invitation email
+registry.registerPath({
+  method: 'post',
+  path: '/invitation/{id}/resend',
+  tags: ['Invitation'],
+  summary: 'Resend invitation email',
+  description:
+    'Resends the invitation email for a PENDING invitation. If the system does not store the plain token, a new token will be generated and the token hash will be updated before sending.',
+  security: [{ bearerAuth: [] }],
+  request: {
+    params: idParamsSchema.openapi({
+      example: { id: 'inv-uuid-123' },
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Invitation email has been resent',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Invitation email has been resent',
             },
           }),
         },

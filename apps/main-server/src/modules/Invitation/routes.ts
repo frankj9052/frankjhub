@@ -6,6 +6,7 @@ import {
   revokeInvitationController,
   getInvitationListController,
   hardDeleteInvitationController,
+  sendInvitationEmailController,
 } from './invitation.controller';
 
 import {
@@ -87,6 +88,16 @@ router.delete(
   ),
   validateRequest({ query: idParamsSchema }),
   hardDeleteInvitationController
+);
+
+// 发邀请email
+router.post(
+  '/invitation/:id/resend',
+  requirePermission(
+    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.UPDATE.name])
+  ),
+  validateRequest({ params: idParamsSchema }),
+  sendInvitationEmailController
 );
 
 // Exported register function

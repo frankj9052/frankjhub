@@ -22,7 +22,11 @@ import { InvitationDto, InvitationOrderByFIelds, OrderEnum } from '@frankjhub/sh
 import { formatShortDateTime } from '@frankjhub/shared-utils';
 import { HiDotsVertical } from 'react-icons/hi';
 import { getInvitationListAsync } from '@/libs/redux/slices/invitationSlice/thunk';
-import { hardDeleteInvitation, revokeInvitation } from '@/services/invitation.service';
+import {
+  hardDeleteInvitation,
+  revokeInvitation,
+  sendInvitationEmail,
+} from '@/services/invitation.service';
 import { toast } from 'react-toastify';
 
 export const InvitationTable = () => {
@@ -92,7 +96,13 @@ export const InvitationTable = () => {
   );
   // send
   const handleSend = async (id: string) => {
-    console.log('send email', id);
+    const result = await sendInvitationEmail(id);
+    if (result.status === 'success') {
+      toast.success(result.message);
+      setOpenModal(undefined);
+    } else {
+      toast.error(String(result.message));
+    }
   };
   // 渲染
   const renderCell = useCallback(

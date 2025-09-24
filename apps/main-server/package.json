@@ -25,7 +25,7 @@
             {
               "glob": "**/*.mjml",
               "input": "apps/main-server/src/modules/email/template",
-              "output": "modules/email/template"
+              "output": "apps/main-server/src/modules/email/template"
             }
           ],
           "esbuildOptions": {

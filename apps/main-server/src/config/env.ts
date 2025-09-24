@@ -51,8 +51,8 @@ const baseSchema = z.object({
   ENABLE_INVITATION_EXPIRE: z.string().default('true').optional(),
   // resend
   RESEND_API_KEY: z.string(),
-  RESEND_FROM_DEFAULT: z.string().default('Frankjhub <no-reply@frankjhub.com>'),
-  RESEND_REPLY_TO_DEFAULT: z.string().default('support@frankjhub.com'),
+  RESEND_FROM_DEFAULT: z.string().default('Frankjhub <no-reply@email.frankjhub.com>'),
+  RESEND_REPLY_TO_DEFAULT: z.string().default('support@email.frankjhub.com'),
   RESEND_WEBHOOK_SECRET: z.string().optional(),
   EMAIL_ENABLE_QUEUE: z.string().default('true'),
   EMAIL_MAX_RETRY: z.string().default('3'),

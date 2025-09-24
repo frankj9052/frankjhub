@@ -13,6 +13,7 @@ import {
   IssueInvitationRequest,
   issueInvitationRequestSchema,
   IssueInvitationResponse,
+  SimpleResponse,
 } from '@frankjhub/shared-schema';
 import { convertZodIssuesToErrorDetails } from '@frankjhub/shared-utils';
 
@@ -81,5 +82,15 @@ export async function hardDeleteInvitation(
   const response = await del<InvitationSingleResponse>('/api/invitation/hard-delete', {
     params: parsedInput.data,
   });
+  return response;
+}
+
+export async function sendInvitationEmail(id: string): Promise<ApiResponse<SimpleResponse>> {
+  const parsedInput = idParamsSchema.safeParse({ id });
+  if (!parsedInput.success) {
+    const error = new ValidationError(convertZodIssuesToErrorDetails(parsedInput.error));
+    return error.toJSON();
+  }
+  const response = await post<SimpleResponse>(`/api/invitation/${parsedInput.data.id}/resend`);
   return response;
 }

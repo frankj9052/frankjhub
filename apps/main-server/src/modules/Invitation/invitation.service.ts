@@ -10,6 +10,7 @@ import {
   IssueInvitationResponse,
   OrderEnum,
   RoleSource,
+  SimpleResponse,
 } from '@frankjhub/shared-schema';
 import AppDataSource from '../../config/data-source';
 import { Invitation } from './entities/Invitation';
@@ -31,6 +32,9 @@ import { createLoggerWithContext } from '../common/libs/logger';
 
 const userOrgRoleService = new UserOrganizationRoleService();
 const userService = new UserService();
+
+// invite accept url base
+const base = 'https://noqclinic.com/accept-invitation';
 
 export class InvitationService {
   private invitationRepo = AppDataSource.getRepository(Invitation);
@@ -75,16 +79,18 @@ export class InvitationService {
     // 确保role属于org或者orgType类
     const org = await this.orgRepo.findOne({
       where: { id: organizationId, isActive: true },
-      select: { id: true, orgType: true },
+      select: { id: true, orgType: true, name: true },
       relations: { orgType: true },
     });
     if (!org) throw new NotFoundError('Organization does not exist!');
+
     const role = await this.roleRepo.findOne({
       where: { id: targetRoleId, isActive: true },
-      select: { organization: true, organizationType: true },
+      select: { id: true, organization: true, organizationType: true, name: true },
       relations: { organization: true, organizationType: true },
     });
     if (!role) throw new NotFoundError('Role does not exist!');
+
     if (role.organization?.id !== org.id && role.organizationType?.id !== org.orgType.id)
       throw new BadRequestError('Role cannot be issued in this organization');
 
@@ -116,8 +122,6 @@ export class InvitationService {
     // 发送邀请邮件
     try {
       const { sendEmailUseCase } = getEmailModule();
-      // invite accept url base
-      const base = 'https://noqclinic.com/accept-invitation';
       const acceptUrl = `${base}?token=${encodeURIComponent(tokenPlain)}`;
       const idempotencyKey = `invite:${savedInv.id}:${normalizedEmail}`;
 
@@ -330,7 +334,54 @@ export class InvitationService {
     };
   }
 
-  async sendInvitationEmail(id: string) {
-    console.log('hello');
+  async sendInvitationEmail(invitationId: string, performedBy: string): Promise<SimpleResponse> {
+    const logger = createLoggerWithContext('sendInvitationEmail');
+    const inv = await this.invitationRepo.findOne({
+      where: { id: invitationId, status: INVITATION_STATUS.PENDING },
+      relations: {
+        organization: { orgType: true },
+        targetRole: true,
+      },
+    });
+    if (!inv) throw new NotFoundError('Pending invitation not found');
+
+    const normalizedEmail = inv.email.trim().toLowerCase();
+
+    // 重新生成 token 并覆盖 hash
+    const tokenPlain = base64url(randomBytes(32));
+    const tokenHash = await argon2.hash(tokenPlain, { type: argon2.argon2id });
+    inv.tokenHash = tokenHash;
+
+    // 延长有效期
+    inv.expiresAt = addHours(new Date(), 72);
+    await this.invitationRepo.save(inv);
+
+    // 重发邮件
+    const { sendEmailUseCase } = getEmailModule();
+    const acceptUrl = `${base}?token=${encodeURIComponent(tokenPlain)}`;
+    const idempotencyKey = `invite:${inv.id}:${normalizedEmail}:${Date.now()}`;
+
+    await sendEmailUseCase.exec({
+      to: normalizedEmail,
+      subject: 'Your Noqclinic invitation (resend)',
+      templateKey: 'transactional.invitation',
+      templateVars: {
+        subject: 'Invitation to Noqclinic',
+        name: normalizedEmail,
+        orgName: inv.organization.orgType
+          ? `${inv.organization.orgType.name} / ${inv.organization.name}`
+          : inv.organization.name,
+        roleName: inv.targetRole.name,
+        acceptUrl,
+      },
+      idempotencyKey,
+      traceId: inv.id,
+    });
+
+    logger.info(`Invitation: ${inv.id} email has been send by ${performedBy}`);
+    return {
+      status: 'success',
+      message: 'Invitation email send successful',
+    };
   }
 }

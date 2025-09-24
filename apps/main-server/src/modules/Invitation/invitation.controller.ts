@@ -137,3 +137,21 @@ export const hardDeleteInvitationController: RequestHandler = async (
     next(error);
   }
 };
+
+export const sendInvitationEmailController: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const performedBy = req.currentUser?.userName;
+    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
+
+    const parsed = idParamsSchema.parse(req.params);
+
+    const result = await invitationService.sendInvitationEmail(parsed.id, performedBy);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
