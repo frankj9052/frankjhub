@@ -5,9 +5,17 @@ import { DataSource } from 'typeorm';
 import { EMAIL_QUEUE } from '../bullmq.email.queue';
 import { EmailRepository } from '../../persistence/email.repository';
 import { EmailOutbox } from '../../entities/EmailOutbox';
+import { createLoggerWithContext } from '../../../common/libs/logger';
+
+let worker: Worker | undefined;
 
 export function startEmailWorkder(connection: IORedis, ds: DataSource, provider: IEmailProvider) {
-  return new Worker(
+  const logger = createLoggerWithContext('startEmailWorkder');
+  if (worker) {
+    logger.warn('[Email] worker already exist');
+    return worker;
+  }
+  worker = new Worker(
     EMAIL_QUEUE,
     async job => {
       const { emailId } = job.data;
@@ -38,4 +46,15 @@ export function startEmailWorkder(connection: IORedis, ds: DataSource, provider:
     },
     { connection }
   );
+  logger.info('[Email] worker is created');
+  return worker;
+}
+
+export async function stopEmailWorker() {
+  if (worker) {
+    const logger = createLoggerWithContext('stopEmailWorker');
+    await worker.close();
+    worker = undefined;
+    logger.info('[Email] Worker is stopped');
+  }
 }

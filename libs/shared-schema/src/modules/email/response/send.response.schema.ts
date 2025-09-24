@@ -1,6 +1,6 @@
-import { createSuccessResponseSchema } from 'src/factories';
+import { createSuccessResponseSchema } from '../../../factories';
 import { emailOutboxSchema } from '../entity';
-import { zInfer } from 'src/libs/z';
+import { zInfer } from '../../../libs/z';
 
 export const sendEmailResultSchema = emailOutboxSchema.pick({
   providerMessageId: true,

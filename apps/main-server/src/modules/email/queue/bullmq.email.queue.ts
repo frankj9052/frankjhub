@@ -1,7 +1,7 @@
 import { JobsOptions, Queue } from 'bullmq';
 import IORedis from 'ioredis';
 
-export const EMAIL_QUEUE = 'email:send';
+export const EMAIL_QUEUE = 'email_send';
 
 export function createEmailQueue(connection: IORedis) {
   const queue = new Queue(EMAIL_QUEUE, { connection });

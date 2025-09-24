@@ -1,5 +1,5 @@
-import { z, zInfer } from 'src/libs/z';
-import { baseEntitySchema } from 'src/modules/common';
+import { z, zInfer } from '../../../libs/z';
+import { baseEntitySchema } from '../../../modules/common';
 import { EMAIL_SUPPRESSION_REASON } from '../constants';
 
 export const emailSuppressionSchema = z.object({

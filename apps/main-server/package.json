@@ -21,7 +21,12 @@
           "main": "apps/main-server/src/main.ts",
           "tsConfig": "apps/main-server/tsconfig.app.json",
           "assets": [
-            "apps/main-server/src/assets"
+            "apps/main-server/src/assets",
+            {
+              "glob": "**/*.mjml",
+              "input": "apps/main-server/src/modules/email/template",
+              "output": "modules/email/template"
+            }
           ],
           "esbuildOptions": {
             "sourcemap": true,

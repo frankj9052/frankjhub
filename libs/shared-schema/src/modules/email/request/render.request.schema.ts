@@ -1,4 +1,4 @@
-import { z, zInfer } from 'src/libs/z';
+import { z, zInfer } from '../../../libs/z';
 
 export const renderEmailTemplateRequestSchema = z.object({
   templateKey: z.string().max(128),

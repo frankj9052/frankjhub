@@ -8,10 +8,12 @@ import AppDataSource from './config/data-source';
 import { closeRedisConnection, connectRedis, redisClient } from './infrastructure/redis';
 import * as Sentry from '@sentry/node';
 import { registerAllJobs } from './jobs';
+import { EmailModule, initEmailModule } from './modules/email/email.module';
 
 const jobRunners: Array<{ close: () => Promise<void> }> = []; // 保存所有 runner 以便关闭
 let server: Server;
 let isShuttingDown = false;
+let emailModule: EmailModule | undefined;
 
 const serverLogger = createLoggerWithContext('Server');
 
@@ -34,6 +36,13 @@ async function startServer() {
     if (redisClient) {
       const runners = await registerAllJobs(redisClient);
       jobRunners.push(...runners);
+      serverLogger.info(`🗓️ Registered ${runners.length} job runner(s).`);
+    }
+
+    // 2.8 初始化邮件模块
+    emailModule = await initEmailModule({ ds: AppDataSource, redis: redisClient });
+    if (env.EMAIL_ENABLE_QUEUE === 'true') {
+      await emailModule.startWorker();
     }
 
     // 3. 创建并配置 Express 应用
@@ -45,8 +54,8 @@ async function startServer() {
       serverLogger.info(`📚 Swagger docs available at http://${env.HOST}:${env.PORT}/api-docs`);
     });
 
-    /* -------- 全局异常与信号处理 -------- */
-    process.on('unhandledRejection', error => {
+    /* -------- 全局异常与信号处理(once避免重复触发) -------- */
+    process.once('unhandledRejection', error => {
       serverLogger.error('❗ Unhandled Rejection:', error);
       Sentry.captureException(error);
       shutdown(1);
@@ -85,6 +94,13 @@ async function shutdown(exitCode: number) {
         server.close(err => (err ? reject(err) : resolve()));
       });
       serverLogger.info('🛑 HTTP server closed.');
+    }
+    // 停 Email Worker（先停 Worker，再关 Redis）
+    if (emailModule) {
+      await emailModule
+        .stopWorker()
+        .catch(err => serverLogger.error('Error stopping Email Worker', err));
+      serverLogger.info('🛑 Email worker stopped.');
     }
     // 关闭 BullMQ（先关 worker/queue，再断开 redis）
     if (jobRunners.length) {

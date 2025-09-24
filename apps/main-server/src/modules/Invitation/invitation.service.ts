@@ -26,6 +26,8 @@ import { applyFilters } from '../common/utils/applyFilters';
 import { Role } from '../role/entities/Role';
 import { Organization } from '../organization/entities/Organization';
 import { ForbiddenError } from '../common/errors/ForbiddenError';
+import { getEmailModule } from '../email/email.module';
+import { createLoggerWithContext } from '../common/libs/logger';
 
 const userOrgRoleService = new UserOrganizationRoleService();
 const userService = new UserService();
@@ -65,6 +67,7 @@ export class InvitationService {
   }
   /** 生成明文token, 返回给调用放用于发邮件，与其哈希入库 */
   async issueInvitation(data: IssueInvitationRequest): Promise<IssueInvitationResponse> {
+    const logger = createLoggerWithContext('issueInvitation');
     const { organizationId, targetRoleId, email, inviterUserId, ttlHours, meta } = data;
     if (!inviterUserId)
       throw new ForbiddenError('Missing inviter user identity — cannot issue invitation');
@@ -109,6 +112,32 @@ export class InvitationService {
     });
 
     const savedInv = await this.invitationRepo.save(inv);
+
+    // 发送邀请邮件
+    try {
+      const { sendEmailUseCase } = getEmailModule();
+      // invite accept url base
+      const base = 'https://noqclinic.com/accept-invitation';
+      const acceptUrl = `${base}?token=${encodeURIComponent(tokenPlain)}`;
+      const idempotencyKey = `invite:${savedInv.id}:${normalizedEmail}`;
+
+      await sendEmailUseCase.exec({
+        to: normalizedEmail,
+        subject: 'You are invited to join noqclinic',
+        templateKey: 'transactional.invitation',
+        templateVars: {
+          subject: 'Invitation to Noqclinic',
+          name: normalizedEmail,
+          orgName: org.name,
+          roleName: role.name,
+          acceptUrl,
+        },
+        idempotencyKey,
+        traceId: savedInv.id,
+      });
+    } catch (error) {
+      logger.warn('[Invitation] send invite email failed', error);
+    }
     return {
       status: 'success',
       message: 'Invitation issued successfully',
