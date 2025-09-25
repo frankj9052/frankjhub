@@ -1,4 +1,4 @@
-import { EMAIL_RECEIPT_EVENT, EmailReceiptEvent, EmailStatus } from '@frankjhub/shared-schema';
+import { EMAIL_RECEIPT_EVENT, EMAIL_STATUS, EmailStatus } from '@frankjhub/shared-schema';
 import { DataSource } from 'typeorm';
 import { EmailReceipt } from '../entities/EmailReceipt';
 import { InvocationError } from '../../common/errors/InvocationError';
@@ -99,7 +99,31 @@ export const resendWebhookController: RequestHandler = async (
 
     // 更新 outbox 状态
     const outboxRepo = ds.getRepository(EmailOutbox);
+    const out = await outboxRepo.findOne({ where: { providerMessageId } });
+
+    if (out) {
+      const mapped = mapEventToStatus(event);
+      if (mapped) {
+        await outboxRepo.update(out.id, { status: mapped });
+      }
+
+      // 硬退回/投诉 -> 抑制
+      if (mapped === EMAIL_STATUS.BOUNCED || mapped === EMAIL_STATUS.COMPLAINED) {
+        // 直接执行 upsert（避免引入额外 repo）
+        await ds.query(
+          `INSERT INTO email_suppressions(email, reason)
+           VALUES ($1,$2)
+          ON CONFILICT (email) DO NOTHING
+          `,
+          [out.to, mapped === EMAIL_STATUS.BOUNCED ? 'bounce' : 'complaint']
+        );
+      } else {
+        // 找不到对应 outbox，记录日志即可（可能历史数据/清理/或并发）
+        logger.info('Outbox not found for providerMessageId', { providerMessageId, event });
+      }
+    }
+    res.status(204).end();
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };

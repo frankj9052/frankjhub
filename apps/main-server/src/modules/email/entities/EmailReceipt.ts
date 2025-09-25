@@ -7,7 +7,7 @@ export class EmailReceipt extends BaseEntity {
   id!: string;
 
   @Index()
-  @Column({ type: 'varchar', length: 256 })
+  @Column({ type: 'varchar', length: 256, unique: true })
   providerMessageId!: string;
 
   @Index()
