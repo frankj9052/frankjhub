@@ -8,6 +8,7 @@ import {
   UserListRequest,
   UserListResponse,
   UserOptionListResponse,
+  UserRegisterRequest,
   UserSingleResponse,
   UserUpdateRequest,
 } from '@frankjhub/shared-schema';
@@ -16,6 +17,7 @@ import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { normalizeDate } from '@frankjhub/shared-utils';
 import { applyFilters } from '../common/utils/applyFilters';
 import { validate as isUuid } from 'uuid';
+import { BadRequestError } from '../common/errors/BadRequestError';
 
 const logger = createLoggerWithContext('UserService');
 
@@ -284,6 +286,37 @@ export class UserService {
         userName: u.userName,
         avatarImage: u.avatarImage,
       })),
+    };
+  }
+
+  async register(data: UserRegisterRequest): Promise<UserSingleResponse> {
+    const { password, userName, email, firstName, lastName, middleName } = data;
+    // exist user check
+    const exist = await this.userRepo.exists({
+      where: [{ email }, { userName }],
+      withDeleted: true,
+    });
+    if (exist) {
+      throw new BadRequestError('User already exist.');
+    }
+
+    const createUser = this.userRepo.create({
+      email,
+      password,
+      userName,
+      firstName,
+      lastName,
+      middleName: middleName ?? undefined,
+      createdBy: userName,
+      updatedBy: userName,
+    });
+
+    const savedUser = await this.userRepo.save(createUser);
+
+    return {
+      status: 'success',
+      message: 'Register successful',
+      data: this.buildUser(savedUser),
     };
   }
 }

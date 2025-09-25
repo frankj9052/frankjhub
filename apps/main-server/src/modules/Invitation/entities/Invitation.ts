@@ -71,6 +71,10 @@ export class Invitation extends BaseEntity {
   @Column({ type: 'varchar', length: 255 })
   tokenHash!: string;
 
+  @Index('ix_inv_accept_url_base')
+  @Column({ type: 'varchar', length: 512 })
+  acceptUrlBase!: string;
+
   // 附加信息（发起原因，来源系统等）
   @Column({ type: 'jsonb', nullable: true })
   meta?: Record<string, unknown> | null;

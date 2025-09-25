@@ -34,8 +34,7 @@ const userOrgRoleService = new UserOrganizationRoleService();
 const userService = new UserService();
 
 // invite accept url base
-const base = 'https://noqclinic.com/accept-invitation';
-
+// const base = 'https://noqclinic.com/accept-invitation';
 export class InvitationService {
   private invitationRepo = AppDataSource.getRepository(Invitation);
   private orgRepo = AppDataSource.getRepository(Organization);
@@ -60,6 +59,7 @@ export class InvitationService {
       acceptedUserName: inv.acceptedUser?.userName ?? null,
       expiresAt: normalizeDate(inv.expiresAt) ?? 'error',
       tokenHash: 'Secret',
+      acceptUrlBase: inv.acceptUrlBase,
       meta: inv.meta,
       createdBy: inv.createdBy,
       createdAt: normalizeDate(inv.createdAt) ?? 'error',
@@ -72,7 +72,8 @@ export class InvitationService {
   /** 生成明文token, 返回给调用放用于发邮件，与其哈希入库 */
   async issueInvitation(data: IssueInvitationRequest): Promise<IssueInvitationResponse> {
     const logger = createLoggerWithContext('issueInvitation');
-    const { organizationId, targetRoleId, email, inviterUserId, ttlHours, meta } = data;
+    const { organizationId, targetRoleId, email, inviterUserId, ttlHours, acceptUrlBase, meta } =
+      data;
     if (!inviterUserId)
       throw new ForbiddenError('Missing inviter user identity — cannot issue invitation');
 
@@ -114,6 +115,7 @@ export class InvitationService {
       acceptedUserId: null,
       expiresAt: addHours(new Date(), ttlHours ?? 72),
       tokenHash,
+      acceptUrlBase,
       meta: meta ?? null,
     });
 
@@ -122,7 +124,7 @@ export class InvitationService {
     // 发送邀请邮件
     try {
       const { sendEmailUseCase } = getEmailModule();
-      const acceptUrl = `${base}?token=${encodeURIComponent(tokenPlain)}`;
+      const acceptUrl = `${inv.acceptUrlBase}?token=${encodeURIComponent(tokenPlain)}`;
       const idempotencyKey = `invite:${savedInv.id}:${normalizedEmail}`;
 
       await sendEmailUseCase.exec({
@@ -155,7 +157,7 @@ export class InvitationService {
 
   /** 接受邀请 （必须在登陆状态下调用） */
   async acceptInvitation(data: AcceptInvitationRequest): Promise<AcceptInvitationResponse> {
-    const { token, currentUserId, currentUserEmail } = data;
+    const { token, email } = data;
 
     // 找到inv
     const candidates = await this.invitationRepo.find({
@@ -182,13 +184,18 @@ export class InvitationService {
     }
 
     // 受邀邮箱 = 登陆邮箱
-    if (matched.email !== currentUserEmail.trim().toLowerCase()) {
+    if (matched.email !== email.trim().toLowerCase()) {
       throw new BadRequestError('This invitation is not for your email address');
     }
 
+    // 注册用户
+    const registerUser = await userService.register(data);
+
+    if (registerUser.status !== 'success') throw new BadRequestError(registerUser.message);
+
     // 状态流转
     matched.status = INVITATION_STATUS.ACCEPTED;
-    matched.acceptedUserId = currentUserId;
+    matched.acceptedUserId = registerUser.data.id;
     const savedInv = await this.invitationRepo.save(matched);
 
     if (!savedInv.inviterUserId) {
@@ -358,7 +365,7 @@ export class InvitationService {
 
     // 重发邮件
     const { sendEmailUseCase } = getEmailModule();
-    const acceptUrl = `${base}?token=${encodeURIComponent(tokenPlain)}`;
+    const acceptUrl = `${inv.acceptUrlBase}?token=${encodeURIComponent(tokenPlain)}`;
     const idempotencyKey = `invite:${inv.id}:${normalizedEmail}:${Date.now()}`;
 
     await sendEmailUseCase.exec({

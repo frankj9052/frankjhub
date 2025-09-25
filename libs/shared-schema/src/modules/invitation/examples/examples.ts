@@ -25,6 +25,7 @@ export const invitationDataExample: InvitationDto = {
   acceptedUserName: null,
   expiresAt: '2025-09-22T10:00:00.000Z',
   tokenHash: 'Secret', // 仅展示占位
+  acceptUrlBase: 'https://auth.frankjhub.com',
   meta: { note: 'Initial admin onboarding' },
   createdBy: 'Alice Manager',
   createdAt: '2025-09-19T08:00:00.000Z',

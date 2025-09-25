@@ -1,4 +1,6 @@
+import { Providers } from '@/components/Providers';
 import './global.css';
+import { Sidebar } from '@/components/Sidebar';
 
 export const metadata = {
   title: 'Welcome to clinic-portal',
@@ -8,7 +10,14 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>
+          <div className="min-h-screen grid grid-cols-[auto_1fr]">
+            <Sidebar />
+            <div>{children}</div>
+          </div>
+        </Providers>
+      </body>
     </html>
   );
 }

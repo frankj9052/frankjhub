@@ -39,6 +39,9 @@ export const invitationSchema = z.object({
   // 安全令牌
   tokenHash: z.string().max(255),
 
+  // 接收邀请的链接
+  acceptUrlBase: z.string().max(512),
+
   // 附加信息
   meta: z.record(z.unknown()).nullable().optional(),
 });

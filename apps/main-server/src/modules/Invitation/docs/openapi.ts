@@ -38,6 +38,7 @@ registry.registerPath({
               ttlHours: 72,
               inviterUserId: 'admin-user-id',
               meta: { note: 'Initial admin onboarding' },
+              acceptUrlBase: 'https://clinic.frankjhub.com',
             },
           }),
         },
@@ -78,8 +79,12 @@ registry.registerPath({
         'application/json': {
           schema: acceptInvitationRequestSchema.openapi({
             example: {
-              currentUserId: 'user-uuid',
-              currentUserEmail: 'user-email@email.com',
+              userName: 'test user',
+              firstName: 'Frank',
+              lastName: 'Li',
+              middleName: 'Middle',
+              password: 'strong_password',
+              email: 'test@email.com',
               token: 'eDM4dVhBNU1mY0RkN0FIVnhvWm9sa2ZpQ2tSUkE',
             },
           }),

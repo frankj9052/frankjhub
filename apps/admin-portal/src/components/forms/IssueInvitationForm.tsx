@@ -180,6 +180,26 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
           />
         </div>
 
+        {/* input accept url base */}
+        <div className="w-full">
+          <Controller
+            name="acceptUrlBase"
+            control={control}
+            render={({ field, fieldState }) => (
+              <FrankInput
+                label="Accept URL Base"
+                variant="bordered"
+                size="sm"
+                type="text"
+                onBlur={field.onBlur}
+                isInvalid={!!fieldState.error}
+                errorMessage={fieldState.error?.message}
+                onValueChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+
         {/* Server Errors */}
         {errors?.root?.serverError && (
           <p className="text-danger text-sm">

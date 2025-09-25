@@ -53,22 +53,8 @@ export const acceptInvitationController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
-    const currentUserId = req.currentUser?.id;
-    const currentUserEmail = req.currentUser?.email;
-    if (!currentUserId || !currentUserEmail) {
-      throw new UnauthorizedError('User identity not found in request');
-    }
-
     const parsed = acceptInvitationRequestSchema.parse(req.body);
-    if (currentUserId !== parsed.currentUserId || currentUserEmail !== parsed.currentUserEmail)
-      throw new UnauthorizedError('User identity not match in request');
-
-    const result = await invitationService.acceptInvitation({
-      token: parsed.token,
-      currentUserId,
-      currentUserEmail,
-    });
-
+    const result = await invitationService.acceptInvitation(parsed);
     res.status(200).json(result);
   } catch (error) {
     next(error);

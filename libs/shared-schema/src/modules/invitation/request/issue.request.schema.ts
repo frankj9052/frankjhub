@@ -7,6 +7,7 @@ export const issueInvitationRequestSchema = invitationSchema
     targetRoleId: true,
     email: true,
     inviterUserId: true,
+    acceptUrlBase: true,
     meta: true,
   })
   .extend({

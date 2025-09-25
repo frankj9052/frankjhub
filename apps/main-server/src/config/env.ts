@@ -25,6 +25,7 @@ const baseSchema = z.object({
   PG_CONN_TIMEOUT_MS: z.string().default('2000'),
   SUPER_ADMIN_EMAIL: z.string(),
   SUPER_ADMIN_PASSWORD: z.string(),
+  APP_BASE_URL: z.string(),
 
   // 新增: Session相关校验
   SESSION_SECRET: z.string(), // 只要是非空字符串就行
