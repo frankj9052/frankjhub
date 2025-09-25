@@ -44,6 +44,12 @@
     },
     {
       "path": "./libs/shared-errors"
+    },
+    {
+      "path": "./apps/clinic-portal"
+    },
+    {
+      "path": "./apps/patient-portal"
     }
   ],
   "ts-node": {

@@ -1,0 +1,46 @@
+{
+  "name": "@frankjhub/clinic-portal",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "next": "~15.2.4",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "nx": {
+    "projectType": "application",
+    "sourceRoot": "apps/clinic-portal",
+    "targets": {
+      "dev": {
+        "defaultConfiguration": "development"
+      },
+      "start": {
+        "defaultConfiguration": "production"
+      },
+      "start:only": {
+        "executor": "nx:run-commands",
+        "defaultConfiguration": "production",
+        "options": {
+          "command": "next start apps/clinic-portal"
+        }
+      },
+      "build:only": {
+        "executor": "@nx/next:build",
+        "dependsOn": [],
+        "defaultConfiguration": "production",
+        "options": {
+          "root": "apps/clinic-portal",
+          "outputPath": "apps/clinic-portal",
+          "buildLibsFromSource": true
+        }
+      },
+      "collect-source": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/collectSourceFiles.ts",
+          "cwd": "apps/clinic-portal"
+        }
+      }
+    }
+  }
+}
