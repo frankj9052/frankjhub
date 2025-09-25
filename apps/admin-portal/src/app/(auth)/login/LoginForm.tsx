@@ -3,7 +3,7 @@ import { useDispatch } from '@/libs/redux';
 import { getSessionAsync } from '@/libs/redux/slices/currentUserSlice/thunks';
 import { loginClient } from '@/services/auth';
 import { LoginRequest, loginRequestSchema } from '@frankjhub/shared-schema';
-import { FrankCard } from '@frankjhub/shared-ui-hero-ssr';
+import { FrankGeneralCard } from '@frankjhub/shared-ui-hero-ssr';
 import { Button, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -36,7 +36,7 @@ export default function LoginForm() {
     }
   };
   return (
-    <FrankCard
+    <FrankGeneralCard
       className="w-2/5 mx-auto"
       cardHeight={370}
       cardHeader={

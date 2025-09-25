@@ -1,4 +1,4 @@
-import { FrankCard } from '@frankjhub/shared-ui-hero-ssr';
+import { FrankGeneralCard } from '@frankjhub/shared-ui-hero-ssr';
 import { motion, Variants } from 'framer-motion';
 import Image from 'next/image';
 
@@ -30,7 +30,7 @@ export interface ProjectCardProps {
 export const ProjectCard = ({ image, title, subTitle, onPress }: ProjectCardProps) => {
   return (
     <motion.div initial="rest" animate="rest" whileHover="hover" variants={coverVariants}>
-      <FrankCard
+      <FrankGeneralCard
         cardCover={
           <div className="h-full relative overflow-hidden">
             <Image

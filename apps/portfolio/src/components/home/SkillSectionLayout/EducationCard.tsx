@@ -1,4 +1,4 @@
-import { FrankCard } from '@frankjhub/shared-ui-hero-ssr';
+import { FrankGeneralCard } from '@frankjhub/shared-ui-hero-ssr';
 
 export type EducationCardProps = {
   year: string;
@@ -9,7 +9,7 @@ export type EducationCardProps = {
 
 export const EducationCard = ({ year, program, school, location }: EducationCardProps) => {
   return (
-    <FrankCard
+    <FrankGeneralCard
       className="border-b-3 border-primary hover:scale-[1.02] cursor-default"
       cardHeight={110}
       cardBody={

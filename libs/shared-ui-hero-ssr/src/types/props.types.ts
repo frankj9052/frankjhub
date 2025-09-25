@@ -31,7 +31,9 @@ export type ButtonVariant =
   | 'ghost'
   | undefined;
 export type PaginationVariant = 'flat' | 'faded' | 'bordered' | 'light' | undefined;
+
 export type Radius = 'sm' | 'md' | 'lg' | 'none' | 'full' | undefined;
+
 export type IsInvalid = boolean | undefined;
 export type EndContent = ReactNode | undefined;
 export type Width = string | number | undefined;
@@ -267,3 +269,14 @@ export type PaginationClassNames =
   | undefined;
 export type Page = number | undefined;
 export type PaginationOnChange = (page: number) => void | undefined;
+
+// Card
+export type IsBlurred = boolean | undefined;
+export type IsFooterBlurred = boolean | undefined;
+export type IsPressable = boolean | undefined;
+export type Shadow = 'none' | 'sm' | 'md' | 'lg' | undefined;
+export type FullWidth = boolean | undefined;
+export type IsHoverable = boolean | undefined;
+export type DisableAnimation = boolean | undefined;
+export type AllowTextSelectionOnPress = boolean | undefined;
+export type CardRadius = Exclude<Radius, 'full'>;

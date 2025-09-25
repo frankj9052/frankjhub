@@ -1,4 +1,4 @@
-import { FrankCard } from '@frankjhub/shared-ui-hero-ssr';
+import { FrankGeneralCard } from '@frankjhub/shared-ui-hero-ssr';
 import { Divider } from '@heroui/react';
 export type WorkCardProps = {
   companyName: string;
@@ -15,7 +15,7 @@ export const WorkCard = ({
   jobDescription,
 }: WorkCardProps) => {
   return (
-    <FrankCard
+    <FrankGeneralCard
       className="cursor-default hover:scale-[1.02]"
       cardHeight={240}
       cardBody={

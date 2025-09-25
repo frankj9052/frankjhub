@@ -1,2 +1,4 @@
 // 卡片组件
-export * from './FrankCard';
+export * from './general';
+
+export * from './base';

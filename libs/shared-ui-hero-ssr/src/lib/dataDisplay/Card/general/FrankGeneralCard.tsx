@@ -1,7 +1,7 @@
 import { Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
 import { ReactNode } from 'react';
 
-export type FrankCardProps = {
+export type FrankGeneralCardProps = {
   cardCover?: ReactNode;
   cardBody?: ReactNode;
   cardHeader?: ReactNode;
@@ -24,7 +24,7 @@ export type FrankCardProps = {
 };
 
 /**
- * FrankCard Component - A customizable card component based on HeroUI Card.
+ * FrankGeneralCard Component - A customizable card component based on HeroUI Card.
  *
  * @param {ReactNode} cardCover - The cover content of the card, typically an image or overlay.
  * @param {ReactNode} cardBody - The main body content of the card.
@@ -47,7 +47,7 @@ export type FrankCardProps = {
  *
  * @returns {JSX.Element} A customizable card component with optional cover, header, body, and footer sections.
  */
-export const FrankCard = ({
+export const FrankGeneralCard = ({
   cardCover,
   cardBody,
   cardHeader,
@@ -67,7 +67,7 @@ export const FrankCard = ({
   disableRipple,
   allowTextSelectionOnPress,
   radius,
-}: FrankCardProps) => {
+}: FrankGeneralCardProps) => {
   return (
     <div
       style={{
@@ -102,4 +102,4 @@ export const FrankCard = ({
   );
 };
 
-export default FrankCard;
+export default FrankGeneralCard;

@@ -1,16 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { FrankCard } from './FrankCard';
+import { FrankGeneralCard } from './FrankGeneralCard';
 
 const meta = {
-  title: 'Shared-UI-Hero-SSR/DataDisplay/Card/FrankCard',
-  component: FrankCard,
+  title: 'Shared-UI-Hero-SSR/DataDisplay/Card/General/FrankGeneralCard',
+  component: FrankGeneralCard,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {
       description: {
         component:
-          'FrankCard is a customizable card component with optional cover, header, body, and footer sections, supporting interactivity like press, hover, and blur effects.',
+          'FrankGeneralCard is a customizable card component with optional cover, header, body, and footer sections, supporting interactivity like press, hover, and blur effects.',
       },
     },
     actions: {
@@ -100,7 +100,7 @@ const meta = {
       description: 'Whether to allow text selection while pressing the card.',
     },
   },
-} satisfies Meta<typeof FrankCard>;
+} satisfies Meta<typeof FrankGeneralCard>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
