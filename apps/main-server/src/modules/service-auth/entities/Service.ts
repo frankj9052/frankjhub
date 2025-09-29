@@ -7,8 +7,34 @@ export class Service extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
+  /** 自然键：如 'booking'、'shift'*/
   @Column({ type: 'varchar', length: 100, unique: true })
   serviceId!: string;
+
+  @Column({ type: 'varchar' })
+  baseUrl!: string; // 例: http://booking:4001
+
+  @Column({ default: 'api://' })
+  audPrefix!: string; // 例: api://booking
+
+  @Column({ type: 'jsonb', default: [] })
+  routes!: Array<{
+    path: string; // '/appointments'
+    methods: string[]; // ['GET','POST']
+    requiredScopes: string[]; // ['booking:read']
+    rewrite?: string; // '^/booking' => ''
+    rateLimit?: { windowMs: number; max: number };
+  }>;
+
+  /** 服务级最低要求（网关层，全部路由生效；路由级可叠加覆盖） */
+  @Column({ type: 'text', array: true, default: [] })
+  requiredScopes!: string[];
+
+  @Column({ nullable: true })
+  healthCheckPath?: string;
+
+  @Column({ nullable: true })
+  ownerTeam?: string;
 
   @Column({ type: 'text' })
   serviceSecret!: string; // hashed secret
@@ -34,4 +60,10 @@ export class Service extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   isActive!: boolean;
+
+  @Column({ type: 'int', default: 1 })
+  secretVersion!: number;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  lastRotatedAt?: Date;
 }
