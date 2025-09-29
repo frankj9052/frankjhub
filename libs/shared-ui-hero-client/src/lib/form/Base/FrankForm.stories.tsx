@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrankForm } from './FrankForm';
-import { FrankInput } from '../Input/FrankInput';
+import { FrankInput } from '../FormFields/Input/FrankInput';
 
 const meta = {
   title: 'Shared-UI-Hero-Client/Form/Base/FrankForm',

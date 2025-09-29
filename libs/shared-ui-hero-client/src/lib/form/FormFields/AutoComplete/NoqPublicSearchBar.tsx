@@ -5,7 +5,7 @@ import { FormEvent, Key } from 'react';
 import { FaArrowRight } from 'react-icons/fa6';
 import { FrankButtonBase, FrankSpinner } from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
-import { FrankForm } from '../Base';
+import { FrankForm } from '../../Base';
 
 export type NoqPublicSearchBarProps = {
   height?: number;

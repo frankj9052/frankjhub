@@ -3,7 +3,7 @@ import { FrankDatePicker } from './FrankDatePicker';
 import { MdOutlineKeyboardArrowDown } from 'react-icons/md';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/DatePicker/FrankDatePicker',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/DatePicker/FrankDatePicker',
   component: FrankDatePicker,
   tags: ['autodocs'],
   parameters: {

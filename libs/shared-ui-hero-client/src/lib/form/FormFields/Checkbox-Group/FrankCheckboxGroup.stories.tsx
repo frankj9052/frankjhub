@@ -4,7 +4,7 @@ import { useState } from 'react';
 import FrankCheckbox from '../Checkbox/FrankCheckbox';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Checkbox-Group/FrankCheckboxGroup',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Checkbox-Group/FrankCheckboxGroup',
   component: FrankCheckboxGroup,
   tags: ['autodocs'],
   parameters: {

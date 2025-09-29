@@ -1,11 +1,11 @@
 import { Controller, useForm } from 'react-hook-form';
-import { FrankForm } from '../Base';
 import { ContactCreateRequest, contactCreateRequestSchema } from '@frankjhub/shared-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FrankInput } from '../Input/FrankInput';
-import { FrankTextArea } from '../Textarea';
 import { FrankButton } from '@frankjhub/shared-ui-hero-ssr';
 import { FormEvent, useEffect, useState } from 'react';
+import { FrankForm } from '../../Base/FrankForm';
+import { FrankInput } from '../../FormFields/Input/FrankInput';
+import { FrankTextArea } from '../../FormFields/Textarea/FrankTextarea';
 
 export interface ContactFormProps {
   width?: number;

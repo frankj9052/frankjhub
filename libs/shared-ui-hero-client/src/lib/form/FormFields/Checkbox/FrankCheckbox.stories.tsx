@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankCheckbox from './FrankCheckbox';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Checkbox/FrankCheckbox',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Checkbox/FrankCheckbox',
   component: FrankCheckbox,
   tags: ['autodocs'],
   parameters: {
@@ -109,7 +109,7 @@ export const Default: Story = {
   },
 };
 
-export const outSideContent: Story = {
+export const OutSideContent: Story = {
   args: {
     outsideContent: <div className="bg-blue-200 w-[100px] h-[200px]"> big component</div>,
     value: 'test value 1',

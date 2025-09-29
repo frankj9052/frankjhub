@@ -1,5 +1,5 @@
-import { Card, CardBody, CardFooter, CardHeader } from '@heroui/react';
 import { ReactNode } from 'react';
+import { FrankCard, FrankCardBody, FrankCardFooter, FrankCardHeader } from '../base';
 
 export type FrankGeneralCardProps = {
   cardCover?: ReactNode;
@@ -75,7 +75,7 @@ export const FrankGeneralCard = ({
         height: cardHeight ? `${cardHeight}px` : '100%',
       }}
     >
-      <Card
+      <FrankCard
         isBlurred={isBlurred}
         isFooterBlurred={isFooterBlurred}
         key={key}
@@ -93,11 +93,11 @@ export const FrankGeneralCard = ({
       >
         {cardCover}
         <div className="absolute w-full h-full flex flex-col">
-          {cardHeader && <CardHeader>{cardHeader}</CardHeader>}
-          {cardBody && <CardBody>{cardBody}</CardBody>}
-          {cardFooter && <CardFooter>{cardFooter}</CardFooter>}
+          {cardHeader && <FrankCardHeader>{cardHeader}</FrankCardHeader>}
+          {cardBody && <FrankCardBody>{cardBody}</FrankCardBody>}
+          {cardFooter && <FrankCardFooter>{cardFooter}</FrankCardFooter>}
         </div>
-      </Card>
+      </FrankCard>
     </div>
   );
 };

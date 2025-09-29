@@ -1,1 +1,2 @@
-export * from './ContactForm';
+export * from './contact';
+export * from './register';

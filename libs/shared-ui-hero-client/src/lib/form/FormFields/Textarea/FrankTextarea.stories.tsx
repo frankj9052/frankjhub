@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrankTextArea } from './FrankTextarea';
 
 const meta: Meta<typeof FrankTextArea> = {
-  title: 'Shared-UI-Hero-Client/Form/Textarea/FrankTextArea',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Textarea/FrankTextArea',
   component: FrankTextArea,
   tags: ['autodocs'],
   parameters: {

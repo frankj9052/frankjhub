@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NoqDatePicker } from './NoqDatePicker';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/DatePicker/NoqDatePicker',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/DatePicker/NoqDatePicker',
   component: NoqDatePicker,
   tags: ['autodocs'],
   parameters: {

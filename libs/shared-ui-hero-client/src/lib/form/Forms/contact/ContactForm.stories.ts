@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { ContactForm } from './ContactForm';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Forms/ContactForm',
+  title: 'Shared-UI-Hero-Client/Form/Forms/Contact/ContactForm',
   component: ContactForm,
   tags: ['autodocs'],
   parameters: {

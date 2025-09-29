@@ -1,15 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { FrankInput } from './FrankInput';
+import { FrankInputBase } from './FrankInputBase';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Input/FrankInput',
-  component: FrankInput,
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Input/FrankInputBase',
+  component: FrankInputBase,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
     docs: {
       description: {
-        component: '',
+        component:
+          'A styled input component based on @heroui/react Input, offering customizable dimensions, validation states, label positioning, and the ability to add content inside or next to the input.',
       },
     },
     actions: {
@@ -81,14 +82,19 @@ const meta = {
       description: 'Callback triggered when the input value changes.',
     },
   },
-  args: {},
-} satisfies Meta<typeof FrankInput>;
+  args: {
+    onValueChange: value => {
+      console.log('Value changed to: ', value);
+    },
+  },
+} satisfies Meta<typeof FrankInputBase>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    placeholder: ' ',
     labelPlacement: 'outside',
     label: (
       <div className="font-inter font-[500] text-[13px] text-[#303030]">
@@ -96,6 +102,8 @@ export const Default: Story = {
       </div>
     ),
     variant: 'bordered',
+    height: 32,
+    width: 138,
   },
 };
 
@@ -109,6 +117,8 @@ export const RoomInput: Story = {
       </div>
     ),
     variant: 'bordered',
+    height: 32,
+    width: 138,
   },
 };
 
@@ -122,5 +132,7 @@ export const LocationLabelInput: Story = {
       </div>
     ),
     variant: 'bordered',
+    height: 32,
+    width: 288,
   },
 };

@@ -3,7 +3,7 @@ import { NoqPublicSearchBar } from './NoqPublicSearchBar';
 import { useState } from 'react';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/AutoComplete/NoqPublicSearchBar',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/AutoComplete/NoqPublicSearchBar',
   component: NoqPublicSearchBar,
   tags: ['autodocs'],
   parameters: {

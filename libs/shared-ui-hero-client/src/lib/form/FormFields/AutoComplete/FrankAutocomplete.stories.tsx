@@ -16,7 +16,7 @@ const defaultItems = Array.from({ length: 30 }, (_, i) => {
 });
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/AutoComplete/FrankAutocomplete',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/AutoComplete/FrankAutocomplete',
   component: FrankAutocomplete,
   tags: ['autodocs'],
   parameters: {

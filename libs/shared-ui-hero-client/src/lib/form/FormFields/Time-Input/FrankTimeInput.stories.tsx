@@ -3,7 +3,7 @@ import FrankTimeInput from './FrankTimeInput';
 import { useState } from 'react';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Time-Input/FrankTimeInput',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Time-Input/FrankTimeInput',
   component: FrankTimeInput,
   tags: ['autodocs'],
   parameters: {

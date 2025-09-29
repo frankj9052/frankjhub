@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { FrankSelect } from './FrankSelect';
 
 const meta: Meta<typeof FrankSelect> = {
-  title: 'Shared-UI-Hero-Client/Form/Select/FrankSelect',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Select/FrankSelect',
   component: FrankSelect,
   tags: ['autodocs'],
   parameters: {

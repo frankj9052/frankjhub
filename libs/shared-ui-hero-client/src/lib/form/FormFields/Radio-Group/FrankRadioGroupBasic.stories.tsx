@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import FrankRadioGroupBasic from './FrankRadioGroupBasic';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Radio-Group/FrankRadioGroupBasic',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/Radio-Group/FrankRadioGroupBasic',
   component: FrankRadioGroupBasic,
   tags: ['autodocs'],
   parameters: {
