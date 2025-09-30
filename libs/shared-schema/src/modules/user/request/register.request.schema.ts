@@ -6,11 +6,11 @@ export const userRegisterRequestSchema = userSchema
     userName: true,
     firstName: true,
     lastName: true,
-    middleName: true,
   })
   .extend({
     email: z.string().email(),
     password: z.string(),
+    middleName: z.string().nullable().optional(),
   });
 
 export type UserRegisterRequest = zInfer<typeof userRegisterRequestSchema>;

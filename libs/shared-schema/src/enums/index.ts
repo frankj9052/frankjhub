@@ -7,3 +7,4 @@ export * from './email_type.enum';
 export * from './languages.enum';
 export * from './amenities.enum';
 export * from './data_source.enum';
+export * from './http_method.enum';

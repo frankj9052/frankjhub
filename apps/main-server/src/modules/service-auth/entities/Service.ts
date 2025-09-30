@@ -1,6 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import * as argon2 from 'argon2';
 import { BaseEntity } from '../../common/entities/BaseEntity';
+import { HttpMethod } from '@frankjhub/shared-schema';
 
 @Entity()
 export class Service extends BaseEntity {
@@ -11,16 +12,19 @@ export class Service extends BaseEntity {
   @Column({ type: 'varchar', length: 100, unique: true })
   serviceId!: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  name!: string;
+
   @Column({ type: 'varchar' })
   baseUrl!: string; // 例: http://booking:4001
 
-  @Column({ default: 'api://' })
+  @Column({ type: 'varchar', default: 'api://' })
   audPrefix!: string; // 例: api://booking
 
   @Column({ type: 'jsonb', default: [] })
   routes!: Array<{
     path: string; // '/appointments'
-    methods: string[]; // ['GET','POST']
+    methods: HttpMethod[]; // ['GET','POST']
     requiredScopes: string[]; // ['booking:read']
     rewrite?: string; // '^/booking' => ''
     rateLimit?: { windowMs: number; max: number };
@@ -30,10 +34,10 @@ export class Service extends BaseEntity {
   @Column({ type: 'text', array: true, default: [] })
   requiredScopes!: string[];
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   healthCheckPath?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   ownerTeam?: string;
 
   @Column({ type: 'text' })

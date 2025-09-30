@@ -1,7 +1,12 @@
+import {
+  FrankButton,
+  FrankCard,
+  FrankCardBody,
+  FrankCardFooter,
+  FrankCardHeader,
+} from '@frankjhub/shared-ui-hero-ssr';
 import { ReactNode } from 'react';
 import { IconType } from 'react-icons/lib';
-import { FrankCard, FrankCardBody, FrankCardFooter, FrankCardHeader } from '../base';
-import { FrankButton } from '../../../general';
 
 export type CardWrapperProps = {
   body?: ReactNode;
@@ -24,7 +29,7 @@ export const CardWrapper = ({
 }: CardWrapperProps) => {
   return (
     <div className="flex items-center justify-center vertical-center">
-      <FrankCard className="w-4/5 sm:w-2/5 mx-auto p-5">
+      <FrankCard className="mx-auto p-5">
         <FrankCardHeader className="flex flex-col items-center justify-center">
           <div className="flex flex-col gap-2 items-center text-primary">
             <div className="flex flex-row items-center gap-3">
@@ -35,14 +40,16 @@ export const CardWrapper = ({
           </div>
         </FrankCardHeader>
         {body && <FrankCardBody>{body}</FrankCardBody>}
-        <FrankCardFooter>
-          {action && (
-            <FrankButton onPress={action} fullWidth color="primary" variant="bordered">
-              {actionLabel}
-            </FrankButton>
-          )}
-          {footer && footer}
-        </FrankCardFooter>
+        {footer && (
+          <FrankCardFooter>
+            {action && (
+              <FrankButton onPress={action} fullWidth color="primary" variant="bordered">
+                {actionLabel}
+              </FrankButton>
+            )}
+            {footer}
+          </FrankCardFooter>
+        )}
       </FrankCard>
     </div>
   );

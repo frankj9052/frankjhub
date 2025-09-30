@@ -1,4 +1,3 @@
-// /auth/service-login 颁发 JWT
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { ServiceTokenService } from './serviceToken.service';
@@ -7,15 +6,16 @@ import { getJWKS } from './jwks/jwks.service';
 import AppDataSource from '../../config/data-source';
 import { Service } from './entities/Service';
 import * as argon2 from 'argon2';
-import { ServiceRole } from './entities/ServiceRole';
-import { In } from 'typeorm';
-import { RolePermission } from '../role/entities/RolePermission';
+import { ServiceAuthService } from './serviceAuth.service';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),
   serviceSecret: z.string(),
 });
 
+const serviceAuthService = new ServiceAuthService();
+
+// 颁发 JWT
 export const serviceLoginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { serviceId, serviceSecret } = serviceLoginSchema.parse(req.body);
@@ -31,31 +31,9 @@ export const serviceLoginController = async (req: Request, res: Response, next: 
       throw new UnauthorizedError('Invalid service credentials');
     }
 
-    const serviceRoleRepo = AppDataSource.getRepository(ServiceRole);
-    const serviceRoles = await serviceRoleRepo.find({
-      where: { service: { id: service.id } },
-      relations: ['role'],
-    });
-    // 拿到所有 role.id
-    const roleIds = serviceRoles.map(sr => sr.role.id);
-
-    const rolePermissionRepo = AppDataSource.getRepository(RolePermission);
-    const rolePermissions = await rolePermissionRepo.find({
-      where: {
-        role: {
-          id: In(roleIds),
-        },
-      },
-      relations: ['permission'],
-    });
-
-    const scopes = rolePermissions
-      .map(rp => rp.permission.name)
-      .filter((name): name is string => Boolean(name));
-
     const token = await ServiceTokenService.signToken({
       serviceId,
-      scopes,
+      scopes: service.requiredScopes,
     });
 
     res.status(200).json({ status: 'success', data: { token } });
@@ -70,5 +48,14 @@ export const getJwksController = async (req: Request, res: Response, next: NextF
     res.status(200).json(jwks);
   } catch (err) {
     next(err);
+  }
+};
+
+export const getSnapshotController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = serviceAuthService.getSnapshot();
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
   }
 };

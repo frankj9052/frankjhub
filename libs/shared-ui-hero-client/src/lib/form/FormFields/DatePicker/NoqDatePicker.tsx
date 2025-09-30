@@ -4,9 +4,9 @@ import { parseDate } from '@internationalized/date';
 import clsx from 'clsx';
 import { formatNumberString, isValidDate } from '@frankjhub/shared-utils';
 import { useClickOutside, useControlledState } from '@frankjhub/shared-hooks';
-import { FrankPopoverGeneral } from '../../feedback';
 import { FrankSVGIcon } from '@frankjhub/shared-ui-core';
-import { FrankCalendar } from '../../dataDisplay';
+import { FrankPopoverGeneral } from '../../../feedback/Popover/FrankPopoverGeneral';
+import FrankCalendar from '../../../dataDisplay/Calendar/FrankCalendar';
 
 type DateInputType = {
   year: string;

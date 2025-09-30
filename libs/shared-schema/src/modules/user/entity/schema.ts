@@ -17,7 +17,7 @@ export const userSchema = z.object({
   /** 姓名信息 */
   firstName: z.string(),
   lastName: z.string(),
-  middleName: z.string().nullable(),
+  middleName: z.string().nullable().default(null),
 
   /** 个人信息 */
   gender: z.nativeEnum(Gender).nullable(),

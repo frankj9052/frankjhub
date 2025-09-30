@@ -43,13 +43,13 @@ export const SYSTEM_RESOURCES = {
     name: 'service',
     description: 'Define and manage services offered by clinics or organizations',
   },
-  SERVICE_ROLE: {
-    name: 'serviceRole',
-    description: 'Assign roles and permissions specific to services',
-  },
   INVITATION: {
     name: 'invitation',
     description: 'Handle user invitations to organizations, clinics, or services',
+  },
+  BOOKING: {
+    name: 'booking',
+    description: 'Booking services',
   },
 } as const;
 

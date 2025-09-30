@@ -86,6 +86,7 @@ registry.registerPath({
               password: 'strong_password',
               email: 'test@email.com',
               token: 'eDM4dVhBNU1mY0RkN0FIVnhvWm9sa2ZpQ2tSUkE',
+              rePassword: 'strong_password',
             },
           }),
         },

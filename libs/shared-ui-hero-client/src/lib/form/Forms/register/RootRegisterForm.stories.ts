@@ -15,7 +15,12 @@ const meta = {
     actions: {},
   },
 
-  args: {},
+  args: {
+    onSubmit: values => {
+      console.log('form submitted ===> ', values);
+    },
+    token: 'This is Test Token!',
+  },
   argTypes: {},
 } satisfies Meta<typeof RootRegisterForm>;
 
