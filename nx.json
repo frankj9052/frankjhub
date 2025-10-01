@@ -54,7 +54,8 @@
       "plugin": "@nx/jest/plugin",
       "options": {
         "targetName": "test"
-      }
+      },
+      "exclude": ["apps/booking-server-e2e/**/*"]
     },
     {
       "plugin": "@nx/rollup/plugin",

@@ -164,3 +164,4 @@ out
 
 # 禁止上传config.json
 **/config.json
+test-output

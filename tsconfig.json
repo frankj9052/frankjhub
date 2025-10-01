@@ -50,6 +50,9 @@
     },
     {
       "path": "./apps/patient-portal"
+    },
+    {
+      "path": "./apps/booking-server"
     }
   ],
   "ts-node": {

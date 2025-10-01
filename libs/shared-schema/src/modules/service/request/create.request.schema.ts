@@ -9,6 +9,7 @@ export const createServiceRequestSchema = serviceSchema.pick({
   routes: true,
   requiredScopes: true,
   serviceSecret: true,
+  audPrefix: true,
 });
 
 export type CreateServiceRequest = zInfer<typeof createServiceRequestSchema>;

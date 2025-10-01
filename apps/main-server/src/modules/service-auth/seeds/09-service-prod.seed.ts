@@ -21,7 +21,12 @@ export default class ServiceProdSeed extends BaseSeeder {
         continue;
       }
 
-      const service = serviceRepo.create(config);
+      const service = serviceRepo.create({
+        ...config,
+        isActive: true,
+        createdBy: 'Seed',
+        updatedBy: 'Seed',
+      });
 
       this.servicesToInsert.push(service);
     }

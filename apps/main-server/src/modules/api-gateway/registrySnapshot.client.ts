@@ -12,7 +12,7 @@ let SNAPSHOT: ServiceSnapshotResponseData = { version: 0, services: [] };
 
 export async function refreshSnapshot() {
   const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
-    headers: { 'X-Api-Key': env.REGISTRY_API_KEY || '' },
+    headers: { 'x-api-key': env.REGISTRY_API_KEY || '' },
     timeout: 5000,
   });
   if (data.status === 'success' && data.data.version !== SNAPSHOT.version) {

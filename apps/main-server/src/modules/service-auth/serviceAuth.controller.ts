@@ -7,6 +7,7 @@ import AppDataSource from '../../config/data-source';
 import { Service } from './entities/Service';
 import * as argon2 from 'argon2';
 import { ServiceAuthService } from './serviceAuth.service';
+import { env } from '../../config/env';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),
@@ -53,7 +54,11 @@ export const getJwksController = async (req: Request, res: Response, next: NextF
 
 export const getSnapshotController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = serviceAuthService.getSnapshot();
+    const apiKey = req.header('x-api-key');
+    if (!apiKey || apiKey !== env.REGISTRY_API_KEY) {
+      throw new UnauthorizedError();
+    }
+    const result = await serviceAuthService.getSnapshot();
     res.status(200).json(result);
   } catch (error) {
     next(error);

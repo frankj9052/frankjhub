@@ -22,7 +22,7 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
     | undefined;
 
   if (!sessionUser?.id || !sessionUser?.sessionVersion) {
-    logger.debug('No session user found. Skipping currentUser injection.');
+    // logger.debug('No session user found. Skipping currentUser injection.');
     return next(); // 用户未登录，不挂载 currentUser
   }
 

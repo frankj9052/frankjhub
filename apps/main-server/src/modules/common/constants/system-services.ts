@@ -7,7 +7,8 @@ export const SYSTEM_SERVICES: Record<string, CreateServiceRequest> = {
   BOOKING: {
     serviceId: 'booking',
     name: 'Booking Service',
-    baseUrl: 'http://booking:4001',
+    baseUrl: 'http://localhost:4000',
+    audPrefix: 'api://',
     routes: [
       {
         path: '/booking',
@@ -15,15 +16,18 @@ export const SYSTEM_SERVICES: Record<string, CreateServiceRequest> = {
         requiredScopes: [
           buildPermissionName(SYSTEM_RESOURCES.BOOKING.name, [SYSTEM_ACTIONS.READ.name]),
         ],
+        rewrite: '^/booking', // 把前缀 /booking 去掉
       },
       {
-        path: '/appointments',
+        path: '/booking',
         methods: ['POST'],
         requiredScopes: [
           buildPermissionName(SYSTEM_RESOURCES.BOOKING.name, [SYSTEM_ACTIONS.CREATE.name]),
         ],
+        rewrite: '^/booking',
       },
     ],
+    // 服务级通用要求
     requiredScopes: [],
     serviceSecret: 'booking-service-secret',
     description: 'Booking Service',
