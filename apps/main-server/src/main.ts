@@ -45,6 +45,12 @@ async function startServer() {
       await emailModule.startWorker();
     }
 
+    // 2.9 启动快照定时器
+    const { startSnapshotScheduler } = await import(
+      './modules/api-gateway/registrySnapshot.client.js'
+    );
+    startSnapshotScheduler();
+
     // 3. 创建并配置 Express 应用
     const app = await createApp();
 

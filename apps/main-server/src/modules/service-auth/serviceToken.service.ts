@@ -48,7 +48,7 @@ export class ServiceTokenService {
       .setProtectedHeader({ alg: 'RS256' })
       .setIssuedAt()
       .setExpirationTime('1h')
-      .setIssuer(env.JWT_SERVICE_ISSUER)
+      .setIssuer(env.JWT_ISSUER)
       .setAudience(payload.serviceId)
       .sign(privateKey);
 
@@ -61,7 +61,7 @@ export class ServiceTokenService {
       const { jwtVerify } = await getJose();
 
       const { payload } = await jwtVerify(token, publicKey, {
-        issuer: env.JWT_SERVICE_ISSUER,
+        issuer: env.JWT_ISSUER,
       });
 
       return payload as ServiceTokenPayload;

@@ -12,6 +12,10 @@ declare module 'express' {
     serviceAuth?: {
       serviceId: string;
       scopes: string[];
+      iss?: string;
+      aud?: string;
+      iat?: number;
+      exp?: number;
     };
     rawBody?: string;
   }

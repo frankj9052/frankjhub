@@ -21,6 +21,12 @@ export async function createApp() {
   app.use(corsOptions);
   app.options('*', corsPreflight);
   app.use(securityHeaders);
+
+  // 挂载网关
+  const { gatewayRawRouter } = await import('./modules/api-gateway/proxyRouter.js');
+  app.use('/gw', gatewayRawRouter);
+
+  // body解析放网关后面
   app.use(
     express.json({
       verify: rawBodyOption,

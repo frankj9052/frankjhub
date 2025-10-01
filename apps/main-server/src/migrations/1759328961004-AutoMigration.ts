@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AutoMigration1759257420135 implements MigrationInterface {
-  name = 'AutoMigration1759257420135';
+export class AutoMigration1759328961004 implements MigrationInterface {
+  name = 'AutoMigration1759328961004';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -67,25 +67,13 @@ export class AutoMigration1759257420135 implements MigrationInterface {
       `CREATE UNIQUE INDEX "IDX_uor_name" ON "user_organization_role" ("name") `
     );
     await queryRunner.query(
-      `CREATE TABLE "service" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "service_id" character varying(100) NOT NULL, "base_url" character varying NOT NULL, "aud_prefix" character varying NOT NULL DEFAULT 'api://', "routes" jsonb NOT NULL DEFAULT '[]', "required_scopes" text array NOT NULL DEFAULT '{}', "health_check_path" character varying, "owner_team" character varying, "service_secret" text NOT NULL, "description" text, "is_active" boolean NOT NULL DEFAULT false, "secret_version" integer NOT NULL DEFAULT '1', "last_rotated_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "UQ_48c5a0e13da2b2948fb7f3a0c4a" UNIQUE ("service_id"), CONSTRAINT "PK_85a21558c006647cd76fdce044b" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
-      `CREATE TABLE "service_role" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "is_active" boolean NOT NULL DEFAULT true, "service_id" uuid NOT NULL, "role_id" uuid NOT NULL, CONSTRAINT "PK_8dea164127ed2ef877a1a6ec287" PRIMARY KEY ("id"))`
+      `CREATE TABLE "service" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "service_id" character varying(100) NOT NULL, "name" character varying(100) NOT NULL, "base_url" character varying NOT NULL, "aud_prefix" character varying NOT NULL DEFAULT 'api://', "routes" jsonb NOT NULL DEFAULT '[]', "required_scopes" text array NOT NULL DEFAULT '{}', "health_check_path" character varying, "owner_team" character varying, "service_secret" text NOT NULL, "description" text, "is_active" boolean NOT NULL DEFAULT false, "secret_version" integer NOT NULL DEFAULT '1', "last_rotated_at" TIMESTAMP WITH TIME ZONE, CONSTRAINT "UQ_48c5a0e13da2b2948fb7f3a0c4a" UNIQUE ("service_id"), CONSTRAINT "PK_85a21558c006647cd76fdce044b" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE TABLE "email_suppression" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "email" character varying(320) NOT NULL, "reason" character varying(64) NOT NULL, CONSTRAINT "PK_7c01fd4660a34be4ff82d235f72" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_c799e37d31dc4930aa36f7d483" ON "email_suppression" ("email") `
-    );
-    await queryRunner.query(
-      `CREATE TABLE "email_receipt" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "provider_message_id" character varying(256) NOT NULL, "event" character varying(64) NOT NULL, "payload" jsonb, CONSTRAINT "UQ_8b37f8d324287f49ffb44550a26" UNIQUE ("provider_message_id"), CONSTRAINT "PK_9d626545ebec85c7ff9c7e63ca2" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
-      `CREATE INDEX "IDX_8b37f8d324287f49ffb44550a2" ON "email_receipt" ("provider_message_id") `
-    );
-    await queryRunner.query(
-      `CREATE INDEX "IDX_6463cd0c29ed19c57b895d8c2d" ON "email_receipt" ("event") `
     );
     await queryRunner.query(
       `CREATE TABLE "email_outbox" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "to" character varying(320) NOT NULL, "cc" character varying(320), "bcc" character varying(320), "from" character varying(320) NOT NULL, "reply_to" character varying(320), "subject" character varying(512) NOT NULL, "template_key" character varying(128), "template_vars" jsonb, "html_body" text, "text_body" text, "channel" "public"."email_outbox_channel_enum" NOT NULL DEFAULT 'transactional', "status" "public"."email_outbox_status_enum" NOT NULL DEFAULT 'queued', "provider_message_id" character varying(256), "provider" "public"."email_outbox_provider_enum" NOT NULL DEFAULT 'resend', "idempotency_key" character varying(128), "attempt" integer NOT NULL DEFAULT '0', "last_error" text, "trace_id" character varying(128), CONSTRAINT "UQ_0916a28c43b791fd0ea78d74718" UNIQUE ("idempotency_key"), CONSTRAINT "PK_b6fbfc201f705fbf1ac87bd7197" PRIMARY KEY ("id"))`
@@ -104,6 +92,15 @@ export class AutoMigration1759257420135 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_6a98524a9826ee6ba486cb6027" ON "email_outbox" ("trace_id") `
+    );
+    await queryRunner.query(
+      `CREATE TABLE "email_receipt" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "provider_message_id" character varying(256) NOT NULL, "event" character varying(64) NOT NULL, "payload" jsonb, CONSTRAINT "UQ_8b37f8d324287f49ffb44550a26" UNIQUE ("provider_message_id"), CONSTRAINT "PK_9d626545ebec85c7ff9c7e63ca2" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_8b37f8d324287f49ffb44550a2" ON "email_receipt" ("provider_message_id") `
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_6463cd0c29ed19c57b895d8c2d" ON "email_receipt" ("event") `
     );
     await queryRunner.query(
       `CREATE TABLE "clinic" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "org_id" uuid NOT NULL, "display_name" character varying(255) NOT NULL, "legal_name" character varying(255), "slug" character varying(160), "status" "public"."clinic_status_enum" NOT NULL DEFAULT 'active', "phones" jsonb, "emails" jsonb, "website_url" text, "booking_url" text, "social_links" jsonb, "address_line1" character varying(255) NOT NULL, "address_line2" character varying(255), "unit" character varying(50), "city" character varying(120) NOT NULL, "province" character varying(50) NOT NULL, "postal_code" character varying(20) NOT NULL, "country_code" character(2) NOT NULL DEFAULT 'CA', "formatted_address" text, "place_id" character varying(120), "timezone" character varying(60), "lat" numeric(9,6), "lng" numeric(9,6), "location" geography(Point,4326), "open_hours" jsonb, "services" text array NOT NULL DEFAULT '{}', "insurances" text array NOT NULL DEFAULT '{}', "languages" text array NOT NULL DEFAULT '{}', "amenities" jsonb, "wheelchair_accessible" boolean NOT NULL DEFAULT false, "accepts_new_patients" boolean NOT NULL DEFAULT true, "walk_in" boolean NOT NULL DEFAULT false, "telehealth" boolean NOT NULL DEFAULT false, "emergency" boolean NOT NULL DEFAULT false, "avg_wait_minutes" smallint, "specialties" text array NOT NULL DEFAULT '{}', "rating_avg" numeric(3,2) NOT NULL DEFAULT '0', "review_count" integer NOT NULL DEFAULT '0', "logo_url" text, "photo_urls" text array NOT NULL DEFAULT '{}', "short_description" character varying(280), "description" text, "tags" text array NOT NULL DEFAULT '{}', "license_number" character varying(120), "accreditations" text array NOT NULL DEFAULT '{}', "established_year" smallint, "tax_number" character varying(120), "embedding" vector(1536), "data_source" character varying(60) NOT NULL DEFAULT 'manual', "source_updated_at" TIMESTAMP WITH TIME ZONE, "last_synced_at" TIMESTAMP WITH TIME ZONE, "data_version" integer NOT NULL DEFAULT '1', CONSTRAINT "UQ_0b620bc70a113b7909eeca1e60f" UNIQUE ("slug"), CONSTRAINT "PK_d7f10e5499997eba0b14b785d58" PRIMARY KEY ("org_id")); COMMENT ON COLUMN "clinic"."rating_avg" IS '0.00 ~ 5.00'`
@@ -157,12 +154,6 @@ export class AutoMigration1759257420135 implements MigrationInterface {
       `ALTER TABLE "user_organization_role" ADD CONSTRAINT "FK_43a3c5fd03293a390bd5c84931f" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "service_role" ADD CONSTRAINT "FK_de14f0d28528ba981fd4238373f" FOREIGN KEY ("service_id") REFERENCES "service"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "service_role" ADD CONSTRAINT "FK_cd5d56f86e66e8db590859c321d" FOREIGN KEY ("role_id") REFERENCES "role"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
       `ALTER TABLE "clinic" ADD CONSTRAINT "FK_d7f10e5499997eba0b14b785d58" FOREIGN KEY ("org_id") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
@@ -194,12 +185,6 @@ export class AutoMigration1759257420135 implements MigrationInterface {
     );
     await queryRunner.query(
       `ALTER TABLE "clinic" DROP CONSTRAINT "FK_d7f10e5499997eba0b14b785d58"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "service_role" DROP CONSTRAINT "FK_cd5d56f86e66e8db590859c321d"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "service_role" DROP CONSTRAINT "FK_de14f0d28528ba981fd4238373f"`
     );
     await queryRunner.query(
       `ALTER TABLE "user_organization_role" DROP CONSTRAINT "FK_43a3c5fd03293a390bd5c84931f"`
@@ -242,18 +227,17 @@ export class AutoMigration1759257420135 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."ix_clinic_postal_code"`);
     await queryRunner.query(`DROP INDEX "public"."ix_clinic_status"`);
     await queryRunner.query(`DROP TABLE "clinic"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_6463cd0c29ed19c57b895d8c2d"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_8b37f8d324287f49ffb44550a2"`);
+    await queryRunner.query(`DROP TABLE "email_receipt"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_6a98524a9826ee6ba486cb6027"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_0916a28c43b791fd0ea78d7471"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_a131f9addc4fa1eb04bbdc5c3b"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_3e1cafb815a8666793a7d9bd8b"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_648db1d4551b4ed132beebbf30"`);
     await queryRunner.query(`DROP TABLE "email_outbox"`);
-    await queryRunner.query(`DROP INDEX "public"."IDX_6463cd0c29ed19c57b895d8c2d"`);
-    await queryRunner.query(`DROP INDEX "public"."IDX_8b37f8d324287f49ffb44550a2"`);
-    await queryRunner.query(`DROP TABLE "email_receipt"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_c799e37d31dc4930aa36f7d483"`);
     await queryRunner.query(`DROP TABLE "email_suppression"`);
-    await queryRunner.query(`DROP TABLE "service_role"`);
     await queryRunner.query(`DROP TABLE "service"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_uor_name"`);
     await queryRunner.query(`DROP INDEX "public"."ix_uor_user"`);

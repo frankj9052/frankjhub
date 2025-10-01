@@ -32,7 +32,7 @@ export async function verifyServiceJwt(
 
   const { payload } = await jwtVerify(token, jwks, {
     algorithms: ['RS256'],
-    issuer: env.SERVICE_AUTH_ISSUER,
+    issuer: env.JWT_ISSUER,
     audience: expectedAudience,
   });
 
