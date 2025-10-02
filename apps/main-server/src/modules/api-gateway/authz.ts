@@ -4,6 +4,7 @@ import { Request } from 'express';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { verifyServiceJwt } from '../service-auth/utils/verifyWithJwks';
 import { ForbiddenError } from '../common/errors/ForbiddenError';
+import { hasPermission } from '../permission/utils/hasPermission';
 
 export async function verifyAccess(req: Request, expectedAudience: string | string[]) {
   const auth = req.headers.authorization || '';
@@ -13,7 +14,6 @@ export async function verifyAccess(req: Request, expectedAudience: string | stri
   // verifyServiceJwt 目前签名为 (token, expectedAudience: string)
   // 若 expectedAudience 是数组，按需遍历校验，任一通过即可
   const audiences = Array.isArray(expectedAudience) ? expectedAudience : [expectedAudience];
-
   let ok = false;
   let lastErr: any;
   for (const aud of audiences) {
@@ -35,7 +35,8 @@ export function checkScopes(req: Request, required: string[]) {
   const tokenScopes = String(req.serviceAuth?.scopes || '')
     .split(/[ ,]/)
     .filter(Boolean);
-  const missing = required.filter(s => !tokenScopes.includes(s));
+  // 校验所需权限作用域
+  const missing = required.filter(required => !hasPermission(tokenScopes, required));
   if (missing.length) {
     const err: any = new ForbiddenError('Insufficient scope');
     err.status = 403;

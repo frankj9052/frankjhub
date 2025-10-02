@@ -5,7 +5,9 @@ const app = express();
 app.use(express.json());
 
 // 简单健康检查
-app.get('/health', (_req, res) => res.json({ ok: true, service: 'booking-service' }));
+app.get('/health', (_req, res) => {
+  res.json({ ok: true, service: 'booking-service' });
+});
 
 // 业务路由(网关将把 /gw/test/booking 重写到 /booking)
 app.get('/booking', (req, res) => {

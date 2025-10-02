@@ -25,13 +25,19 @@ export class RolePermission extends BaseEntity {
   @Column({ type: 'boolean', default: true })
   isActive?: boolean;
 
+  @Column({ type: 'uuid' })
+  permissionId!: string;
+
   /* 外键 */
   @ManyToOne(() => Permission, { nullable: false })
-  @JoinColumn({ name: 'permission_id' })
+  @JoinColumn({ name: 'permissionId' })
   permission!: Permission;
 
+  @Column({ type: 'uuid' })
+  roleId!: string;
+
   @ManyToOne(() => Role, { nullable: false })
-  @JoinColumn({ name: 'role_id' })
+  @JoinColumn({ name: 'roleId' })
   role!: Role;
 
   @BeforeInsert()

@@ -8,6 +8,10 @@ import { Service } from './entities/Service';
 import * as argon2 from 'argon2';
 import { ServiceAuthService } from './serviceAuth.service';
 import { env } from '../../config/env';
+import { Role } from '../role/entities/Role';
+import { In } from 'typeorm';
+import { RolePermission } from '../role/entities/RolePermission';
+import { parseRolePermissionName } from '../codecs/permissionCodec';
 
 const serviceLoginSchema = z.object({
   serviceId: z.string(),
@@ -24,6 +28,23 @@ export const serviceLoginController = async (req: Request, res: Response, next: 
     const serviceRepo = AppDataSource.getRepository(Service);
     const service = await serviceRepo.findOne({ where: { serviceId } });
 
+    const roleCodes = req?.session?.user?.roleCodes ?? [];
+    let rolePermissions: RolePermission[] = [];
+    let scopes: string[] = [];
+    if (roleCodes && roleCodes.length > 0) {
+      // 找到所有的role
+      const roleRepo = AppDataSource.getRepository(Role);
+      const roles = await roleRepo.find({
+        where: { code: In(roleCodes), isActive: true },
+        relations: {
+          rolePermissions: true,
+        },
+      });
+      rolePermissions = roles.flatMap(role => role.rolePermissions);
+    }
+
+    scopes = rolePermissions.map(rp => parseRolePermissionName(rp.name).permissionName);
+
     if (
       !service ||
       !service.isActive ||
@@ -34,7 +55,10 @@ export const serviceLoginController = async (req: Request, res: Response, next: 
 
     const token = await ServiceTokenService.signToken({
       serviceId,
-      scopes: service.requiredScopes,
+      scopes,
+      iss: env.JWT_ISSUER,
+      sub: service.serviceId,
+      aud: service.audPrefix + service.serviceId,
     });
 
     res.status(200).json({ status: 'success', data: { token } });

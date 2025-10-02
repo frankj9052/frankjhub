@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { ServiceJwtPayload, serviceJwtPayloadSchema } from '@frankjhub/shared-schema';
 import { env } from '../../../config/env';
 import { BadRequestError } from '../../common/errors/BadRequestError';
 import { getJose } from '../libs/lazyJose';
@@ -11,17 +11,6 @@ const getRemoteJWKSet = async () => {
   JWKS = createRemoteJWKSet(new URL(env.SERVICE_AUTH_JWKS_URL));
   return JWKS;
 };
-
-const ServiceJwtPayloadSchema = z.object({
-  serviceId: z.string(),
-  scopes: z.array(z.string()),
-  iss: z.string(),
-  aud: z.string(),
-  iat: z.number(),
-  exp: z.number(),
-});
-
-export type ServiceJwtPayload = z.infer<typeof ServiceJwtPayloadSchema>;
 
 export async function verifyServiceJwt(
   token: string,
@@ -36,10 +25,10 @@ export async function verifyServiceJwt(
     audience: expectedAudience,
   });
 
-  const result = ServiceJwtPayloadSchema.safeParse(payload);
+  const result = serviceJwtPayloadSchema.safeParse(payload);
   if (!result.success) {
     throw new BadRequestError('Invalid JWT payload structure', result.error.format());
   }
 
-  return payload as ServiceJwtPayload;
+  return payload;
 }

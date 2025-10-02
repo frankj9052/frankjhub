@@ -68,11 +68,14 @@ export default class RolePermissionProdSeed extends BaseSeeder {
 
     this.logger.info('🚀 Creating role-permission link...');
     const rpRepo = this.getRepository(dataSource);
-
     const rolePermission = rpRepo.create({
       role: this.role,
+      roleId: this.role.id,
       permission: this.permission,
+      permissionId: this.permission.id,
       isActive: true,
+      createdBy: 'Seed',
+      updatedBy: 'Seed',
     });
 
     // ✅ 会触发 @BeforeInsert() 自动生成 name 字段

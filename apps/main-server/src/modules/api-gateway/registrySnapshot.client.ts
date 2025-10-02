@@ -22,7 +22,7 @@ export async function refreshSnapshot() {
 
 // 返回的是网关路由匹配的结果对象，语义上它就是 一次路由匹配后的描述信息
 export function getMatch(req: import('express').Request): RouteMatchResult | null {
-  const path = req.path;
+  const path = req.path || '/';
   const method = req.method.toUpperCase() as HttpMethod;
   for (const s of SNAPSHOT.services) {
     for (const r of s.routes) {

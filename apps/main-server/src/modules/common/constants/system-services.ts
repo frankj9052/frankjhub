@@ -19,11 +19,9 @@ export const SYSTEM_SERVICES: Record<string, CreateServiceRequest> = {
         rewrite: '^/booking', // 把前缀 /booking 去掉
       },
       {
-        path: '/booking',
-        methods: ['POST'],
-        requiredScopes: [
-          buildPermissionName(SYSTEM_RESOURCES.BOOKING.name, [SYSTEM_ACTIONS.CREATE.name]),
-        ],
+        path: '/health',
+        methods: ['GET'],
+        requiredScopes: [],
         rewrite: '^/booking',
       },
     ],

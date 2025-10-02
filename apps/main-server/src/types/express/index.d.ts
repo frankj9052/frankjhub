@@ -13,7 +13,7 @@ declare module 'express' {
       serviceId: string;
       scopes: string[];
       iss?: string;
-      aud?: string;
+      aud?: string | string[];
       iat?: number;
       exp?: number;
     };

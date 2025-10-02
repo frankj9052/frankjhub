@@ -4,6 +4,7 @@ import { env } from '../../config/env';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { getJose } from './libs/lazyJose';
+import { ServiceJwtPayload } from '@frankjhub/shared-schema';
 
 const logger = createLoggerWithContext('ServiceTokenService');
 
@@ -26,36 +27,29 @@ const getPublicKey = async (): Promise<CryptoKey> => {
   return cachedPublicKey;
 };
 
-export interface ServiceTokenPayload {
-  serviceId: string;
-  scopes: string[];
-  iss?: string;
-  sub?: string;
-  aud?: string | string[];
-  exp?: number;
-  nbf?: number;
-  iat?: number;
-  jti?: string;
-  [key: string]: unknown;
-}
-
 export class ServiceTokenService {
-  static async signToken(payload: ServiceTokenPayload): Promise<string> {
+  static async signToken(payload: ServiceJwtPayload): Promise<string> {
     const privateKey = await getPrivateKey();
     const { SignJWT } = await getJose();
 
+    const nowSec = Math.floor(Date.now() / 1000);
+    const jti = crypto.randomUUID();
+
     const jwt = await new SignJWT(payload)
-      .setProtectedHeader({ alg: 'RS256' })
-      .setIssuedAt()
+      .setProtectedHeader({ alg: 'RS256', kid: 'main-key' })
+      .setIssuer(env.JWT_ISSUER) // 谁签的
+      .setSubject(payload.serviceId) // 调用方是谁
+      .setAudience(payload.aud) // 目标资源（被调用者）
+      .setIssuedAt(nowSec)
+      .setNotBefore(nowSec - 5) // 容忍轻微时钟漂移
       .setExpirationTime('1h')
-      .setIssuer(env.JWT_ISSUER)
-      .setAudience(payload.serviceId)
+      .setJti(jti)
       .sign(privateKey);
 
     return jwt;
   }
 
-  static async verifyToken(token: string): Promise<ServiceTokenPayload> {
+  static async verifyToken(token: string): Promise<ServiceJwtPayload> {
     try {
       const publicKey = await getPublicKey();
       const { jwtVerify } = await getJose();
@@ -64,7 +58,7 @@ export class ServiceTokenService {
         issuer: env.JWT_ISSUER,
       });
 
-      return payload as ServiceTokenPayload;
+      return payload as ServiceJwtPayload;
     } catch (err: any) {
       if (err.code === 'ERR_JWT_EXPIRED') {
         logger.warn('Token expired', err);

@@ -43,9 +43,15 @@ export class Role extends BaseEntity {
   @Column({ type: 'enum', enum: RoleSource, default: RoleSource.TYPE })
   roleSource?: RoleSource;
 
+  @Column({ type: 'uuid', nullable: true })
+  organizationTypeId?: string | null;
+
   @ManyToOne(() => OrganizationType, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationTypeId' })
   organizationType?: OrganizationType | null;
+
+  @Column({ type: 'uuid', nullable: true })
+  organizationId?: string | null;
 
   @ManyToOne(() => Organization, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'organizationId' })

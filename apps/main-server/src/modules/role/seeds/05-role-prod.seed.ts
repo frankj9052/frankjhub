@@ -94,6 +94,8 @@ export default class RoleProdSeed extends BaseSeeder {
         description,
         isActive: true,
         roleSource,
+        createdBy: 'Seed',
+        updatedBy: 'Seed',
       };
 
       if (roleSource === RoleSource.TYPE && organizationType) {

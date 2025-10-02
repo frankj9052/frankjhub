@@ -13,27 +13,29 @@ export const gatewayRawRouter = Router();
 const logger = createLoggerWithContext('gatewayRawRouter');
 // 测试router
 // 请求 GET http://localhost:3100/gw/__debug/match/booking/booking
-gatewayRawRouter.get('/__debug/match/*', (req, res) => {
-  const { getMatch } = require('./registrySnapshot.client');
-  const fake = { ...req, path: req.path.replace('/__debug/match', '') };
-  const match = getMatch(fake as any);
-  res.json({ path: req.path, stripped: (fake as any).path, match });
-});
+// gatewayRawRouter.get('/__debug/match/*', (req, res) => {
+//   const { getMatch } = require('./registrySnapshot.client');
+//   const fake = { ...req, path: req.path.replace('/__debug/match', '') };
+//   const match = getMatch(fake as any);
+//   res.json({ path: req.path, stripped: (fake as any).path, match });
+// });
 
 // 2) 可选：打一条“进入网关”的日志，便于确认挂载生效
-gatewayRawRouter.use((req, _res, next) => {
-  logger.info(`[GW] inbound: method=${req.method} originalUrl=${req.originalUrl} path=${req.path}`);
-  next();
-});
+// gatewayRawRouter.use((req, _res, next) => {
+//   logger.info(`[GW] inbound: method=${req.method} originalUrl=${req.originalUrl} path=${req.path}`);
+//   next();
+// });
 
 // 注意：不要在此 router 上挂 json/urlencoded 解析（保持原始流）
 // 依赖：http-proxy-middleware（安装到 main-server）
-gatewayRawRouter.use('*', async (req, res, next) => {
+// 注意通配符*会吃掉req.path里的内容，去掉星号或者用req.url, req.restUrl
+gatewayRawRouter.use(async (req, res, next) => {
   try {
     const match = getMatch(req);
-    if (!match) return res.status(404).json(new NotFoundError('Route not found'));
 
+    if (!match) return res.status(404).json(new NotFoundError('Route not found'));
     await verifyAccess(req, match.audience);
+
     checkScopes(req, match.requiredScopes);
 
     const proxy = createProxyMiddleware({
@@ -45,20 +47,21 @@ gatewayRawRouter.use('*', async (req, res, next) => {
       pathRewrite: match.rewrite ? { [match.rewrite]: '' } : undefined,
       on: {
         proxyReq: (proxyReq, req, _res) => {
+          // 先删掉潜在的用户伪造
+          proxyReq.removeHeader('x-forwarded-service');
+          proxyReq.removeHeader('x-request-id');
+
           proxyReq.setHeader(
             'x-forwarded-service',
             (req as any).serviceAuth?.serviceId || (req as any).serviceAuth?.sub || ''
           );
           proxyReq.setHeader('x-request-id', String(req.headers['x-request-id'] || ''));
-          logger.debug('[GW] proxying to:', match.target, 'path=', (req as any).url);
+          logger.debug(`[GW] proxying to: ${match.target}, path=${req.url}`);
         },
         proxyRes: (proxyRes, req, _res) => {
           // 记录上游状态，确认确实到了上游
           logger.info(
-            '[GW] upstream status:',
-            proxyRes.statusCode,
-            'for',
-            (req as any).originalUrl
+            `[GW] upstream status: ${proxyRes.statusCode} for ${(req as any).originalUrl}`
           );
           // 关键：让 proxy 明确处理响应（避免 Express 继续向后）
           // 默认情况下已处理，但我们显式确保不会 next()
@@ -79,10 +82,4 @@ gatewayRawRouter.use('*', async (req, res, next) => {
       .status(code)
       .json({ error: error.message || 'unauthorized', required: error.required });
   }
-});
-
-// 放在 gatewayRawRouter 最后
-gatewayRawRouter.use((req, res) => {
-  // 能走到这里，说明既没命中调试路由，也没被代理接管
-  res.status(404).json({ error: 'gw_route_not_matched', path: req.originalUrl });
 });
