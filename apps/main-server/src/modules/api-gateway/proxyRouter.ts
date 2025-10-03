@@ -1,6 +1,5 @@
 // 动态匹配 + 反向代理
 // 代理路由（避免 bodyParser，使用原始流）
-
 import { Router } from 'express';
 import { getMatch } from './registrySnapshot.client';
 import { NotFoundError } from '../common/errors/NotFoundError';
@@ -34,8 +33,24 @@ gatewayRawRouter.use(async (req, res, next) => {
     const match = getMatch(req);
 
     if (!match) return res.status(404).json(new NotFoundError('Route not found'));
-    await verifyAccess(req, match.audience);
 
+    // const isPublic = match.requiredScopes.length > 0;
+    // const hasCred =
+    //   !!req.headers.authorization ||
+    //   !!req.headers.cookie ||
+    //   !!req.headers['x-api-key'] ||
+    //   !!req.headers['x-service-token'] ||
+    //   !!req?.session?.user;
+
+    console.log('header cookie check ===> ', req.headers.cookie);
+    console.log('check session ===> ', req?.session?.user);
+    console.log('check authorization ===> ', req.headers.authorization);
+    console.log('current user check ===> ', req.currentUser);
+    console.log('service auth check ===> ', req.serviceAuth);
+    console.log('path check ===> ', req.path);
+    console.log('url check ===> ', req.url);
+
+    await verifyAccess(req, match.audience);
     checkScopes(req, match.requiredScopes);
 
     const proxy = createProxyMiddleware({
@@ -49,7 +64,13 @@ gatewayRawRouter.use(async (req, res, next) => {
         proxyReq: (proxyReq, req, _res) => {
           // 先删掉潜在的用户伪造
           proxyReq.removeHeader('x-forwarded-service');
+          proxyReq.removeHeader('x-forwarded-user');
+          proxyReq.removeHeader('x-principal-type');
+          proxyReq.removeHeader('x-forwarded-scopes');
           proxyReq.removeHeader('x-request-id');
+
+          // 统一的主体（principal）模型：user 或 service
+          // const principalType = req.serviceAuth ? 'service' : req.currentUser ? 'user' : 'anonymous';
 
           proxyReq.setHeader(
             'x-forwarded-service',

@@ -3,7 +3,8 @@
 import 'express-session';
 import 'express';
 import { UserPayload } from '@frankjhub/shared-schema';
-declare module 'express' {
+// declare module 'express' {
+declare module 'express-serve-static-core' {
   interface Request {
     requestId?: string;
 

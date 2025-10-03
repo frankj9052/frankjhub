@@ -17,14 +17,20 @@ export async function createApp() {
   app.disable('x-powered-by');
 
   // ---- 全局中间件 ----
-  app.use(cookieParser());
+  app.use(cookieParser()); // 给 session 用
+  app.use(requestId); // 让上游能拿到 x-request-id
   app.use(corsOptions);
   app.options('*', corsPreflight);
   app.use(securityHeaders);
 
+  // 认证态相关
+  app.use(sessionMiddleware);
+  app.use(currentUser);
+
   // 挂载网关
   const { gatewayRawRouter } = await import('./modules/api-gateway/proxyRouter.js');
-  app.use('/gw', gatewayRawRouter);
+  // 给网关挂载需要的轻中间件
+  app.use('/gw', requestId, sessionMiddleware, currentUser, gatewayRawRouter);
 
   // body解析放网关后面
   app.use(
@@ -33,11 +39,6 @@ export async function createApp() {
     })
   );
   app.use(express.urlencoded({ extended: true, verify: rawBodyOption }));
-
-  // 其它中间件
-  app.use(requestId);
-  app.use(sessionMiddleware);
-  app.use(currentUser);
 
   // ---- 动态注册业务路由（异步操作）----
   const apiRouter = Router();
