@@ -226,6 +226,7 @@ export class OrganizationService {
 
     org.deletedAt = new Date();
     org.deletedBy = performedBy;
+    org.updatedBy = performedBy;
     await this.orgRepo.save(org);
 
     return {

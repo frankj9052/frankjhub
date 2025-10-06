@@ -1,0 +1,87 @@
+import { ServiceListPageData } from '../response';
+
+export const serviceListDataExample: ServiceListPageData = {
+  data: [
+    {
+      id: 'svc_001',
+      serviceId: 'booking-service',
+      name: 'Booking Service',
+      baseUrl: 'https://api.example.com/booking',
+      audPrefix: 'booking',
+      requiredScopes: ['booking.read', 'booking.write'],
+      routes: [
+        {
+          path: '/bookings',
+          methods: ['GET', 'POST'],
+          requiredScopes: ['booking.read', 'booking.write'],
+          rateLimit: {
+            windowMs: 60000,
+            max: 100,
+          },
+        },
+        {
+          path: '/bookings/:id',
+          methods: ['GET', 'PATCH', 'DELETE'],
+          requiredScopes: ['booking.read', 'booking.write'],
+          rewrite: '/bookings/{id}',
+        },
+      ],
+      isActive: true,
+      secretVersion: 3,
+      createdAt: '2025-10-01T09:00:00Z',
+      createdBy: 'admin_user',
+      updatedAt: '2025-10-05T12:00:00Z',
+      updatedBy: 'system_user',
+      deletedAt: null,
+      deletedBy: null,
+      description: 'Handles customer bookings and schedule management.',
+      healthCheckPath: '/health',
+      ownerTeam: 'backend-platform',
+      lastRotatedAt: new Date('2025-09-30T00:00:00Z'),
+    },
+    {
+      id: 'svc_002',
+      serviceId: 'payment-service',
+      name: 'Payment Service',
+      baseUrl: 'https://api.example.com/payment',
+      audPrefix: 'payment',
+      requiredScopes: ['payment.read', 'payment.charge'],
+      routes: [
+        {
+          path: '/payments',
+          methods: ['POST'],
+          requiredScopes: ['payment.charge'],
+          rateLimit: {
+            windowMs: 60000,
+            max: 50,
+          },
+        },
+        {
+          path: '/payments/:id',
+          methods: ['GET'],
+          requiredScopes: ['payment.read'],
+        },
+      ],
+      isActive: false,
+      secretVersion: 5,
+      createdAt: '2025-09-20T08:30:00Z',
+      createdBy: 'finance_team',
+      updatedAt: '2025-10-03T10:00:00Z',
+      updatedBy: 'devops_bot',
+      deletedAt: null,
+      deletedBy: null,
+      description: 'Processes payments and manages transaction records.',
+      healthCheckPath: '/status',
+      ownerTeam: 'finance-core',
+      lastRotatedAt: new Date('2025-09-25T00:00:00Z'),
+    },
+  ],
+  total: 2,
+  pageCount: 1,
+  currentPage: 1,
+  pageSize: 10,
+  search: '',
+  filters: {
+    isActive: ['isActive'],
+  },
+};

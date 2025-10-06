@@ -1,7 +1,6 @@
 import { z, zInfer } from '../../../libs/z';
 import { baseEntitySchema } from '../../../modules/common';
 import { serviceRouteSchema } from './service-route.schema';
-import { serviceSecretSchema } from './service-secret.schema';
 
 export const serviceSchema = z.object({
   ...baseEntitySchema.shape,
@@ -17,7 +16,6 @@ export const serviceSchema = z.object({
   requiredScopes: z.array(z.string().min(1)).default([]),
   healthCheckPath: z.string().optional(),
   ownerTeam: z.string().optional(),
-  serviceSecret: serviceSecretSchema,
   description: z.string().optional(),
   isActive: z.boolean().default(false),
   secretVersion: z.number().int().min(1).default(1),

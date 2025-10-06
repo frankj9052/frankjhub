@@ -1,15 +1,20 @@
 import { zInfer } from '../../../libs/z';
-import { serviceSchema } from '../entities';
+import { serviceSchema, serviceSecretSchema } from '../entities';
 
-export const createServiceRequestSchema = serviceSchema.pick({
-  serviceId: true,
-  baseUrl: true,
-  name: true,
-  description: true,
-  routes: true,
-  requiredScopes: true,
-  serviceSecret: true,
-  audPrefix: true,
-});
+export const serviceCreateRequestSchema = serviceSchema
+  .pick({
+    serviceId: true,
+    name: true,
+    baseUrl: true,
+    audPrefix: true,
+    routes: true,
+    requiredScopes: true,
+    healthCheckPath: true,
+    ownerTeam: true,
+    description: true,
+  })
+  .extend({
+    serviceSecret: serviceSecretSchema,
+  });
 
-export type CreateServiceRequest = zInfer<typeof createServiceRequestSchema>;
+export type ServiceCreateRequest = zInfer<typeof serviceCreateRequestSchema>;
