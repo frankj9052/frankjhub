@@ -19,6 +19,9 @@ app.get('/booking', (req, res) => {
       // 查看网关有没有透传这些头
       'x-forwarded-service': req.headers['x-forwarded-service'] || null,
       'x-request-id': req.headers['x-request-id'] || null,
+      'x-forwarded-scopes': req.headers['x-forwarded-scopes'] || null,
+      'x-forwarded-user': req.headers['x-forwarded-user'] || null,
+      'x-forwarded-user-name': req.headers['x-forwarded-user-name'] || null,
       authorization: req.headers['authorization'],
     },
   });

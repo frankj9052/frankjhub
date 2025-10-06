@@ -17,9 +17,7 @@ export const serviceLoginController = async (req: Request, res: Response, next: 
   try {
     const parsed = serviceLoginSchema.parse(req.body);
 
-    const session = req.session;
-
-    const result = await serviceAuthService.serviceLogin(parsed, session);
+    const result = await serviceAuthService.serviceLogin(parsed);
 
     res.status(200).json(result);
   } catch (error) {

@@ -1,19 +1,10 @@
 import { z } from 'zod';
 import { registry } from '../../../config/openapiRegistry';
-
-// ✅ Schema: service-login 请求体
-const serviceLoginSchema = z.object({
-  serviceId: z.string().openapi({ example: 'main-server' }),
-  serviceSecret: z.string().openapi({ example: 'abc123' }),
-});
-
-// ✅ Schema: service-login 成功响应
-const serviceLoginResponseSchema = z.object({
-  status: z.literal('success'),
-  data: z.object({
-    token: z.string().describe('JWT access token (RS256 signed)'),
-  }),
-});
+import {
+  buildErrorResponses,
+  serviceLoginResponseSchema,
+  serviceLoginSchema,
+} from '@frankjhub/shared-schema';
 
 // ✅ 注册 /auth/service-login 路由文档
 registry.registerPath({
@@ -27,7 +18,12 @@ registry.registerPath({
       required: true,
       content: {
         'application/json': {
-          schema: serviceLoginSchema,
+          schema: serviceLoginSchema.openapi({
+            example: {
+              serviceId: 'booking',
+              serviceSecret: 'booking-service-secret',
+            },
+          }),
         },
       },
     },
@@ -37,7 +33,15 @@ registry.registerPath({
       description: 'Login successful, returns JWT access token',
       content: {
         'application/json': {
-          schema: serviceLoginResponseSchema,
+          schema: serviceLoginResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Service login successful',
+              data: {
+                token: 'booking-service-token',
+              },
+            },
+          }),
         },
       },
     },
@@ -73,5 +77,148 @@ registry.registerPath({
         },
       },
     },
+  },
+});
+
+// 发布快照
+registry.registerPath({
+  method: 'get',
+  path: '/registry/snapshot',
+  tags: ['Service Auth'],
+  summary: 'Get active services snapshot for the API Gateway',
+  description:
+    'Return the current active services snapshot for the gateway to consume. Requires a valid **x-api-key** header.',
+  // 声明必须的 header 参数 x-api-key
+  parameters: [
+    {
+      in: 'header',
+      name: 'x-api-key',
+      required: true,
+      description: 'Registry API key. Must match server-side env.REGISTRY_API_KEY.',
+      schema: { type: 'string' },
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Snapshot fetched successfully',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              status: { type: 'string', enum: ['success'] },
+              message: { type: 'string' },
+              data: {
+                type: 'object',
+                properties: {
+                  version: { type: 'number', description: 'Unix timestamp (ms) of this snapshot' },
+                  services: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        key: { type: 'string', description: 'Service natural key, e.g. "booking"' },
+                        aud: { type: 'string', description: 'Audience, e.g. "api://booking"' },
+                        baseUrl: { type: 'string', description: 'Service base URL' },
+                        requiredScopes: {
+                          type: 'array',
+                          items: { type: 'string' },
+                          description: 'Service-level minimal required scopes (if any)',
+                        },
+                        routes: {
+                          type: 'array',
+                          items: {
+                            type: 'object',
+                            properties: {
+                              path: { type: 'string' },
+                              methods: {
+                                type: 'array',
+                                items: {
+                                  type: 'string',
+                                  description: 'HTTP method (GET/POST/...)',
+                                },
+                              },
+                              requiredScopes: {
+                                type: 'array',
+                                items: { type: 'string' },
+                                description: 'Route-level required scopes',
+                              },
+                              rewrite: { type: 'string', nullable: true },
+                              rateLimit: {
+                                type: 'object',
+                                nullable: true,
+                                properties: {
+                                  windowMs: { type: 'number' },
+                                  max: { type: 'number' },
+                                },
+                                additionalProperties: false,
+                              },
+                            },
+                            required: ['path', 'methods', 'requiredScopes'],
+                            additionalProperties: false,
+                          },
+                        },
+                      },
+                      required: ['key', 'aud', 'baseUrl', 'routes'],
+                      additionalProperties: false,
+                    },
+                  },
+                },
+                required: ['version', 'services'],
+                additionalProperties: false,
+              },
+            },
+            required: ['status', 'message', 'data'],
+            additionalProperties: false,
+          },
+          examples: {
+            success: {
+              summary: 'Example snapshot',
+              value: {
+                status: 'success',
+                message: 'Get service snapshot successful',
+                data: {
+                  version: 1727972400000,
+                  services: [
+                    {
+                      key: 'booking',
+                      aud: 'api://booking',
+                      baseUrl: 'http://localhost:4101',
+                      requiredScopes: ['booking:read'],
+                      routes: [
+                        {
+                          path: '/appointments',
+                          methods: ['GET', 'POST'],
+                          requiredScopes: ['booking:read', 'booking:write'],
+                          rewrite: '^/booking',
+                          rateLimit: { windowMs: 60000, max: 120 },
+                        },
+                      ],
+                    },
+                    {
+                      key: 'shift',
+                      aud: 'api://shift',
+                      baseUrl: 'http://localhost:4102',
+                      requiredScopes: [],
+                      routes: [
+                        {
+                          path: '/shifts',
+                          methods: ['GET'],
+                          requiredScopes: ['shift:read'],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      500: 'InternalServerError',
+    }),
   },
 });
