@@ -5,6 +5,7 @@ import {
   ServiceListResponse,
   ServiceLogin,
   ServiceLoginResponse,
+  ServiceSingleResponse,
   ServiceSnapshot,
   ServiceSnapshotResponse,
   ServiceUpdateRequest,
@@ -247,6 +248,24 @@ export class ServiceAuthService {
     return {
       status: 'success',
       message: `Service ${service.serviceId} deleted permanently`,
+    };
+  }
+
+  // get service by id
+  async getServiceById(id: string): Promise<ServiceSingleResponse> {
+    const service = await this.serviceRepo.findOne({
+      where: { id },
+      withDeleted: true, // 支持查询软删除的数据，便于编辑/恢复
+    });
+
+    if (!service) {
+      throw new NotFoundError(`Service ${id} not found`);
+    }
+
+    return {
+      status: 'success',
+      message: `Get service:"${service.serviceId}" successful`,
+      data: this.buildService(service),
     };
   }
 }

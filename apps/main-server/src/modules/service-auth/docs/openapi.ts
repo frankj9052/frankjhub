@@ -11,6 +11,8 @@ import {
   serviceListResponseSchema,
   serviceLoginResponseSchema,
   serviceLoginSchema,
+  serviceSingleResponseExample,
+  serviceSingleResponseSchema,
   serviceUpdateRequestExample,
   serviceUpdateRequestSchema,
   serviceUpdateResponseExample,
@@ -475,6 +477,44 @@ registry.registerPath({
               },
             },
           },
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/** Get service by ID */
+registry.registerPath({
+  method: 'get',
+  path: '/service/{id}',
+  tags: ['Service Auth - Admin'],
+  summary: 'Get service details by ID',
+  description:
+    'Fetch a single service record by its unique ID. Includes soft-deleted entries as well. Requires appropriate permission.',
+  parameters: [
+    {
+      in: 'path',
+      name: 'id',
+      required: true,
+      description: 'UUID of the service to retrieve',
+      schema: { type: 'string', format: 'uuid' },
+      example: '3d2c0a23-3c8c-4a8b-9c7a-0c5cda7a1111',
+    },
+  ],
+  responses: {
+    200: {
+      description: 'Service fetched successfully',
+      content: {
+        'application/json': {
+          schema: serviceSingleResponseSchema.openapi({
+            example: serviceSingleResponseExample,
+          }),
         },
       },
     },

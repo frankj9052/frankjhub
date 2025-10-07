@@ -125,3 +125,13 @@ export const hardDeleteServiceController = async (
     next(error);
   }
 };
+
+export const getServiceByIdController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const parsed = idParamsSchema.parse(req.params);
+    const result = await serviceAuthService.getServiceById(parsed.id);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};

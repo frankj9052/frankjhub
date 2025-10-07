@@ -4,6 +4,7 @@ import { Router } from 'express';
 import {
   createServiceController,
   getJwksController,
+  getServiceByIdController,
   getServiceListController,
   getSnapshotController,
   hardDeleteServiceController,
@@ -90,6 +91,12 @@ router.delete(
   ),
   validateRequest({ query: idParamsSchema }),
   hardDeleteServiceController
+);
+
+router.get(
+  '/service/:id',
+  requirePermission(buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.READ.name])),
+  getServiceByIdController
 );
 
 export function register(parent: Router) {
