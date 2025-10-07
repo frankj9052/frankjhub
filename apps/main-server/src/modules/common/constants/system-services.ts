@@ -1,9 +1,9 @@
-import { CreateServiceRequest } from '@frankjhub/shared-schema';
+import { ServiceCreateRequest } from '@frankjhub/shared-schema';
 import { buildPermissionName } from '../../codecs/permissionCodec';
 import { SYSTEM_RESOURCES } from './system-resources';
 import { SYSTEM_ACTIONS } from './system-actions';
 
-export const SYSTEM_SERVICES: Record<string, CreateServiceRequest> = {
+export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
   BOOKING: {
     serviceId: 'booking',
     name: 'Booking Service',

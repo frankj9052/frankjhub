@@ -1,6 +1,8 @@
-import { ServiceListPageData } from '../response';
+import { ServiceListPageData, ServiceListResponse } from '../response';
+import { OrderEnum } from '../../../enums/order.enum';
+import { ServiceListRequest } from '../request';
 
-export const serviceListDataExample: ServiceListPageData = {
+export const serviceListExample: ServiceListPageData = {
   data: [
     {
       id: 'svc_001',
@@ -84,4 +86,21 @@ export const serviceListDataExample: ServiceListPageData = {
   filters: {
     isActive: ['isActive'],
   },
+};
+
+export const serviceListRequestExample: ServiceListRequest = {
+  limit: 20,
+  offset: 0,
+  order: OrderEnum.ASC,
+  orderBy: 'createdAt',
+  search: '',
+  filters: {
+    status: ['isActive'],
+  },
+};
+
+export const serviceListResponseExample: ServiceListResponse = {
+  status: 'success',
+  message: 'Get service list successful',
+  data: serviceListExample,
 };

@@ -2,8 +2,19 @@ import { z } from 'zod';
 import { registry } from '../../../config/openapiRegistry';
 import {
   buildErrorResponses,
+  idParamsSchema,
+  serviceCreateRequestExample,
+  serviceCreateRequestSchema,
+  serviceListRequestExample,
+  serviceListRequestSchema,
+  serviceListResponseExample,
+  serviceListResponseSchema,
   serviceLoginResponseSchema,
   serviceLoginSchema,
+  serviceUpdateRequestExample,
+  serviceUpdateRequestSchema,
+  serviceUpdateResponseExample,
+  simpleResponseSchema,
 } from '@frankjhub/shared-schema';
 
 // ✅ 注册 /auth/service-login 路由文档
@@ -218,6 +229,259 @@ registry.registerPath({
     },
     ...buildErrorResponses({
       401: 'UnauthorizedError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+// create
+registry.registerPath({
+  method: 'post',
+  path: '/service',
+  tags: ['Service Auth - Admin'],
+  summary: 'Create a new Service',
+  description:
+    'Create a service entry. Requires appropriate permission via middleware. Returns a simple success message.',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: serviceCreateRequestSchema.openapi({
+            example: serviceCreateRequestExample,
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Service created',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Created service "booking"',
+            },
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      400: 'BadRequestError', // 已存在或校验失败
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/* List Services */
+registry.registerPath({
+  method: 'get',
+  path: '/service/list',
+  tags: ['Service Auth - Admin'],
+  summary: 'List services with pagination & filters',
+  description:
+    'Query services with pagination, optional search, and status filters. Requires permission.',
+  request: {
+    query: serviceListRequestSchema.openapi({
+      example: serviceListRequestExample,
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Service list with pagination',
+      content: {
+        'application/json': {
+          schema: serviceListResponseSchema.openapi({
+            example: serviceListResponseExample,
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/* Update Service */
+registry.registerPath({
+  method: 'patch',
+  path: '/service/update',
+  tags: ['Service Auth - Admin'],
+  summary: 'Update a service by id',
+  description:
+    'Partial update of a service (by id). Only provided fields are updated. Requires permission.',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: serviceUpdateRequestSchema.openapi({
+            example: serviceUpdateRequestExample,
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Service updated',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema.openapi({
+            example: serviceUpdateResponseExample,
+          }),
+        },
+      },
+    },
+    ...buildErrorResponses({
+      400: 'BadRequestError',
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/* Soft Delete Service */
+registry.registerPath({
+  method: 'patch',
+  path: '/service/soft-delete',
+  tags: ['Service Auth - Admin'],
+  summary: 'Soft delete a service',
+  description:
+    'Mark a service as deleted (sets deletedAt/deletedBy). Requires permission. Body carries the id.',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: idParamsSchema.openapi({
+            example: { id: '3d2c0a23-3c8c-4a8b-9c7a-0c5cda7a1111' },
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Service soft-deleted',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema,
+          examples: {
+            ok: {
+              value: {
+                status: 'success',
+                message: 'Service booking soft deleted by admin',
+              },
+            },
+          },
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/* Restore Service */
+registry.registerPath({
+  method: 'patch',
+  path: '/service/restore',
+  tags: ['Service Auth - Admin'],
+  summary: 'Restore a soft-deleted service',
+  description:
+    'Restore a previously soft-deleted service. If the service is not deleted, returns a success message stating so.',
+  request: {
+    body: {
+      required: true,
+      content: {
+        'application/json': {
+          schema: idParamsSchema.openapi({
+            example: { id: '3d2c0a23-3c8c-4a8b-9c7a-0c5cda7a1111' },
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Service restored or no-op if not deleted',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema,
+          examples: {
+            restored: {
+              value: {
+                status: 'success',
+                message: 'Service booking restored by admin',
+              },
+            },
+            notDeleted: {
+              value: {
+                status: 'success',
+                message: 'Service booking is not deleted',
+              },
+            },
+          },
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
+      500: 'InternalServerError',
+    }),
+  },
+});
+
+/* Hard Delete Service */
+registry.registerPath({
+  method: 'delete',
+  path: '/service/hard-delete',
+  tags: ['Service Auth - Admin'],
+  summary: 'Hard delete a service (permanent)',
+  description:
+    'Permanently remove a service. **id** is passed via query string. Requires permission.',
+  request: {
+    query: idParamsSchema.openapi({
+      example: { id: '3d2c0a23-3c8c-4a8b-9c7a-0c5cda7a1111' },
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Service hard-deleted',
+      content: {
+        'application/json': {
+          schema: simpleResponseSchema,
+          examples: {
+            ok: {
+              value: {
+                status: 'success',
+                message: 'Service booking deleted permanently',
+              },
+            },
+          },
+        },
+      },
+    },
+    ...buildErrorResponses({
+      401: 'UnauthorizedError',
+      403: 'ForbiddenError',
+      404: 'NotFoundError',
       500: 'InternalServerError',
     }),
   },
