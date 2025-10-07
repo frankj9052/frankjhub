@@ -11,6 +11,7 @@ import {
   userOrganizationRoleSlice,
   usersSlice,
 } from './slices';
+import { serviceSlice } from './slices/serviceSlice';
 
 export const reducer = {
   test: testSlice.reducer,
@@ -24,4 +25,5 @@ export const reducer = {
   role: roleSlice.reducer,
   userOrganizationRole: userOrganizationRoleSlice.reducer,
   invitation: invitationSlice.reducer,
+  service: serviceSlice.reducer,
 };

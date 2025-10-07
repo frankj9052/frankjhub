@@ -9,3 +9,5 @@ export const SERVICE_FILTER = {
 export const serviceFilterSchema = createFiltersSchema({
   status: SERVICE_FILTER,
 });
+
+export type ServiceStatus = (typeof SERVICE_FILTER)[keyof typeof SERVICE_FILTER];
