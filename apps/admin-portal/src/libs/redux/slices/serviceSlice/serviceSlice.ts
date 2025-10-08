@@ -24,6 +24,7 @@ const INITIAL_VISIBLE_COLUMNS: string[] = [
   'baseUrl',
   'description',
   'isActive',
+  'actions',
 ];
 
 const sortableFields = new Set(Object.values(SERVICE_ORDER_BY_FIELD));

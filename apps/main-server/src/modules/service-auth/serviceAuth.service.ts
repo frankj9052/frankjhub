@@ -144,7 +144,6 @@ export class ServiceAuthService {
       ...result,
       data: result.data.map(srv => this.buildService(srv)),
     };
-
     const response: ServiceListResponse = {
       status: 'success',
       message: 'Get service list successful',

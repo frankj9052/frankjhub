@@ -2,6 +2,7 @@ import {
   DropdownMenuProps,
   DropdownProps,
   PressEvent,
+  SharedSelection,
   SlotsToClasses,
   SortDescriptor,
   Table,
@@ -247,6 +248,7 @@ export type OnSelectionChange = (keys: Selection) => void;
 // dropdown
 export type DropdownItemKey = string | number;
 export type OnPress = (e: PressEvent) => void | undefined;
+export type DropdownSelection = SharedSelection;
 
 // value & value change
 export type StringValue = string | undefined;

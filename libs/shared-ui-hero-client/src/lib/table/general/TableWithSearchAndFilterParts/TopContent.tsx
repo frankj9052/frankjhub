@@ -66,6 +66,7 @@ export const TopContent = ({
                   selectionMode={filter.selectionMode}
                   onSelectionChange={filter.onSelectionChange}
                   dropdownItems={filter.dropdownItems}
+                  key={filter.trigger}
                 />
               ))}
 

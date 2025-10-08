@@ -67,7 +67,7 @@ export const createServiceController = async (req: Request, res: Response, next:
 export const getServiceListController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const parsed = serviceListRequestSchema.parse(req.query);
-    const result = serviceAuthService.getServiceList(parsed);
+    const result = await serviceAuthService.getServiceList(parsed);
     res.status(200).json(result);
   } catch (error) {
     next(error);

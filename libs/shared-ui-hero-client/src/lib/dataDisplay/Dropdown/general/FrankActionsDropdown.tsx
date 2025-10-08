@@ -1,4 +1,4 @@
-import { FrankButton, OnPress, TextValue } from '@frankjhub/shared-ui-hero-ssr';
+import { ClassName, FrankButton, OnPress, TextValue } from '@frankjhub/shared-ui-hero-ssr';
 import { FrankDropdown } from '../Base/FrankDropdown';
 import { FrankDropdownMenu } from '../Base/FrankDropdownMenu';
 import { FrankDropdownTrigger } from '../Base/FrankDropdownTrigger';
@@ -11,6 +11,7 @@ export type ActionsDropdown = {
   onPress: OnPress;
   label: ReactNode;
   textValue: TextValue;
+  className?: ClassName;
 };
 
 export interface FrankActionsDropdownProps {
@@ -27,7 +28,12 @@ export const FrankActionsDropdown = ({ actions }: FrankActionsDropdownProps) => 
       </FrankDropdownTrigger>
       <FrankDropdownMenu>
         {actions.map(action => (
-          <FrankDropdownItem key={action.key} onPress={action.onPress} textValue={action.textValue}>
+          <FrankDropdownItem
+            key={action.key}
+            onPress={action.onPress}
+            textValue={action.textValue}
+            className={action.className}
+          >
             {action.label}
           </FrankDropdownItem>
         ))}
