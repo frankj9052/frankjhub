@@ -3,6 +3,7 @@ import {
   ClassName,
   EndContent,
   ErrorMessage,
+  FullWidth,
   Height,
   InputClassNames,
   IsClearable,
@@ -50,6 +51,7 @@ export interface FrankInputProps {
   classNames?: InputClassNames;
   startContent?: StartContent;
   onClear?: OnClear;
+  fullWidth?: FullWidth;
 }
 
 export const FrankInput = ({
@@ -77,6 +79,7 @@ export const FrankInput = ({
   classNames,
   startContent,
   onClear,
+  fullWidth,
 }: FrankInputProps) => {
   return (
     <Input
@@ -104,6 +107,7 @@ export const FrankInput = ({
       classNames={classNames}
       startContent={startContent}
       onClear={onClear}
+      fullWidth={fullWidth}
     />
   );
 };

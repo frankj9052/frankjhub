@@ -83,6 +83,16 @@ const sidebarData: SidebarDataType[] = [
       },
     ],
   },
+  {
+    category: 'Service',
+    list: [
+      {
+        icon: <div>4</div>,
+        label: 'Services',
+        src: '/dashboard/services',
+      },
+    ],
+  },
 ];
 
 type Props = {

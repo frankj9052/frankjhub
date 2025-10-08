@@ -11,6 +11,7 @@ import {
 } from '@heroui/react';
 import { ComponentProps, CSSProperties, FormEvent, ReactNode } from 'react';
 import { Key, Selection } from '@react-types/shared';
+import { OrderEnum } from '@frankjhub/shared-schema';
 
 export type Label = ReactNode | undefined;
 export type Type = string | undefined;
@@ -269,6 +270,14 @@ export type PaginationClassNames =
   | undefined;
 export type Page = number | undefined;
 export type PaginationOnChange = (page: number) => void | undefined;
+export type Pagination = {
+  limit: number;
+  offset: number;
+  order: OrderEnum;
+  orderBy: string;
+  search: string | undefined;
+  filters: any;
+};
 
 // Card
 export type IsBlurred = boolean | undefined;
