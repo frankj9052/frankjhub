@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-schema"
+    },
+    {
       "path": "../shared-ui-core"
     },
     {
