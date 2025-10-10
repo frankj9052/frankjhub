@@ -110,6 +110,7 @@ export const TopContent = ({
           backdrop="opaque"
           body={<CreateForm onClose={() => setOpenModal(false)} />}
           hideHeaderAndFooter
+          size="4xl"
         />
       </div>
     </div>

@@ -69,6 +69,7 @@ export const AddPermission = ({
           selectedKey={selectedKey}
           onSelectionChange={setSelectedKey}
           isDisabled={isDisabled}
+          endContent={<div />}
         />
         {/* Add Button */}
         <FrankButton color="secondary" isDisabled={!selectedKey || isDisabled} onPress={handleAdd}>

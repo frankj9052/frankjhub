@@ -323,3 +323,4 @@ export type ClassNamesForAutocompelete =
       | 'selectorButton'
     >
   | undefined;
+export type SelectorIcon = ReactNode | undefined;

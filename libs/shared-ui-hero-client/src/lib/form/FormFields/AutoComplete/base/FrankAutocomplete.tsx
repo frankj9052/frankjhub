@@ -21,6 +21,7 @@ import {
   Placeholder,
   Radius,
   SelectedKeyForAutocomplete,
+  SelectorIcon,
   Size,
   StartContent,
   VariantForAutocomplete,
@@ -75,6 +76,7 @@ export type FrankAutocompleteProps<T extends DefaultAutocompleteItem> = {
   isDisabled?: IsDisabled;
   id?: string | undefined;
   isClearable?: IsClearable;
+  selectorIcon?: SelectorIcon;
 };
 
 export function FrankAutocomplete<T extends DefaultAutocompleteItem>({
@@ -104,6 +106,7 @@ export function FrankAutocomplete<T extends DefaultAutocompleteItem>({
   children,
   id,
   isClearable,
+  selectorIcon,
 }: FrankAutocompleteProps<T>) {
   return (
     <Autocomplete
@@ -132,6 +135,7 @@ export function FrankAutocomplete<T extends DefaultAutocompleteItem>({
       size={size}
       isDisabled={isDisabled}
       isClearable={isClearable}
+      selectorIcon={selectorIcon}
     >
       {children}
     </Autocomplete>

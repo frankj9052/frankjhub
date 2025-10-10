@@ -20,6 +20,7 @@ import {
   Placeholder,
   Radius,
   SelectedKeyForAutocomplete,
+  SelectorIcon,
   Size,
   StartContent,
   VariantForAutocomplete,
@@ -52,6 +53,7 @@ export interface FrankAutocompleteGeneralProps {
   isDisabled?: IsDisabled;
   id?: undefined | string;
   isClearable?: IsClearable;
+  selectorIcon?: SelectorIcon;
 }
 
 export const FrankAutocompleteGeneral = ({
@@ -80,6 +82,7 @@ export const FrankAutocompleteGeneral = ({
   isDisabled,
   id,
   isClearable,
+  selectorIcon,
 }: FrankAutocompleteGeneralProps) => {
   return (
     <FrankAutocomplete
@@ -108,6 +111,7 @@ export const FrankAutocompleteGeneral = ({
       size={size}
       isDisabled={isDisabled}
       isClearable={isClearable}
+      selectorIcon={selectorIcon}
     >
       {item => (
         <FrankAutocompleteItem key={item.key} textValue={item.textValue}>
