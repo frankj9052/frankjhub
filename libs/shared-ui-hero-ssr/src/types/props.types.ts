@@ -1,4 +1,6 @@
 import {
+  AutocompleteProps,
+  AutocompleteSectionProps,
   DropdownMenuProps,
   DropdownProps,
   PressEvent,
@@ -10,7 +12,7 @@ import {
   TableHeaderProps,
   TableRow,
 } from '@heroui/react';
-import { ComponentProps, CSSProperties, FormEvent, ReactNode } from 'react';
+import { ComponentProps, CSSProperties, FocusEvent, FormEvent, ReactNode } from 'react';
 import { Key, Selection } from '@react-types/shared';
 import { OrderEnum } from '@frankjhub/shared-schema';
 
@@ -33,6 +35,7 @@ export type ButtonVariant =
   | 'ghost'
   | undefined;
 export type PaginationVariant = 'flat' | 'faded' | 'bordered' | 'light' | undefined;
+export type VariantForAutocomplete = 'flat' | 'faded' | 'bordered' | 'underlined' | undefined;
 
 export type Radius = 'sm' | 'md' | 'lg' | 'none' | 'full' | undefined;
 
@@ -47,6 +50,15 @@ export type TableBodyChildren<T = unknown> = TableBodyProps<T>['children'];
 export type TableRowChildren = NonNullable<ComponentProps<typeof TableRow>['children']>;
 export type DropdownMenuChildren = DropdownMenuProps['children'];
 export type DropdownChildren = DropdownProps['children'];
+export type AutocompleteSectionChildren = AutocompleteSectionProps['children'];
+export type DefaultAutocompleteItem = {
+  label: Label;
+  key: string;
+  textValue?: string;
+  description?: string;
+};
+export type AutocompleteChildren<T extends DefaultAutocompleteItem> =
+  AutocompleteProps<T>['children'];
 export type Content = ReactNode | undefined;
 export type ShowArrow = boolean | undefined;
 export type ClassName = string | undefined;
@@ -243,7 +255,9 @@ export type GeneralTableColumn = {
   align?: Align;
 };
 export type SelectedKey = 'all' | Iterable<Key> | undefined;
+export type SelectedKeyForAutocomplete = Key | null | undefined;
 export type OnSelectionChange = (keys: Selection) => void;
+export type OnSelectionChangeForAutocomplete = (key: Key | null) => void;
 
 // dropdown
 export type DropdownItemKey = string | number;
@@ -291,3 +305,21 @@ export type IsHoverable = boolean | undefined;
 export type DisableAnimation = boolean | undefined;
 export type AllowTextSelectionOnPress = boolean | undefined;
 export type CardRadius = Exclude<Radius, 'full'>;
+
+// autocomplete
+export type AllowsCustomValue = boolean | undefined;
+export type OnBlur = ((e: FocusEvent<HTMLInputElement, Element>) => void) | undefined;
+export type DefaultFilter = AutocompleteProps['defaultFilter'];
+export type InputValue = string | undefined;
+export type OnInputChange = (value: string) => void;
+export type ClassNamesForAutocompelete =
+  | SlotsToClasses<
+      | 'base'
+      | 'listbox'
+      | 'clearButton'
+      | 'listboxWrapper'
+      | 'popoverContent'
+      | 'endContentWrapper'
+      | 'selectorButton'
+    >
+  | undefined;

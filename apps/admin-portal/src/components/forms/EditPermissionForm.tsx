@@ -15,7 +15,7 @@ import {
 } from '@/services/permission.service';
 import { PermissionUpdateRequest, permissionUpdateRequestSchema } from '@frankjhub/shared-schema';
 import {
-  FrankAutocomplete,
+  FrankCustomizedAutocomplete,
   FrankSelect,
   FrankTextArea,
   FrankModal,
@@ -181,7 +181,7 @@ export const EditPermissionForm = () => {
               name="resourceId"
               control={control}
               render={({ field, fieldState }) => (
-                <FrankAutocomplete
+                <FrankCustomizedAutocomplete
                   label="Resource"
                   ariaLabel="resource"
                   selectedKey={field.value ?? ''}

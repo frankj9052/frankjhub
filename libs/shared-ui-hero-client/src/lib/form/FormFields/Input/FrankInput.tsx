@@ -7,6 +7,7 @@ import {
   Height,
   InputClassNames,
   IsClearable,
+  IsDisabled,
   IsInvalid,
   IsRequired,
   Label,
@@ -52,6 +53,7 @@ export interface FrankInputProps {
   startContent?: StartContent;
   onClear?: OnClear;
   fullWidth?: FullWidth;
+  isDisabled?: IsDisabled;
 }
 
 export const FrankInput = ({
@@ -80,6 +82,7 @@ export const FrankInput = ({
   startContent,
   onClear,
   fullWidth,
+  isDisabled,
 }: FrankInputProps) => {
   return (
     <Input
@@ -108,6 +111,7 @@ export const FrankInput = ({
       startContent={startContent}
       onClear={onClear}
       fullWidth={fullWidth}
+      isDisabled={isDisabled}
     />
   );
 };

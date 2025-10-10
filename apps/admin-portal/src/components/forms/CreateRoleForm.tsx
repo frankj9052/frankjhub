@@ -18,8 +18,7 @@ import {
 } from '@frankjhub/shared-schema';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
 import {
-  DefaultAutocompleteItemsType,
-  FrankAutocomplete,
+  FrankCustomizedAutocomplete,
   FrankSelect,
   SelectItemType,
 } from '@frankjhub/shared-ui-hero-client';
@@ -29,6 +28,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useEffect, useMemo } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
+import { DefaultAutocompleteItem } from '@frankjhub/shared-ui-hero-ssr';
 
 type Props = {
   onClose: () => void;
@@ -89,7 +89,7 @@ export const CreateRoleForm = ({ onClose }: Props) => {
   const roleSource = watch('roleSource');
   const orgOptionList = useSelector(state => state.organization.options?.data);
   const orgTypeOptionList = useSelector(state => state.organizationType.options?.data);
-  const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
+  const defaultItems = useMemo<DefaultAutocompleteItem[]>(() => {
     let list: OrganizationOptionList | OrganizationTypeOptionList = [];
     if (roleSource === RoleSource.ORG && orgOptionList?.length) {
       list = orgOptionList;
@@ -181,7 +181,7 @@ export const CreateRoleForm = ({ onClose }: Props) => {
               name="sourceId"
               control={control}
               render={({ field, fieldState }) => (
-                <FrankAutocomplete
+                <FrankCustomizedAutocomplete
                   ariaLabel="Select resource id"
                   label="Select where the role belong to"
                   defaultFilter={true}

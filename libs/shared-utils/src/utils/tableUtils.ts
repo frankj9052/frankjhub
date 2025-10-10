@@ -70,3 +70,52 @@ export const formatValue = (value: unknown): string => {
   }
   return String(value);
 };
+
+type GeneralTableColumn = {
+  name: string;
+  uid: string;
+  sortable?: boolean;
+  align?: 'center' | 'start' | 'end' | undefined;
+};
+
+/**
+ * 根据字段名数组生成表格列配置
+ *
+ * @param keys - 对象的字段名数组
+ * @param options - 可选配置项
+ *   - customMappings: 自定义列名映射
+ *   - extraColumns: 额外添加的列
+ *   - sortableFields: 可排序字段集合
+ *   - alignMappings: 字段对齐方式映射
+ *   - exclude: 排除的字段名数组
+ *
+ * @returns GeneralTableColumn[]
+ */
+export function generateColumnsFromKeys(
+  keys: string[],
+  {
+    customMappings = {},
+    extraColumns = [],
+    sortableFields = new Set<string>(),
+    alignMappings = {},
+    exclude = [],
+  }: {
+    customMappings?: Record<string, string>;
+    extraColumns?: GeneralTableColumn[];
+    sortableFields?: Set<string>;
+    alignMappings?: Record<string, 'start' | 'center' | 'end'>;
+    exclude?: string[];
+  } = {}
+): GeneralTableColumn[] {
+  return [
+    ...keys
+      .filter(key => !exclude.includes(key)) // 过滤掉需要排除的字段
+      .map(key => ({
+        uid: key,
+        name: customMappings[key] ?? key.charAt(0).toUpperCase() + key.slice(1),
+        sortable: sortableFields.has(key),
+        align: alignMappings[key] ?? 'start',
+      })),
+    ...extraColumns,
+  ];
+}

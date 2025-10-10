@@ -8,7 +8,11 @@ import {
 } from '@/libs/redux';
 import { createPermission } from '@/services/permission.service';
 import { PermissionCreateRequest, permissionCreateRequestSchema } from '@frankjhub/shared-schema';
-import { FrankAutocomplete, FrankSelect, FrankTextArea } from '@frankjhub/shared-ui-hero-client';
+import {
+  FrankCustomizedAutocomplete,
+  FrankSelect,
+  FrankTextArea,
+} from '@frankjhub/shared-ui-hero-client';
 import { handleFormServerErrors } from '@frankjhub/shared-utils';
 import { Button, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -98,7 +102,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
               name="resourceId"
               control={control}
               render={({ field, fieldState }) => (
-                <FrankAutocomplete
+                <FrankCustomizedAutocomplete
                   label="Select Resource (*)"
                   ariaLabel="Select resource"
                   variant="bordered"

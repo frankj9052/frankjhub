@@ -10,8 +10,8 @@ import {
 import { getUserOptionListAsync } from '@/libs/redux/slices/usersSlice/thunk';
 import { useDebouncedCallback } from '@frankjhub/shared-hooks';
 import { UserOrganizationRoleUpdateRequest } from '@frankjhub/shared-schema';
-import { DefaultAutocompleteItemsType, FrankAutocomplete } from '@frankjhub/shared-ui-hero-client';
-import { UserListItem } from '@frankjhub/shared-ui-hero-ssr';
+import { FrankCustomizedAutocomplete } from '@frankjhub/shared-ui-hero-client';
+import { DefaultAutocompleteItem, UserListItem } from '@frankjhub/shared-ui-hero-ssr';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -27,7 +27,7 @@ export const UserSelection = () => {
     dispatch(getUserOptionListAsync({ data: { keyword: '' } }));
   }, [dispatch]);
 
-  const defaultItems: DefaultAutocompleteItemsType[] =
+  const defaultItems: DefaultAutocompleteItem[] =
     userOptionList?.map(user => ({
       label: (
         <UserListItem
@@ -96,7 +96,7 @@ export const UserSelection = () => {
   return (
     <div>
       <div className="w-1/2">
-        <FrankAutocomplete
+        <FrankCustomizedAutocomplete
           ariaLabel="select a user"
           allowsCustomValue={false}
           label="Select a user"

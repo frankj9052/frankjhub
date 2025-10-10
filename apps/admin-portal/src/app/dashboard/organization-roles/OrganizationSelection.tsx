@@ -7,12 +7,15 @@ import {
 } from '@/libs/redux';
 import { OrganizationRoleRef, UserOrganizationRoleUpdateRequest } from '@frankjhub/shared-schema';
 import {
-  DefaultAutocompleteItemsType,
   FrankActionsDropdown,
-  FrankAutocomplete,
+  FrankCustomizedAutocomplete,
   FrankGeneralTable,
 } from '@frankjhub/shared-ui-hero-client';
-import { FrankButton, GeneralTableColumn } from '@frankjhub/shared-ui-hero-ssr';
+import {
+  DefaultAutocompleteItem,
+  FrankButton,
+  GeneralTableColumn,
+} from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -48,7 +51,7 @@ export const OrganizationSelection = () => {
   const [createOrg, setCreateOrg] = useState<OrganizationRoleRef | undefined>(undefined);
   const watchedOrg = watch('organizations');
 
-  const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
+  const defaultItems = useMemo<DefaultAutocompleteItem[]>(() => {
     const data = organizationOptionList?.data ?? [];
     // avoid exist org display in add new area
     const excludeIds = new Set(orgList.map(o => o.id));
@@ -93,7 +96,7 @@ export const OrganizationSelection = () => {
       <h1 className={clsx(['text-xl font-semibold'])}>Organizations:</h1>
       {/* autocomplete */}
       <div className={clsx(['flex gap-3 items-center'])}>
-        <FrankAutocomplete
+        <FrankCustomizedAutocomplete
           ariaLabel="Add new organization"
           label="Add new organization"
           defaultFilter={true}

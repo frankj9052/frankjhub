@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { CreateServiceForm } from './CreateServiceForm';
+import { CreatePermissionForm } from './CreatePermissionForm';
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/Forms/Create/CreateServiceForm',
-  component: CreateServiceForm,
+  title: 'Shared-UI-Hero-Client/Form/Forms/Create/CreatePermissionForm',
+  component: CreatePermissionForm,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
@@ -21,31 +21,16 @@ const meta = {
     },
   },
   argTypes: {},
-} satisfies Meta<typeof CreateServiceForm>;
+} satisfies Meta<typeof CreatePermissionForm>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  args: {
-    permissionOptionList: [
-      {
-        id: '1',
-        name: '*:*',
-      },
-      {
-        id: '2',
-        name: 'booking:*',
-      },
-      {
-        id: '3',
-        name: 'email:["create","update"]',
-      },
-    ],
-  },
+  args: {},
   render: args => (
     <div className="w-[800px]">
-      <CreateServiceForm {...args} key="create-service-form" />
+      <CreatePermissionForm {...args} />
     </div>
   ),
 };

@@ -9,12 +9,11 @@ import { getInvitationListAsync } from '@/libs/redux/slices/invitationSlice/thun
 import { issueInvitation } from '@/services/invitation.service';
 import { IssueInvitationRequest, issueInvitationRequestSchema } from '@frankjhub/shared-schema';
 import {
-  DefaultAutocompleteItemsType,
-  FrankAutocomplete,
+  FrankCustomizedAutocomplete,
   FrankForm,
   FrankInput,
 } from '@frankjhub/shared-ui-hero-client';
-import { FrankButton } from '@frankjhub/shared-ui-hero-ssr';
+import { DefaultAutocompleteItem, FrankButton } from '@frankjhub/shared-ui-hero-ssr';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -51,7 +50,7 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
 
   // organization option list
   const orgOptionList = useSelector(state => state.organization.options);
-  const defaultOrgOptionList = useMemo<DefaultAutocompleteItemsType[]>(() => {
+  const defaultOrgOptionList = useMemo<DefaultAutocompleteItem[]>(() => {
     if (!orgOptionList?.data) return [];
     return orgOptionList.data.map(item => ({
       key: item.id,
@@ -73,7 +72,7 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
 
   // role option list
   const roleOptionList = useSelector(state => state.role.options);
-  const defaultRoleOptionList = useMemo<DefaultAutocompleteItemsType[]>(() => {
+  const defaultRoleOptionList = useMemo<DefaultAutocompleteItem[]>(() => {
     if (!roleOptionList?.data || !selectedOrgId || !orgOptionList?.data) return [];
     const selectedOrg = orgOptionList.data.find(org => org.id === selectedOrgId);
     if (!selectedOrg) return [];
@@ -117,7 +116,7 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
             name="organizationId"
             control={control}
             render={({ field, fieldState }) => (
-              <FrankAutocomplete
+              <FrankCustomizedAutocomplete
                 ariaLabel="Select an organization"
                 label="Select an organization"
                 defaultFilter={true}
@@ -141,7 +140,7 @@ export const IssueInvitationForm = ({ onClose }: Props) => {
             name="targetRoleId"
             control={control}
             render={({ field, fieldState }) => (
-              <FrankAutocomplete
+              <FrankCustomizedAutocomplete
                 ariaLabel="Select a target role"
                 label="Select a target role"
                 defaultFilter={true}

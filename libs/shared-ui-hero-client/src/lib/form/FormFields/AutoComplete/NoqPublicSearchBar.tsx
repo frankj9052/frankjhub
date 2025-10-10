@@ -1,22 +1,26 @@
-import FrankAutocomplete, { DefaultAutocompleteItemsType } from './FrankAutocomplete';
+import { FrankCustomizedAutocomplete } from './FrankCustomizedAutocomplete';
 import { IoIosSearch } from 'react-icons/io';
 import { GoLocation } from 'react-icons/go';
 import { FormEvent, Key } from 'react';
 import { FaArrowRight } from 'react-icons/fa6';
-import { FrankButtonBase, FrankSpinner } from '@frankjhub/shared-ui-hero-ssr';
+import {
+  DefaultAutocompleteItem,
+  FrankButtonBase,
+  FrankSpinner,
+} from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
 import { FrankForm } from '../../Base';
 
 export type NoqPublicSearchBarProps = {
   height?: number;
   searchMainInput?: {
-    defaultItems?: DefaultAutocompleteItemsType[];
+    defaultItems?: DefaultAutocompleteItem[];
     onInputChange?: (value: string) => void;
     onSelectionChange?: (key: Key | null) => void;
     allowsCustomValue?: boolean;
   };
   searchAddressInput?: {
-    defaultItems?: DefaultAutocompleteItemsType[];
+    defaultItems?: DefaultAutocompleteItem[];
     onInputChange?: (value: string) => void;
     onSelectionChange?: (key: Key | null) => void;
     addressPlaceholder?: string;
@@ -32,11 +36,11 @@ export type NoqPublicSearchBarProps = {
  *
  * @param {number} [height] - Optional. Height of the search bar in pixels.
  * @param {object} [searchMainInput] - Optional. Configuration for the main specialty search input.
- * @param {DefaultAutocompleteItemsType[]} [searchMainInput.defaultItems] - Optional. Default specialty search suggestions.
+ * @param {DefaultAutocompleteItem[]} [searchMainInput.defaultItems] - Optional. Default specialty search suggestions.
  * @param {(value: string) => void} [searchMainInput.onInputChange] - Optional. Callback triggered when specialty input value changes.
  * @param {(key: Key | null) => void} [searchMainInput.onSelectionChange] - Optional. Callback triggered when specialty selection changes.
  * @param {object} [searchAddressInput] - Optional. Configuration for the address search input.
- * @param {DefaultAutocompleteItemsType[]} [searchAddressInput.defaultItems] - Optional. Default address search suggestions.
+ * @param {DefaultAutocompleteItem[]} [searchAddressInput.defaultItems] - Optional. Default address search suggestions.
  * @param {(value: string) => void} [searchAddressInput.onInputChange] - Optional. Callback triggered when address input value changes.
  * @param {(key: Key | null) => void} [searchAddressInput.onSelectionChange] - Optional. Callback triggered when address selection changes.
  * @param {string} [searchAddressInput.addressPlaceholder] - Optional. Custom placeholder text for the address input.
@@ -59,7 +63,7 @@ export function NoqPublicSearchBar({
             height: height ? `${height}px` : '100%',
           }}
         >
-          <FrankAutocomplete
+          <FrankCustomizedAutocomplete
             allowsCustomValue={!!searchMainInput?.allowsCustomValue}
             placeholder="Specialty, condition, or procedure"
             customizeStyles={{
@@ -90,7 +94,7 @@ export function NoqPublicSearchBar({
             height: height ? `${height}px` : '100%',
           }}
         >
-          <FrankAutocomplete
+          <FrankCustomizedAutocomplete
             allowsCustomValue={!!searchAddressInput?.allowsCustomValue}
             placeholder={searchAddressInput?.addressPlaceholder ?? 'Enter Address'}
             customizeStyles={{

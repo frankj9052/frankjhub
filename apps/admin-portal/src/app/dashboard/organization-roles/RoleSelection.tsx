@@ -10,12 +10,15 @@ import {
   UserOrganizationRoleUpdateRequest,
 } from '@frankjhub/shared-schema';
 import {
-  DefaultAutocompleteItemsType,
   FrankActionsDropdown,
-  FrankAutocomplete,
+  FrankCustomizedAutocomplete,
   FrankGeneralTable,
 } from '@frankjhub/shared-ui-hero-client';
-import { FrankButton, GeneralTableColumn } from '@frankjhub/shared-ui-hero-ssr';
+import {
+  DefaultAutocompleteItem,
+  FrankButton,
+  GeneralTableColumn,
+} from '@frankjhub/shared-ui-hero-ssr';
 import clsx from 'clsx';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -75,7 +78,7 @@ export const RoleSelection = () => {
     return userOrgRole?.organizations.find(o => o.id === selectedOrg)?.orgTypeId ?? null;
   }, [userOrgRole, selectedOrg]);
 
-  const defaultItems = useMemo<DefaultAutocompleteItemsType[]>(() => {
+  const defaultItems = useMemo<DefaultAutocompleteItem[]>(() => {
     if (!roleOptionList?.length) return [];
     return roleOptionList
       .filter(role => {
@@ -126,7 +129,7 @@ export const RoleSelection = () => {
     >
       <h1 className={clsx(['text-xl font-semibold'])}>Roles:</h1>
       <div className={clsx(['flex gap-3 items-center'])}>
-        <FrankAutocomplete
+        <FrankCustomizedAutocomplete
           ariaLabel="Add new role"
           label="Add new role"
           defaultFilter={true}

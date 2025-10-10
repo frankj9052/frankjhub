@@ -1,3 +1,4 @@
+import { IsDisabled } from '@frankjhub/shared-ui-hero-ssr';
 import { Select, SelectItem, SharedSelection } from '@heroui/react';
 
 /**
@@ -27,6 +28,7 @@ export type FrankSelectProps = {
   errorMessage?: string;
   disallowEmptySelection?: boolean;
   variant?: 'flat' | 'faded' | 'bordered' | 'underlined';
+  isDisabled?: IsDisabled;
 };
 
 /**
@@ -63,6 +65,7 @@ export const FrankSelect = ({
   errorMessage,
   disallowEmptySelection,
   variant,
+  isDisabled,
 }: FrankSelectProps) => {
   return (
     <div
@@ -85,6 +88,7 @@ export const FrankSelect = ({
         errorMessage={errorMessage}
         disallowEmptySelection={!!disallowEmptySelection}
         variant={variant}
+        isDisabled={isDisabled}
       >
         {item => <SelectItem key={item.key}>{item.label}</SelectItem>}
       </Select>

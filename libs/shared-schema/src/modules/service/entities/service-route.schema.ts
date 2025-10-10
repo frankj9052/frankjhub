@@ -6,7 +6,7 @@ import { rateLimitSchema } from './rate-limit.schema';
 export const serviceRouteSchema = z.object({
   path: z.string().min(1).regex(/^\/.*/, 'must start with /'),
   methods: z.array(httpMethodSchema).min(1, 'Need at least one method'),
-  requiredScopes: z.array(z.string().min(1, 'scope cannot be empty')).default([]),
+  requiredScopes: z.array(z.string()),
   /** 反向代理改写表达式（可按你的网关实现约定成正则或前缀） */
   rewrite: z.string().optional(),
   rateLimit: rateLimitSchema.optional(),

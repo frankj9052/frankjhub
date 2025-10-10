@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { debounce } from 'lodash';
 import { IoSearchOutline } from 'react-icons/io5';
+import { FrankAutocompleteItem } from './FrankAutocompleteItem';
 
 const defaultItems = Array.from({ length: 30 }, (_, i) => {
   const labelText =
@@ -16,7 +17,7 @@ const defaultItems = Array.from({ length: 30 }, (_, i) => {
 });
 
 const meta = {
-  title: 'Shared-UI-Hero-Client/Form/FormFields/AutoComplete/FrankAutocomplete',
+  title: 'Shared-UI-Hero-Client/Form/FormFields/AutoComplete/Base/FrankAutocomplete',
   component: FrankAutocomplete,
   tags: ['autodocs'],
   parameters: {
@@ -84,17 +85,13 @@ const meta = {
       control: false,
       description: 'Element displayed at the start of the input.',
     },
-    customizeStyles: {
+    classNames: {
       control: false,
       description: 'Custom styles for input text, clear button, and content area.',
     },
-    width: {
+    fullWidth: {
       control: { type: 'number' },
       description: 'Width of the component in pixels.',
-    },
-    height: {
-      control: { type: 'number' },
-      description: 'Height of the component in pixels.',
     },
   },
   args: {},
@@ -123,7 +120,8 @@ export const Default: Story = {
       console.log('key ===> ', key);
     },
     endContent: <IoSearchOutline />,
-    height: 32,
+    fullWidth: true,
+    children: <FrankAutocompleteItem>label</FrankAutocompleteItem>,
   },
   decorators: [
     (Story, context) => {
@@ -192,6 +190,6 @@ export const ProviderAutocomplete: Story = {
     variant: 'bordered',
     radius: 'sm',
     defaultItems: defaultItems,
-    defaultFilter: true,
+    children: <FrankAutocompleteItem>label</FrankAutocompleteItem>,
   },
 };

@@ -1,14 +1,7 @@
-import { IsDisabled, Size } from '@frankjhub/shared-ui-hero-ssr';
+import { DefaultAutocompleteItem, IsDisabled, Size } from '@frankjhub/shared-ui-hero-ssr';
 import { Autocomplete, AutocompleteItem } from '@heroui/react';
 import clsx from 'clsx';
 import { Key, ReactNode } from 'react';
-
-export type DefaultAutocompleteItemsType = {
-  label: string | ReactNode;
-  key: string;
-  textValue?: string;
-  description?: string;
-};
 
 /**
  * A customizable Autocomplete component built on top of @heroui/react,
@@ -17,7 +10,7 @@ export type DefaultAutocompleteItemsType = {
  * @param {string} ariaLabel - Accessibility label for the autocomplete input.
  * @param {string} [className] - Optional. Custom className for the wrapper div.
  * @param {string} [placeholder] - Optional. Placeholder text for the input field.
- * @param {DefaultAutocompleteItemsType[]} [defaultItems] - Optional. List of items to display as suggestions.
+ * @param {DefaultAutocompleteItem[]} [defaultItems] - Optional. List of items to display as suggestions.
  * @param {boolean} [defaultFilter=true] - Optional. Whether to use the default filtering behavior.
  * @param {"flat" | "faded" | "bordered" | "underlined" | "ghost"} [variant] - Optional. Visual style variant of the input.
  * @param {"sm" | "md" | "lg" | "none" | "full"} [radius] - Optional. Border radius of the input field.
@@ -31,7 +24,7 @@ export type DefaultAutocompleteItemsType = {
  * @param {number} [width] - Optional. Width of the component in pixels.
  * @param {number} [height] - Optional. Height of the component in pixels.
  */
-export type FrankAutocompleteProps = {
+export type FrankCustomizedAutocompleteProps = {
   allowsCustomValue?: boolean;
   ariaLabel: string;
   label?: ReactNode;
@@ -40,7 +33,7 @@ export type FrankAutocompleteProps = {
   errorMessage?: ReactNode;
   className?: string;
   placeholder?: string;
-  defaultItems?: DefaultAutocompleteItemsType[];
+  defaultItems?: DefaultAutocompleteItem[];
   defaultFilter?: boolean;
   variant?: 'flat' | 'faded' | 'bordered' | 'underlined' | 'ghost';
   radius?: 'sm' | 'md' | 'lg' | 'none' | 'full';
@@ -62,7 +55,7 @@ export type FrankAutocompleteProps = {
   isDisabled?: IsDisabled;
 };
 
-export function FrankAutocomplete({
+export function FrankCustomizedAutocomplete({
   allowsCustomValue = false,
   ariaLabel,
   label,
@@ -86,7 +79,7 @@ export function FrankAutocomplete({
   isLoading,
   size,
   isDisabled,
-}: FrankAutocompleteProps) {
+}: FrankCustomizedAutocompleteProps) {
   return (
     <div
       style={{
@@ -160,5 +153,3 @@ export function FrankAutocomplete({
     </div>
   );
 }
-
-export default FrankAutocomplete;
