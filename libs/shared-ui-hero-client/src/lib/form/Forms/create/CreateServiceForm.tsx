@@ -55,14 +55,9 @@ export const CreateServiceForm = ({
 
   return (
     <FrankForm
-      onSubmit={handleSubmit(
-        (values, e) => {
-          onSubmit(values, setError, e);
-        },
-        error => {
-          console.log('what happend ==> ', error);
-        }
-      )}
+      onSubmit={handleSubmit((values, e) => {
+        onSubmit(values, setError, e);
+      })}
     >
       {/* serviceId & serviceName */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">

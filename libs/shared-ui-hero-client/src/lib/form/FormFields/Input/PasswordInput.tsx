@@ -1,6 +1,7 @@
 import {
   ErrorMessage,
   IsInvalid,
+  IsRequired,
   Label,
   OnBlur,
   onValueChange,
@@ -22,6 +23,7 @@ export interface PasswordInputProps {
   isInvalid?: IsInvalid;
   errorMessage?: ErrorMessage;
   size?: Size;
+  isRequired?: IsRequired;
 }
 
 export const PasswordInput = ({
@@ -33,6 +35,7 @@ export const PasswordInput = ({
   isInvalid,
   errorMessage,
   size = 'sm',
+  isRequired = true,
 }: PasswordInputProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(prev => !prev);
@@ -46,7 +49,7 @@ export const PasswordInput = ({
       isInvalid={isInvalid}
       errorMessage={errorMessage}
       size={size}
-      isRequired={true}
+      isRequired={isRequired}
       endContent={
         <button
           aria-label="toggle password visibility"
