@@ -208,6 +208,9 @@ export type IsClearable = boolean | undefined;
 export type StartContent = ReactNode | undefined;
 export type OnClear = () => void | undefined;
 export type DisallowEmptySelection = boolean | undefined;
+// input
+export type Value = string | undefined;
+export type onValueChange = ((value: string) => void) | undefined;
 // Table
 export type IsCompact = boolean | undefined;
 export type RemoveWrapper = boolean | undefined;

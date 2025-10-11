@@ -14,6 +14,8 @@ import {
   EndContent,
   ClassName,
   FullWidth,
+  AriaLabel,
+  DisableAnimation,
 } from '../../../types/props.types';
 
 export interface FrankButtonProps {
@@ -31,6 +33,8 @@ export interface FrankButtonProps {
   endContent?: EndContent;
   className?: ClassName;
   fullWidth?: FullWidth;
+  ariaLabel?: AriaLabel;
+  disableAnimation?: DisableAnimation;
 }
 
 export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
@@ -50,6 +54,8 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
       endContent,
       className,
       fullWidth,
+      ariaLabel,
+      disableAnimation,
       ...props
     },
     ref
@@ -58,6 +64,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
       <Button
         ref={ref}
         {...props}
+        aria-label={ariaLabel}
         onPress={onPress}
         variant={variant}
         radius={radius}
@@ -71,6 +78,7 @@ export const FrankButton = forwardRef<HTMLButtonElement, FrankButtonProps>(
         endContent={endContent}
         className={className}
         fullWidth={fullWidth}
+        disableAnimation={disableAnimation}
       >
         {children}
       </Button>

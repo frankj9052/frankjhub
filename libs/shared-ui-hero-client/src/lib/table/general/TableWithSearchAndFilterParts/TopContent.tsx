@@ -1,7 +1,12 @@
 import { ChangeEvent, ComponentType, Dispatch, SetStateAction, useState } from 'react';
 import { TableTopSearchbar } from './TopContentParts/TableSearchbar';
 import { TableTopDropdown } from './TopContentParts/TableTopDropdown';
-import { FrankButton, OnSelectionChange, SelectionMode } from '@frankjhub/shared-ui-hero-ssr';
+import {
+  FrankButton,
+  OnSelectionChange,
+  SelectedKey,
+  SelectionMode,
+} from '@frankjhub/shared-ui-hero-ssr';
 import { LabeledEnumItem } from '@frankjhub/shared-schema';
 import FrankModal from '../../../feedback/Modal/FrankModal';
 
@@ -15,13 +20,13 @@ export interface TopContentProps {
   filterList: {
     trigger: string;
     ariaLabel: string;
-    selectedKey: Set<string>;
+    selectedKey: SelectedKey;
     selectionMode: SelectionMode;
     onSelectionChange: OnSelectionChange;
     dropdownItems: LabeledEnumItem[];
   }[];
   columnSelection: {
-    selectedKey: Set<string>;
+    selectedKey: SelectedKey;
     onSelectionChange: OnSelectionChange;
     dropdownItems: LabeledEnumItem[];
   };

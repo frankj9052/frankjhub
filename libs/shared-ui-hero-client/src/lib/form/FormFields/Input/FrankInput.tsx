@@ -13,6 +13,7 @@ import {
   Label,
   LabelPlacement,
   Name,
+  OnBlur,
   OnClear,
   Placeholder,
   Radius,
@@ -44,7 +45,7 @@ export interface FrankInputProps {
   height?: Height;
   value?: StringValue;
   onValueChange?: StringChangeHandler;
-  onBlur?: () => void;
+  onBlur?: OnBlur;
   tabIndex?: TabIndex;
   autoComplete?: AutoComplete;
   className?: ClassName;

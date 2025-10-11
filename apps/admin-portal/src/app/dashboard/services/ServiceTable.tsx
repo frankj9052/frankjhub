@@ -24,7 +24,7 @@ import {
   TableTopSearchbarProps,
   TableWithSearchAndFilter,
 } from '@frankjhub/shared-ui-hero-client';
-import { DropdownSelection, OnSortChange } from '@frankjhub/shared-ui-hero-ssr';
+import { DropdownSelection, OnSortChange, SelectedKey } from '@frankjhub/shared-ui-hero-ssr';
 import { formatShortDateTime } from '@frankjhub/shared-utils';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, Key, ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
@@ -102,7 +102,7 @@ export const ServiceTable = () => {
   const columnSelection: TableTopDropdownProps = {
     trigger: 'Columns',
     ariaLabel: 'Table Columns',
-    selectedKey: new Set(String(visibleColumns)),
+    selectedKey: new Set(visibleColumns) as SelectedKey,
     selectionMode: 'multiple',
     onSelectionChange: handleColumnSelectionChange,
     dropdownItems: columns,
@@ -166,12 +166,11 @@ export const ServiceTable = () => {
                       header: 'Delete',
                       body: `Are you sure you want to delete service: ${srv.serviceId}`,
                       onPress: async () => {
-                        if (!openModal) return;
                         const result = await softDeleteService(srv.id);
                         if (result.status === 'success') {
                           toast.success(result.message);
-                          setOpenModal(undefined);
                           dispatch(getServiceListAsync({ data: pagination }));
+                          setOpenModal(undefined);
                         } else {
                           toast.error(String(result.message));
                         }
@@ -189,7 +188,7 @@ export const ServiceTable = () => {
           return <span>{String(cellValue ?? '')}</span>;
       }
     },
-    [dispatch, router, openModal, pagination]
+    [dispatch, router, pagination]
   );
 
   /** Fetch data */

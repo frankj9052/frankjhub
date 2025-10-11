@@ -1,7 +1,12 @@
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import { FrankDropdown } from '../../../../dataDisplay/Dropdown/Base/FrankDropdown';
 import { FrankDropdownTrigger } from '../../../../dataDisplay/Dropdown/Base/FrankDropdownTrigger';
-import { FrankButton, OnSelectionChange, SelectionMode } from '@frankjhub/shared-ui-hero-ssr';
+import {
+  FrankButton,
+  OnSelectionChange,
+  SelectedKey,
+  SelectionMode,
+} from '@frankjhub/shared-ui-hero-ssr';
 import { FrankDropdownMenu } from '../../../../dataDisplay/Dropdown/Base/FrankDropdownMenu';
 import { FrankDropdownItem } from '../../../../dataDisplay/Dropdown/Base/FrankDropdownItem';
 import { LabeledEnumItem } from '@frankjhub/shared-schema';
@@ -9,7 +14,7 @@ import { LabeledEnumItem } from '@frankjhub/shared-schema';
 export interface TableTopDropdownProps {
   trigger: string;
   ariaLabel: string;
-  selectedKey: Set<string>;
+  selectedKey: SelectedKey;
   selectionMode: SelectionMode;
   onSelectionChange: OnSelectionChange;
   dropdownItems: LabeledEnumItem[];

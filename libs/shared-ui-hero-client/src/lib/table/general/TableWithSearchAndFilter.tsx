@@ -21,6 +21,7 @@ import {
   FrankSpinner,
   OnSelectionChange,
   OnSortChange,
+  SelectedKey,
   SelectionMode,
   Status,
 } from '@frankjhub/shared-ui-hero-ssr';
@@ -65,13 +66,13 @@ export interface TableWithSearchAndFilterProps<T extends PartialAll> {
   filterList: {
     trigger: string;
     ariaLabel: string;
-    selectedKey: Set<string>;
+    selectedKey: SelectedKey;
     selectionMode: SelectionMode;
     onSelectionChange: OnSelectionChange;
     dropdownItems: LabeledEnumItem[];
   }[];
   columnSelection: {
-    selectedKey: Set<string>;
+    selectedKey: SelectedKey;
     onSelectionChange: OnSelectionChange;
     dropdownItems: LabeledEnumItem[];
   };

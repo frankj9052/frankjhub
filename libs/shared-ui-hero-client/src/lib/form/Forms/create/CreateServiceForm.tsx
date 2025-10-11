@@ -11,6 +11,7 @@ import { FrankInput } from '../../FormFields/Input/FrankInput';
 import { FrankButton } from '@frankjhub/shared-ui-hero-ssr';
 import { FrankTextArea } from '../../FormFields/Textarea/FrankTextarea';
 import { AddPermission, AddRoute } from '../add';
+import { PasswordInput } from '../../FormFields';
 
 const defaultValues: ServiceCreateRequest = {
   serviceId: '',
@@ -133,17 +134,13 @@ export const CreateServiceForm = ({
             name="serviceSecret"
             control={control}
             render={({ field, fieldState }) => (
-              <FrankInput
-                type="password"
+              <PasswordInput
                 label="Service Secret"
-                variant="bordered"
                 value={field.value ?? ''}
                 onValueChange={field.onChange}
                 onBlur={field.onBlur}
                 isInvalid={!!fieldState.error}
                 errorMessage={fieldState.error?.message}
-                size="sm"
-                isRequired={true}
               />
             )}
           />
