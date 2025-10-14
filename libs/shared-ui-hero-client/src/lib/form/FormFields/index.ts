@@ -14,3 +14,4 @@ export * from './Textarea';
 export * from './Time-Input';
 // 日期选择器组件
 export * from './DatePicker';
+export * from './Switch';

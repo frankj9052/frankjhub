@@ -15,7 +15,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
         {/* 侧边栏 */}
         <Sidebar />
         {/* 主窗口 */}
-        <div className="flex-1 p-3">{children}</div>
+        <div className="flex-1 p-3 overflow-y-auto">{children}</div>
       </div>
     </div>
   );

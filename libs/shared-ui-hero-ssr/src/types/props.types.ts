@@ -7,6 +7,7 @@ import {
   SharedSelection,
   SlotsToClasses,
   SortDescriptor,
+  SwitchThumbIconProps,
   Table,
   TableBodyProps,
   TableHeaderProps,
@@ -36,6 +37,15 @@ export type ButtonVariant =
   | undefined;
 export type PaginationVariant = 'flat' | 'faded' | 'bordered' | 'light' | undefined;
 export type VariantForAutocomplete = 'flat' | 'faded' | 'bordered' | 'underlined' | undefined;
+export type VariantForChip =
+  | 'solid'
+  | 'bordered'
+  | 'light'
+  | 'flat'
+  | 'faded'
+  | 'shadow'
+  | 'dot'
+  | undefined;
 
 export type Radius = 'sm' | 'md' | 'lg' | 'none' | 'full' | undefined;
 
@@ -62,6 +72,9 @@ export type AutocompleteChildren<T extends DefaultAutocompleteItem> =
 export type Content = ReactNode | undefined;
 export type ShowArrow = boolean | undefined;
 export type ClassName = string | undefined;
+export type ClassNamesForChip =
+  | SlotsToClasses<'base' | 'content' | 'avatar' | 'dot' | 'closeButton'>
+  | undefined;
 
 export const COLORS = [
   'default',
@@ -81,6 +94,15 @@ export const TABLE_COLORS = BUTTON_COLORS;
 export type ButtonColor = (typeof BUTTON_COLORS)[number] | undefined;
 export type TableColor = ButtonColor;
 export type GeneralColor = ButtonColor;
+export type ColorForChip =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | undefined;
+export type ColorForSwitch = ColorForChip;
 export type Placement =
   | 'bottom'
   | 'bottom-end'
@@ -327,3 +349,25 @@ export type ClassNamesForAutocompelete =
     >
   | undefined;
 export type SelectorIcon = ReactNode | undefined;
+
+/** Chip */
+export type OnClose = ((e: PressEvent) => void) | undefined;
+export type Avatar = ReactNode | undefined;
+
+/** Switch */
+export type DefaultSelected = boolean | undefined;
+export type ThumbIcon = ReactNode | ((props: SwitchThumbIconProps) => ReactNode);
+export type ClassNamesForSwitch =
+  | SlotsToClasses<
+      | 'base'
+      | 'label'
+      | 'thumbIcon'
+      | 'startContent'
+      | 'endContent'
+      | 'wrapper'
+      | 'thumb'
+      | 'hiddenInput'
+    >
+  | undefined;
+export type IsSelected = boolean | undefined;
+export type OnValueChangeForSwitch = ((isSelected: boolean) => void) | undefined;

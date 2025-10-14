@@ -10,3 +10,5 @@ export * from './GoogleMap';
 export * from './Rating';
 
 export * from './Dropdown';
+
+export * from './Chip';

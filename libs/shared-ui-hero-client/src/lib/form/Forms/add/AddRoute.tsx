@@ -101,55 +101,56 @@ export const AddRoute = ({
   return (
     <div className="flex flex-col gap-2">
       {/* Routes Record */}
-      {routes.length > 0 && (
-        <div>
-          <label className="font-semibold text-sm">Route Added:</label>
-          <FrankGeneralTable
-            columns={routeRecords}
-            ariaLabel="route record"
-            data={routes.map((r, index) => ({
-              ...r,
-              id: `[${r.methods.join(', ')}]:${r.path}`,
-              index,
-            }))}
-            renderCell={(item, columnKey) => {
-              const cellValue = item[columnKey as keyof typeof item];
-              switch (columnKey) {
-                case 'methods':
-                case 'requiredScopes':
-                  if (typeof cellValue === 'string') {
-                    return <span>cellValue</span>;
-                  } else if (Array.isArray(cellValue)) {
-                    return <span>[{cellValue.join(', ')}]</span>;
-                  }
-                  return;
-                case 'rateLimit':
-                  if (cellValue && typeof cellValue === 'object') {
-                    const str = Object.entries(cellValue)
-                      .map(([k, v]) => `${k}:${v}`)
-                      .join(', ');
-                    return <span>{str}</span>;
-                  }
-                  return;
-                case 'action': {
-                  return (
-                    <FrankButton
-                      size="sm"
-                      variant="light"
-                      color="danger"
-                      onPress={() => handleDeleteByIndex(item.index)}
-                    >
-                      Delete
-                    </FrankButton>
-                  );
+
+      <div>
+        <label className="font-semibold text-sm">Route Added:</label>
+        <FrankGeneralTable
+          columns={routeRecords}
+          ariaLabel="route record"
+          data={routes.map((r, index) => ({
+            ...r,
+            id: `[${r.methods.join(', ')}]:${r.path}`,
+            index,
+          }))}
+          emptyContent={'No Route Added'}
+          renderCell={(item, columnKey) => {
+            const cellValue = item[columnKey as keyof typeof item];
+            switch (columnKey) {
+              case 'methods':
+              case 'requiredScopes':
+                if (typeof cellValue === 'string') {
+                  return <span>cellValue</span>;
+                } else if (Array.isArray(cellValue)) {
+                  return <span>[{cellValue.join(', ')}]</span>;
                 }
-                default:
-                  return <span>{String(cellValue)}</span>;
+                return;
+              case 'rateLimit':
+                if (cellValue && typeof cellValue === 'object') {
+                  const str = Object.entries(cellValue)
+                    .map(([k, v]) => `${k}:${v}`)
+                    .join(', ');
+                  return <span>{str}</span>;
+                }
+                return;
+              case 'action': {
+                return (
+                  <FrankButton
+                    size="sm"
+                    variant="light"
+                    color="danger"
+                    onPress={() => handleDeleteByIndex(item.index)}
+                  >
+                    Delete
+                  </FrankButton>
+                );
               }
-            }}
-          />
-        </div>
-      )}
+              default:
+                return <span>{String(cellValue)}</span>;
+            }
+          }}
+        />
+      </div>
+
       {/* add routes button */}
       {!showForm && (
         <div>
@@ -160,6 +161,7 @@ export const AddRoute = ({
               setShowForm(true);
             }}
             isDisabled={isDisabled}
+            variant="ghost"
           >
             Create a new route
           </FrankButton>
@@ -286,6 +288,7 @@ export const AddRoute = ({
               onPress={() => {
                 setShowForm(false);
                 setRoute(initialRoute);
+                setLocalError(null);
               }}
               size="sm"
             >

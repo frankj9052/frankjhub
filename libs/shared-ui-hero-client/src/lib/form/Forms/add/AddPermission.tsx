@@ -77,28 +77,32 @@ export const AddPermission = ({
         </FrankButton>
       </div>
       {/* Added Record */}
-      {currentKeys.length > 0 && (
+      {
         <div className="bg-gray-100 p-3 rounded-lg flex flex-col gap-2">
           <label className="font-semibold text-sm">Basic Required Permissions:</label>
           <ul className=" flex flex-col pl-3 justify-center gap-1">
-            {currentKeys.map(key => (
-              <li key={key} className="flex justify-between items-center text-sm">
-                <span>{key}</span>
-                <FrankButton
-                  size="sm"
-                  variant="light"
-                  color="danger"
-                  className="h-5"
-                  onPress={() => handleRemove(key)}
-                  isDisabled={isDisabled}
-                >
-                  Remove
-                </FrankButton>
-              </li>
-            ))}
+            {currentKeys.length > 0 ? (
+              currentKeys.map(key => (
+                <li key={key} className="flex justify-between items-center text-sm">
+                  <span>{key}</span>
+                  <FrankButton
+                    size="sm"
+                    variant="light"
+                    color="danger"
+                    className="h-5"
+                    onPress={() => handleRemove(key)}
+                    isDisabled={isDisabled}
+                  >
+                    Remove
+                  </FrankButton>
+                </li>
+              ))
+            ) : (
+              <span className="text-sm">[]</span>
+            )}
           </ul>
         </div>
-      )}
+      }
       {/* Error message */}
       {errorMessage && <p className="text-danger text-sm pl-1">{errorMessage}</p>}
     </div>
