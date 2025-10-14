@@ -62,7 +62,7 @@ const ViewUserPage = () => {
             />
             <Detail
               label="Updated At"
-              value={format(new Date(user.updatedAt), 'yyyy-MM-dd HH:mm')}
+              value={user.updatedAt ? format(new Date(user.updatedAt), 'yyyy-MM-dd HH:mm') : ''}
             />
           </div>
         </CardBody>
