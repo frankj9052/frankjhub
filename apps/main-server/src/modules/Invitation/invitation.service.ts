@@ -29,6 +29,7 @@ import { Organization } from '../organization/entities/Organization';
 import { ForbiddenError } from '../common/errors/ForbiddenError';
 import { getEmailModule } from '../email/email.module';
 import { createLoggerWithContext } from '../common/libs/logger';
+import { User } from '../user/entities/User';
 
 const userOrgRoleService = new UserOrganizationRoleService();
 const userService = new UserService();
@@ -39,6 +40,7 @@ export class InvitationService {
   private invitationRepo = AppDataSource.getRepository(Invitation);
   private orgRepo = AppDataSource.getRepository(Organization);
   private roleRepo = AppDataSource.getRepository(Role);
+  private userRepo = AppDataSource.getRepository(User);
 
   buildInvitation(inv: Invitation): InvitationDto {
     return {
@@ -189,13 +191,32 @@ export class InvitationService {
     }
 
     // 注册用户
-    const registerUser = await userService.register(data);
+    const exist = await this.userRepo.exists({
+      where: [{ email: data.email }, { userName: data.email }],
+      withDeleted: true,
+    });
+    if (exist) {
+      throw new BadRequestError('User already exist.');
+    }
+    const createUser = this.userRepo.create({
+      email,
+      password: data.password,
+      userName: data.userName,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      middleName: data.middleName ?? undefined,
+      createdBy: data.userName,
+      updatedBy: data.userName,
+      isActive: true,
+      emailVerified: true,
+      profileCompleted: false,
+    });
 
-    if (registerUser.status !== 'success') throw new BadRequestError(registerUser.message);
+    const savedUser = await this.userRepo.save(createUser);
 
     // 状态流转
     matched.status = INVITATION_STATUS.ACCEPTED;
-    matched.acceptedUserId = registerUser.data.id;
+    matched.acceptedUserId = savedUser.id;
     const savedInv = await this.invitationRepo.save(matched);
 
     if (!savedInv.inviterUserId) {

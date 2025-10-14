@@ -16,6 +16,7 @@ import {
 import { ComponentProps, CSSProperties, FocusEvent, FormEvent, ReactNode } from 'react';
 import { Key, Selection } from '@react-types/shared';
 import { OrderEnum } from '@frankjhub/shared-schema';
+import { FieldValues, UseFormSetError } from 'react-hook-form';
 
 export type Label = ReactNode | undefined;
 export type Type = string | undefined;
@@ -371,3 +372,4 @@ export type ClassNamesForSwitch =
   | undefined;
 export type IsSelected = boolean | undefined;
 export type OnValueChangeForSwitch = ((isSelected: boolean) => void) | undefined;
+export type SetError<T extends FieldValues> = UseFormSetError<T>;

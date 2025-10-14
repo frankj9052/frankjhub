@@ -61,7 +61,7 @@ export default function EditUserPage() {
       lastName: user.lastName ?? '',
       middleName: user.middleName ?? '',
       gender: user.gender,
-      dateOfBirth: format(new Date(user.dateOfBirth ?? ''), 'yyyy-MM-dd'),
+      dateOfBirth: user?.dateOfBirth ? format(new Date(user.dateOfBirth), 'yyyy-MM-dd') : '',
       honorific: user.honorific,
       avatarImage: user.avatarImage ?? '',
       isActive: user.isActive,
