@@ -6,17 +6,22 @@ import {
 } from '@frankjhub/shared-schema';
 import axios from 'axios';
 import { env } from '../../config/env';
+import { createLoggerWithContext } from '../common/libs/logger';
 
 // 从控制面接口拉取快照
 let SNAPSHOT: ServiceSnapshotResponseData = { version: 0, services: [] };
-
+const logger = createLoggerWithContext('refreshSnapshot');
 export async function refreshSnapshot() {
-  const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
-    headers: { 'x-api-key': env.REGISTRY_API_KEY || '' },
-    timeout: 5000,
-  });
-  if (data.status === 'success' && data.data.version !== SNAPSHOT.version) {
-    SNAPSHOT = data.data;
+  try {
+    const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
+      headers: { 'x-api-key': env.REGISTRY_API_KEY || '' },
+      timeout: 5000,
+    });
+    if (data.status === 'success' && data.data.version !== SNAPSHOT.version) {
+      SNAPSHOT = data.data;
+    }
+  } catch (error) {
+    logger.warn('[snapshot] fetch failed: ', (error as Error).message);
   }
 }
 

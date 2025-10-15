@@ -18,6 +18,7 @@ function extractProviderFields(payload: any) {
   const event: string | undefined = payload?.type || payload?.event || payload?.data?.event;
 
   const providerMessageId: string | undefined =
+    payload?.data?.email_id ||
     payload?.data?.object?.id ||
     payload?.data?.message?.id ||
     payload?.object?.id ||
@@ -83,7 +84,13 @@ export const resendWebhookController: RequestHandler = async (
       }
     }
 
-    const payload = req.body;
+    const raw = (req as any).rawBody ?? req.body; // raw 中间件挂过的 or Buffer
+    const payload =
+      typeof raw === 'string'
+        ? JSON.parse(raw)
+        : Buffer.isBuffer(raw)
+        ? JSON.parse(raw.toString('utf8'))
+        : req.body; // 兜底（万一上游不是 raw）
     const { event, providerMessageId } = extractProviderFields(payload);
 
     if (!event || !providerMessageId) {
@@ -113,14 +120,14 @@ export const resendWebhookController: RequestHandler = async (
         await ds.query(
           `INSERT INTO email_suppressions(email, reason)
            VALUES ($1,$2)
-          ON CONFILICT (email) DO NOTHING
+          ON CONFLICT (email) DO NOTHING
           `,
-          [out.to, mapped === EMAIL_STATUS.BOUNCED ? 'bounce' : 'complaint']
+          [out?.to, mapped === EMAIL_STATUS.BOUNCED ? 'bounce' : 'complaint']
         );
-      } else {
-        // 找不到对应 outbox，记录日志即可（可能历史数据/清理/或并发）
-        logger.info('Outbox not found for providerMessageId', { providerMessageId, event });
       }
+    } else {
+      // 找不到对应 outbox，记录日志即可（可能历史数据/清理/或并发）
+      logger.info('Outbox not found for providerMessageId', { providerMessageId, event });
     }
     res.status(204).end();
   } catch (error) {
