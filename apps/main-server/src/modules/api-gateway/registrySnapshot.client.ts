@@ -6,11 +6,9 @@ import {
 } from '@frankjhub/shared-schema';
 import axios from 'axios';
 import { env } from '../../config/env';
-import { createLoggerWithContext } from '../common/libs/logger';
 
 // 从控制面接口拉取快照
 let SNAPSHOT: ServiceSnapshotResponseData = { version: 0, services: [] };
-const logger = createLoggerWithContext('refreshSnapshot');
 export async function refreshSnapshot() {
   try {
     const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
@@ -20,8 +18,11 @@ export async function refreshSnapshot() {
     if (data.status === 'success' && data.data.version !== SNAPSHOT.version) {
       SNAPSHOT = data.data;
     }
-  } catch (error) {
-    logger.warn('[snapshot] fetch failed: ', (error as Error).message);
+  } catch {
+    SNAPSHOT = {
+      version: NaN,
+      services: [],
+    };
   }
 }
 

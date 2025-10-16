@@ -238,6 +238,13 @@
           "command": "tsx scripts/collectSourceFiles.ts",
           "cwd": "apps/main-server"
         }
+      },
+      "deploy-ec2": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "scripts/deploy-main-server.sh",
+          "cwd": "apps/main-server"
+        }
       }
     }
   }
