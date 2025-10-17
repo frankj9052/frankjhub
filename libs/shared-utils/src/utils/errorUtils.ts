@@ -127,3 +127,79 @@ export function convertZodIssuesToErrorDetails(error: ZodError): Record<string, 
   }
   return result;
 }
+
+/** 以下工具来处理aggregate error, 方便找到原因 */
+type AnyErr = unknown & {
+  code?: string;
+  errno?: number;
+  syscall?: string;
+  address?: string;
+  port?: number;
+  name?: string;
+  message?: string;
+  stack?: string;
+  cause?: unknown;
+};
+
+export interface InnerNetError {
+  name?: string;
+  code?: string;
+  errno?: number;
+  syscall?: string;
+  address?: string;
+  port?: number;
+  message?: string;
+  stack?: string;
+}
+
+const NET_ERROR_CODES = new Set([
+  'ECONNREFUSED',
+  'ETIMEDOUT',
+  'EHOSTUNREACH',
+  'ENETUNREACH',
+  'ECONNRESET',
+]);
+
+/** 递归沿着 cause 链找到第一个 AggregateError（如果有） */
+export function findAggregateError(err: AnyErr | null | undefined): AggregateError | null {
+  if (!err) return null;
+  if (typeof AggregateError !== 'undefined' && err instanceof AggregateError)
+    return err as AggregateError;
+  // 某些库会把 AggregateError 放在 cause 里
+  const cause = (err as AnyErr)?.cause as AnyErr | undefined;
+  if (cause && typeof AggregateError !== 'undefined' && cause instanceof AggregateError)
+    return cause as AggregateError;
+  // 再往下走一层（最多两层够用了，避免深递归带来的风险）
+  const cause2 = (cause as AnyErr)?.cause as AnyErr | undefined;
+  if (cause2 && typeof AggregateError !== 'undefined' && cause2 instanceof AggregateError)
+    return cause2 as AggregateError;
+  return null;
+}
+
+/** 把 AggregateError.errors 展开为便于记录的结构 */
+export function flattenAggregateErrors(agg: AggregateError): InnerNetError[] {
+  const list: InnerNetError[] = [];
+  const errors = Array.from(agg.errors || []);
+  for (const e of errors) {
+    const obj = e as AnyErr;
+    list.push({
+      name: obj?.name,
+      code: obj?.code,
+      errno: obj?.errno,
+      syscall: obj?.syscall,
+      address: obj?.address,
+      port: obj?.port,
+      message: obj?.message,
+      stack: obj?.stack,
+    });
+  }
+  return list;
+}
+
+/** 判断一个错误（或其 cause 链/聚合内层）是否为常见网络类错误 */
+export function isNetLike(err: AnyErr | null | undefined, inner?: InnerNetError[]): boolean {
+  const code = err?.code;
+  if (code && NET_ERROR_CODES.has(code)) return true;
+  if (inner?.some(i => i.code && NET_ERROR_CODES.has(i.code))) return true;
+  return false;
+}

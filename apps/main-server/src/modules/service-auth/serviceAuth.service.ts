@@ -22,6 +22,8 @@ import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { applyFilters } from '../common/utils/applyFilters';
 import { NotFoundError } from '../common/errors/NotFoundError';
+import { getSnapshotFromCache } from '../api-gateway/snapshotCache';
+import { redisClient } from '../../infrastructure/redis';
 
 const logger = createLoggerWithContext('ServiceAuthService');
 const filterConditionMap: Record<string, string> = {
@@ -78,6 +80,13 @@ export class ServiceAuthService {
 
   // 发布快照（给网关用）
   async getSnapshot(): Promise<ServiceSnapshotResponse> {
+    // 优先读取缓存
+    const cached = await getSnapshotFromCache(redisClient);
+    if (cached) {
+      return cached;
+    }
+
+    // 冷启动：仅在缓存为空时，现查一次DB并写回缓存
     const services = await this.serviceRepo.find({ where: { isActive: true } });
     const snapshot: ServiceSnapshot = services.map(s => ({
       key: s.serviceId,

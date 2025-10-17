@@ -53,6 +53,9 @@
     },
     {
       "path": "./apps/booking-server"
+    },
+    {
+      "path": "./apps/api-gateway"
     }
   ],
   "ts-node": {

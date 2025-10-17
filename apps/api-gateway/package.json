@@ -1,0 +1,98 @@
+{
+  "name": "@frankjhub/api-gateway",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/esbuild:esbuild",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
+        "options": {
+          "platform": "node",
+          "outputPath": "apps/api-gateway/dist",
+          "format": [
+            "cjs"
+          ],
+          "bundle": false,
+          "main": "apps/api-gateway/src/main.ts",
+          "tsConfig": "apps/api-gateway/tsconfig.app.json",
+          "assets": [
+            "apps/api-gateway/src/assets"
+          ],
+          "esbuildOptions": {
+            "sourcemap": true,
+            "outExtension": {
+              ".js": ".js"
+            }
+          }
+        },
+        "configurations": {
+          "development": {},
+          "production": {
+            "esbuildOptions": {
+              "sourcemap": false,
+              "outExtension": {
+                ".js": ".js"
+              }
+            }
+          }
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@frankjhub/api-gateway:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@frankjhub/api-gateway:build:development"
+          },
+          "production": {
+            "buildTarget": "@frankjhub/api-gateway:build:production"
+          }
+        }
+      },
+            "serve:prod": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "production",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@frankjhub/api-gateway:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@frankjhub/api-gateway:build:development"
+          },
+          "production": {
+            "buildTarget": "@frankjhub/api-gateway:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      },
+            "collect-source": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "tsx scripts/collectSourceFiles.ts",
+          "cwd": "apps/api-gateway"
+        }
+      }
+    }
+  }
+}

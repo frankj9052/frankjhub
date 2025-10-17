@@ -9,20 +9,24 @@ import { env } from '../../config/env';
 
 // 从控制面接口拉取快照
 let SNAPSHOT: ServiceSnapshotResponseData = { version: 0, services: [] };
+let snapshotFailStreak = 0;
 export async function refreshSnapshot() {
   try {
     const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
       headers: { 'x-api-key': env.REGISTRY_API_KEY || '' },
-      timeout: 5000,
+      timeout: 4000, // 稍短于调度间隔
     });
     if (data.status === 'success' && data.data.version !== SNAPSHOT.version) {
       SNAPSHOT = data.data;
     }
-  } catch {
-    SNAPSHOT = {
-      version: NaN,
-      services: [],
-    };
+    snapshotFailStreak = 0;
+  } catch (e) {
+    snapshotFailStreak++;
+    console.warn(
+      '[snapshot] refresh failed x',
+      snapshotFailStreak,
+      (e as any)?.code || (e as any)?.message
+    );
   }
 }
 
@@ -51,7 +55,8 @@ export function getMatch(req: import('express').Request): RouteMatchResult | nul
 }
 
 // 定时器由模块对外暴露，供 main.ts 调用
+// 把调度间隔拉开，避免 timeout 与间隔相同导致重叠
 export function startSnapshotScheduler() {
   refreshSnapshot().catch(() => void 0);
-  setInterval(() => refreshSnapshot().catch(() => void 0), 5000);
+  setInterval(() => refreshSnapshot().catch(() => void 0), 8000);
 }

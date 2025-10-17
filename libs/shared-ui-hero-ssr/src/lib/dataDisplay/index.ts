@@ -4,3 +4,5 @@ export * from './Avatar';
 export * from './Card';
 // 进度条组件
 export * from './Progress';
+
+export * from './Link';

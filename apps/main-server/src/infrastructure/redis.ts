@@ -33,7 +33,7 @@ const baseOptions: RedisOptions = {
     return delay + jitter;
   },
 };
-export const redisClient = new Redis(url, baseOptions);
+export const redisClient: Redis = new Redis(url, baseOptions);
 
 // 只绑定一次的事件监听
 let listenersWired = false;

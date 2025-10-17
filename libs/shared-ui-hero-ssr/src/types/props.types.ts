@@ -13,7 +13,14 @@ import {
   TableHeaderProps,
   TableRow,
 } from '@heroui/react';
-import { ComponentProps, CSSProperties, FocusEvent, FormEvent, ReactNode } from 'react';
+import {
+  BaseSyntheticEvent,
+  ComponentProps,
+  CSSProperties,
+  FocusEvent,
+  FormEvent,
+  ReactNode,
+} from 'react';
 import { Key, Selection } from '@react-types/shared';
 import { OrderEnum } from '@frankjhub/shared-schema';
 import { FieldValues, UseFormSetError } from 'react-hook-form';
@@ -104,6 +111,14 @@ export type ColorForChip =
   | 'danger'
   | undefined;
 export type ColorForSwitch = ColorForChip;
+export type ColorForLink =
+  | 'foreground'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | undefined;
 export type Placement =
   | 'bottom'
   | 'bottom-end'
@@ -123,6 +138,11 @@ export type Delay = number | undefined;
 export type CloseDelay = number | undefined;
 export type Style = CSSProperties | undefined;
 export type OnSubmit = ((event: FormEvent<HTMLFormElement>) => void | Promise<void>) | undefined;
+export type OnSubmitForForm<T extends FieldValues> = (
+  values: T,
+  setError: UseFormSetError<T>,
+  event: BaseSyntheticEvent<object, any, any> | undefined
+) => void;
 export type DisableRipple = boolean | undefined;
 export type TabIndex = number | undefined;
 export type AutoComplete =
@@ -373,3 +393,10 @@ export type ClassNamesForSwitch =
 export type IsSelected = boolean | undefined;
 export type OnValueChangeForSwitch = ((isSelected: boolean) => void) | undefined;
 export type SetError<T extends FieldValues> = UseFormSetError<T>;
+/** Link */
+export type Href = string | undefined;
+export type Underline = 'none' | 'hover' | 'always' | 'active' | 'focus' | undefined;
+export type IsExternal = boolean | undefined;
+export type ShowAnchorIcon = boolean | undefined;
+export type AnchorIcon = ReactNode | undefined;
+export type IsBlock = boolean | undefined;

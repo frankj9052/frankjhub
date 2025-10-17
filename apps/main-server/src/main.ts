@@ -1,3 +1,5 @@
+import { setDefaultResultOrder } from 'node:dns';
+setDefaultResultOrder('ipv4first');
 import 'express-async-errors';
 import { createApp } from './createApp';
 import { createLoggerWithContext, logger } from './modules/common/libs/logger';
@@ -45,12 +47,6 @@ async function startServer() {
       await emailModule.startWorker();
     }
 
-    // 2.9 启动快照定时器
-    const { startSnapshotScheduler } = await import(
-      './modules/api-gateway/registrySnapshot.client.js'
-    );
-    startSnapshotScheduler();
-
     // 3. 创建并配置 Express 应用
     const app = await createApp();
 
@@ -58,6 +54,15 @@ async function startServer() {
     server = app.listen(Number(env.PORT), () => {
       serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
       serverLogger.info(`📚 Swagger docs available at http://${env.HOST}:${env.PORT}/api-docs`);
+      // 在 server 启动成功后再启动快照定时器
+      import('./modules/api-gateway/registrySnapshot.client.js')
+        .then(({ startSnapshotScheduler }) => {
+          startSnapshotScheduler();
+          serverLogger.info('📸 Registry snapshot scheduler started.');
+        })
+        .catch(err => {
+          serverLogger.error('Failed to start snapshot scheduler', err);
+        });
     });
 
     /* -------- 全局异常与信号处理(once避免重复触发) -------- */
