@@ -15,3 +15,4 @@ export * from './invitation';
 export * from './email';
 export * from './service';
 export * from './api-gateway';
+export * from './env';
