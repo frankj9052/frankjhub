@@ -2,12 +2,12 @@ import { ZodType } from 'zod';
 import dotenvFlow from 'dotenv-flow';
 
 /**
- * SharedConfigService: 环境变量读取与类型安全校验
+ * ConfigService: 环境变量读取与类型安全校验
  * - 自动读取指定路径的 .env 文件
  * - 支持 Zod 校验和自定义逻辑
  * - 抛出错误时进程退出
  */
-export class SharedConfigService<T extends Record<string, any>> {
+export class ConfigService<T extends Record<string, any>> {
   private env: T;
 
   /**

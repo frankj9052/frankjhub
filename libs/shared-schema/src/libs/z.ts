@@ -1,7 +1,10 @@
 import { z as baseZ, infer as zInfer } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 
-extendZodWithOpenApi(baseZ);
+export function createZ() {
+  extendZodWithOpenApi(baseZ);
+  return baseZ;
+}
 
-export const z = baseZ;
+export const z = createZ();
 export type { zInfer };

@@ -1,6 +1,6 @@
 {
-  "name": "@frankjhub/shared-config",
-  "version": "0.0.2",
+  "name": "@frankjhub/shared-redis",
+  "version": "0.0.1",
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.esm.d.ts",
@@ -14,12 +14,13 @@
     }
   },
   "dependencies": {
-    "zod": "3.25.42",
-    "dotenv-flow": "4.1.0"
+    "ioredis": "5.6.1",
+    "winston": "3.17.0",
+    "@frankjhub/shared-schema": "0.0.4"
   },
   "nx": {
     "projectType": "library",
-    "sourceRoot": "libs/shared-config",
+    "sourceRoot": "libs/shared-redis",
     "targets": {
       "deploy": {
         "dependsOn": [
@@ -27,7 +28,7 @@
         ],
         "executor": "nx:run-commands",
         "options": {
-          "command": "npm publish libs/shared-config/dist --access public",
+          "command": "npm publish libs/shared-redis/dist --access public",
           "cwd": "."
         }
       }

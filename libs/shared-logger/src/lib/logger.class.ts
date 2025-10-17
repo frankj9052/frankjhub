@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/node';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 import os from 'os';
+import { ILoggerService } from './logger.type';
 
 /**
  * 自定义日志元信息类型
@@ -25,7 +26,7 @@ type CustomLogMeta = {
  *
  * @template T Env 类型（必须继承 EnvBase）
  */
-export class LoggerService<T extends EnvBase> {
+export class LoggerService<T extends EnvBase> implements ILoggerService {
   private logger: winston.Logger;
   private env: T;
   private logsDir: string;

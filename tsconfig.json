@@ -62,6 +62,9 @@
     },
     {
       "path": "./libs/shared-config"
+    },
+    {
+      "path": "./libs/shared-redis"
     }
   ],
   "ts-node": {

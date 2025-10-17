@@ -28,7 +28,7 @@ const baseSchema = z.object({
   APP_BASE_URL: z.string(),
 
   // 新增: Session相关校验
-  SESSION_SECRET: z.string(), // 只要是非空字符串就行
+  SESSION_SECRET: z.string().min(16), // 只要是非空字符串就行
   SESSION_ENCRYPTION_KEY: z.string().regex(/^[0-9a-f]{64}$/, {
     message: 'SESSION_ENCRYPTION_KEY must be a 64-character hex string (32 bytes)',
   }),
@@ -62,8 +62,8 @@ const baseSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   // 新增api gateway
-  REGISTRY_SNAPSHOT_URL: z.string(),
-  REGISTRY_API_KEY: z.string(),
+  REGISTRY_SNAPSHOT_URL: z.string().url(),
+  REGISTRY_API_KEY: z.string().min(1),
   JWT_ISSUER: z.string().default('jurong-auth'),
 });
 

@@ -1,1 +1,1 @@
-export * from './lib/shared-config.class';
+export * from './lib/config.class';
