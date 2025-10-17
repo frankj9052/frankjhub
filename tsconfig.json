@@ -59,6 +59,9 @@
     },
     {
       "path": "./libs/shared-logger"
+    },
+    {
+      "path": "./libs/shared-config"
     }
   ],
   "ts-node": {
