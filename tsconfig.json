@@ -65,6 +65,15 @@
     },
     {
       "path": "./libs/shared-redis"
+    },
+    {
+      "path": "./libs/shared-cors"
+    },
+    {
+      "path": "./libs/shared-session"
+    },
+    {
+      "path": "./libs/shared-rate-limiter"
     }
   ],
   "ts-node": {

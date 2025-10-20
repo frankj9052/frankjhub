@@ -1,6 +1,7 @@
 {
   "name": "@frankjhub/shared-utils",
   "version": "0.0.9",
+  "type": "module",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",

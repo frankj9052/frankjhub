@@ -1,0 +1,36 @@
+{
+  "name": "@frankjhub/shared-cors",
+  "version": "0.0.1",
+  "main": "./dist/index.esm.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    }
+  },
+  "dependencies": {
+    "cors": "2.8.5",
+    "@frankjhub/shared-schema": "0.0.4"
+  },
+  "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-cors",
+    "targets": {
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm publish libs/shared-cors/dist --access public",
+          "cwd": "."
+        }
+      }
+    }
+  }
+}

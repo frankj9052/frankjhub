@@ -3,11 +3,16 @@ import type { Request, Response, NextFunction } from 'express';
 import { redisClient } from '../../../infrastructure/redis';
 import { TooManyRequestsError } from '../errors/TooManyRequestsError';
 
-interface LimiterOptions {
+export interface LimiterOptions {
+  /** 每 duration 秒最多允许 points 次请求 */
   points: number;
+  /** 窗口期：每 duration 秒最多允许 points 次请求 */
   duration: number;
+  /** 达到上限后封禁 blockDuration 秒 */
   blockDuration?: number;
+  /** 区分日志 */
   keyPrefix: string;
+  /** 区分redis键 */
   keyGenerator?: (req: Request) => string;
 }
 

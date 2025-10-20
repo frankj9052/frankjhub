@@ -1,13 +1,16 @@
-import { LimiterOptions } from './createRateLimiter';
+import { Request } from 'express';
+import { LimiterOptions } from './rateLimiter.class';
 
-export const RateLimiterStrategies: Record<string, LimiterOptions> = {
+export type RateLimiterStrategyKey = 'global' | 'login' | 'signup';
+
+export const RateLimiterStrategies: Record<RateLimiterStrategyKey, LimiterOptions> = {
   /** 🌐 全局 API 限流（API Gateway） */
   global: {
     points: 100,
     duration: 60,
     blockDuration: 60,
     keyPrefix: 'gateway_rl',
-    keyGenerator: req => req.ip || req.headers['x-forwarded-for']?.toString() || 'anon',
+    keyGenerator: (req: Request) => req.ip || req.headers['x-forwarded-for']?.toString() || 'anon',
   },
   /** 👤 登录失败限流（Main Server） */
   login: {
@@ -23,4 +26,4 @@ export const RateLimiterStrategies: Record<string, LimiterOptions> = {
     blockDuration: 1800,
     keyPrefix: 'signup_fail_ip',
   },
-} as const;
+};

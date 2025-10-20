@@ -18,5 +18,25 @@
     "eslint.config.js",
     "eslint.config.cjs",
     "eslint.config.mjs"
+  ],
+  "references": [
+    {
+      "path": "../../libs/shared-session/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-cors/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-redis/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-logger/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-schema/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-config/tsconfig.lib.json"
+    }
   ]
 }
