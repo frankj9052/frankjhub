@@ -32,7 +32,7 @@ export class SessionService<T extends EnvSession & EnvBase> {
 
   constructor(env: T, logger: Logger, redisClient: Redis) {
     this.env = env;
-    this.logger = logger.child('SessionService');
+    this.logger = logger.child({ context: 'SessionService' });
     this.redisClient = redisClient;
 
     const domains = parseCookieDomain(env.SESSION_COOKIE_DOMAIN);

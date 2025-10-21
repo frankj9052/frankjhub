@@ -5,3 +5,5 @@ export * from './envRedis';
 export * from './envCors';
 
 export * from './envSession';
+
+export * from './envJwt';

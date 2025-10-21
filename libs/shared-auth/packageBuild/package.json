@@ -1,0 +1,21 @@
+{
+  "name": "@frankjhub/shared-auth",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "main": "./index.esm.js",
+  "module": "./index.esm.js",
+  "types": "./index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.esm.d.ts",
+      "import": "./index.esm.js",
+      "default": "./index.esm.js"
+    }
+  },
+  "dependencies": {
+    "@frankjhub/shared-schema": "0.0.4",
+    "@frankjhub/shared-jose": "0.0.1",
+    "@frankjhub/shared-errors": "0.0.2"
+  }
+}

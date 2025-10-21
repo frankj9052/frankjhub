@@ -29,6 +29,7 @@ declare module 'express-session' {
       email?: string;
       userName: string;
       roleCodes: string[]; // 用于服务端权限判断
+      permissionStrings: string[];
       sessionVersion: string; // 用于权限刷新机制（如权限变更后刷新 session）
     };
   }

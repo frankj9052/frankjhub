@@ -20,6 +20,7 @@ export const loginController: RequestHandler = async (
       email: userPayload.email,
       userName: userPayload.userName,
       roleCodes: userPayload.orgRoles.map(role => role.roleCode),
+      permissionStrings: userPayload.orgRoles.flatMap(role => role.permissionStrings),
       sessionVersion: userPayload.sessionVersion, // 可用于强制刷新机制
     };
 

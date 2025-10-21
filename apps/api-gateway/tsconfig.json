@@ -7,13 +7,25 @@
       "path": "../../libs/shared-session"
     },
     {
+      "path": "../../libs/shared-error-handler"
+    },
+    {
       "path": "../../libs/shared-cors"
     },
     {
       "path": "../../libs/shared-redis"
     },
     {
+      "path": "../../libs/shared-rate-limiter"
+    },
+    {
       "path": "../../libs/shared-logger"
+    },
+    {
+      "path": "../../libs/shared-errors"
+    },
+    {
+      "path": "../../libs/shared-auth"
     },
     {
       "path": "../../libs/shared-schema"

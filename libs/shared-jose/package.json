@@ -1,0 +1,35 @@
+{
+  "name": "@frankjhub/shared-jose",
+  "version": "0.0.1",
+  "main": "./dist/index.esm.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    }
+  },
+  "dependencies": {
+    "jose": "6.0.11"
+  },
+  "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-jose",
+    "targets": {
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm publish libs/shared-jose/dist --access public",
+          "cwd": "."
+        }
+      }
+    }
+  }
+}

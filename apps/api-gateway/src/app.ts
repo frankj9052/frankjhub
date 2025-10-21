@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import compression from 'compression';
 import { sessionMiddleware } from './middlewares/session';
 import { rateLimiterGlobal } from './infrastructure/rateLimiter';
+import { errorHandler } from './middlewares/errorHandler';
 
 export async function createApp() {
   const app = express();
@@ -27,6 +28,9 @@ export async function createApp() {
 
   // session
   app.use(sessionMiddleware);
+
+  // 全局错误处理器
+  app.use(errorHandler);
 
   return app;
 }

@@ -24,13 +24,25 @@
       "path": "../../libs/shared-session/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared-error-handler/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared-cors/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared-redis/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared-rate-limiter/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared-logger/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-errors/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-auth/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared-schema/tsconfig.lib.json"

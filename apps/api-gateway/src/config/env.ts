@@ -2,6 +2,7 @@ import { ConfigService } from '@frankjhub/shared-config';
 import {
   envBaseSchema,
   envCorsSchema,
+  EnvJwtSchema,
   envRedisSchema,
   envSessionSchema,
   z,
@@ -12,6 +13,7 @@ const envSchema = envBaseSchema
   .merge(envRedisSchema)
   .merge(envCorsSchema)
   .merge(envSessionSchema)
+  .merge(EnvJwtSchema)
   .extend({
     SESSION_SECURE: z.enum(['true', 'false']).default('true'),
 

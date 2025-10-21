@@ -13,5 +13,10 @@
       "default": "./index.esm.js"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "ioredis": "5.6.1",
+    "express": "4.21.2",
+    "rate-limiter-flexible": "7.1.1",
+    "@frankjhub/shared-errors": "0.0.2"
+  }
 }

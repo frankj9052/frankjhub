@@ -74,6 +74,18 @@
     },
     {
       "path": "./libs/shared-rate-limiter"
+    },
+    {
+      "path": "./libs/shared-error-handler"
+    },
+    {
+      "path": "./libs/shared-auth"
+    },
+    {
+      "path": "./libs/shared-jose"
+    },
+    {
+      "path": "./libs/shared-perm"
     }
   ],
   "ts-node": {

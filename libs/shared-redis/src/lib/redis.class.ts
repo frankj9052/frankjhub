@@ -143,7 +143,7 @@ export class RedisService<T extends EnvRedis & EnvBase> {
    * 获取原始 Redis 客户端
    * @returns Redis 实例，可直接使用 ioredis API
    */
-  getClient() {
+  getClient(): Redis {
     return this.client;
   }
 
