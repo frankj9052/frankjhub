@@ -7,12 +7,11 @@ import compression from 'compression';
 import { sessionMiddleware } from './middlewares/session';
 import { rateLimiterGlobal } from './infrastructure/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
+import { mountHealthRoutes } from './routes/health';
+import { gatewayRawRouter } from './gateway/proxyRouter';
 
 export async function createApp() {
   const app = express();
-
-  // Redis速率限制
-  app.use(rateLimiterGlobal);
 
   // 信任反代
   app.set('trust proxy', true);
@@ -28,6 +27,15 @@ export async function createApp() {
 
   // session
   app.use(sessionMiddleware);
+
+  // 健康检查
+  mountHealthRoutes(app);
+
+  // Redis速率限制
+  app.use(rateLimiterGlobal);
+
+  // 网关代理
+  app.use(gatewayRawRouter);
 
   // 全局错误处理器
   app.use(errorHandler);

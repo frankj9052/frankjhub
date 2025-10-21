@@ -5,3 +5,4 @@ export * from './UnauthorizedError';
 export * from './ValidationError';
 export * from './ForbiddenError';
 export * from './BadRequestError';
+export * from './NotFoundError';

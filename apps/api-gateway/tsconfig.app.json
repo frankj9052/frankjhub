@@ -6,7 +6,8 @@
     "types": ["node"],
     "rootDir": "src",
     "moduleResolution": "nodenext",
-    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "esModuleInterop": true,
   },
   "include": ["src/**/*.ts"],
   "exclude": [
@@ -40,6 +41,9 @@
     },
     {
       "path": "../../libs/shared-errors/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-perm/tsconfig.lib.json"
     },
     {
       "path": "../../libs/shared-auth/tsconfig.lib.json"

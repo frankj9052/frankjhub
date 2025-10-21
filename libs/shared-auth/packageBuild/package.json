@@ -1,7 +1,6 @@
 {
   "name": "@frankjhub/shared-auth",
   "version": "0.0.1",
-  "type": "commonjs",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
   "types": "./index.esm.d.ts",

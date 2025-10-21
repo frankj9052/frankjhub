@@ -23,7 +23,6 @@ async function startServer() {
       // 启动 HTTP 服务器
       server = app.listen(Number(env.PORT), () => {
         serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
-        serverLogger.info(`📚 Swagger docs available at http://${env.HOST}:${env.PORT}/api-docs`);
       });
 
       /* -------- 全局异常与信号处理(once避免重复触发) -------- */

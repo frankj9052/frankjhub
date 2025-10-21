@@ -25,6 +25,9 @@
       "path": "../../libs/shared-errors"
     },
     {
+      "path": "../../libs/shared-perm"
+    },
+    {
       "path": "../../libs/shared-auth"
     },
     {
