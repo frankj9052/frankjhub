@@ -57,29 +57,25 @@ const getOrCreateProxy = (m: RouteMatchResult) => {
         ];
         stripHeaders.forEach(h => proxyReq.removeHeader(h));
         // —— 统一主体（principal）传递：service / user / anonymous ——
-        // service（机器对机器）
-        const serviceAuth = eReq.serviceAuth;
-        // user（最终用户）
-        // const currentUser = eReq.currentUser;
-        const sessionUser = eReq.session?.user;
+        const isUser = !!eReq?.headers?.cookie;
+        const isService = eReq?.headers?.authorization;
 
-        const principalType = serviceAuth ? 'service' : sessionUser ? 'user' : 'anonymous';
+        const principalType = isService ? 'service' : isUser ? 'user' : 'anonymous';
 
         proxyReq.setHeader('x-principal-type', principalType);
 
-        if (principalType === 'service') {
-          proxyReq.setHeader('x-forwarded-service', serviceAuth?.serviceId || '');
-          if (Array.isArray(serviceAuth?.scopes) && serviceAuth.scopes.length > 0) {
+        // 透传 service token info
+        if (isService && (req as any).serviceAuth) {
+          const serviceAuth = (req as any).serviceAuth;
+          proxyReq.setHeader('x-forwarded-service', serviceAuth.serviceId || '');
+          if (Array.isArray(serviceAuth.scopes)) {
             proxyReq.setHeader('x-forwarded-scopes', serviceAuth.scopes.join(' '));
           }
-        } else if (principalType === 'user') {
-          const userId = sessionUser?.id;
-          const userName = sessionUser?.userName;
-          const permissions = sessionUser?.permissionStrings;
-          proxyReq.setHeader('x-forwarded-user', userId ?? 'unknwon user');
-          if (userName) proxyReq.setHeader('x-forwarded-user-name', userName);
-          if (permissions && permissions.length > 0)
-            proxyReq.setHeader('x-forwarded-scopes', permissions.join(' '));
+        }
+
+        // 手动透传cookie
+        if (eReq.headers.cookie) {
+          proxyReq.setHeader('cookie', eReq.headers.cookie);
         }
 
         // 透传/对齐请求 ID（与 requestId 中间件配合）
@@ -142,22 +138,15 @@ const getOrCreateProxy = (m: RouteMatchResult) => {
 gatewayRawRouter.use(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const match = getMatch(req);
-
     if (!match) return res.status(404).json(new NotFoundError('Route not found'));
 
     // —— 公开 / 受保护判定（空 scopes = 公开）——
     const isPublic = match.requiredScopes.length === 0;
-    // —— 是否带了任何可用的“凭证” ——
-    const hasCreds =
-      !!req.headers.authorization ||
-      !!req.headers.cookie ||
-      !!req.headers['x-api-key'] ||
-      !!req.headers['x-service-token'] ||
-      !!req?.session?.user;
+    const hasServiceToken = !!req.headers.authorization;
 
     // 公开路由：可匿名；但如带凭证则需要校验（避免“带了但无效”的灰区）
     if (isPublic) {
-      if (hasCreds) {
+      if (hasServiceToken) {
         await verifyAccess(req, match.audience);
       }
     } else {
@@ -200,22 +189,3 @@ gatewayRawRouter.use(async (req: Request, res: Response, next: NextFunction) => 
     }
   }
 });
-
-// 测试router
-// 请求 GET http://localhost:3100/gw/__debug/match/booking/booking
-// gatewayRawRouter.get('/__debug/match/*', (req, res) => {
-//   const { getMatch } = require('./registrySnapshot.client');
-//   const fake = { ...req, path: req.path.replace('/__debug/match', '') };
-//   const match = getMatch(fake as any);
-//   res.json({ path: req.path, stripped: (fake as any).path, match });
-// });
-
-// 2) 可选：打一条“进入网关”的日志，便于确认挂载生效
-// gatewayRawRouter.use((req, _res, next) => {
-//   logger.info(`[GW] inbound: method=${req.method} originalUrl=${req.originalUrl} path=${req.path}`);
-//   next();
-// });
-
-// 注意：不要在此 router 上挂 json/urlencoded 解析（保持原始流）
-// 依赖：http-proxy-middleware（安装到 main-server）
-// 注意通配符*会吃掉req.path里的内容，去掉星号或者用req.url, req.restUrl

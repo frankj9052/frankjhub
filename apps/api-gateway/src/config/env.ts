@@ -21,6 +21,8 @@ const envSchema = envBaseSchema
     REGISTRY_SNAPSHOT_URL: z.string().url(),
     REGISTRY_API_KEY: z.string().min(1),
     SNAPSHOT_REFRESH_INTERVAL_MS: z.coerce.number().int().positive().default(8000),
+    SNAPSHOT_EVENTS_CHANNEL: z.string().optional(),
+    SNAPSHOT_MAX_AGE_MS: z.string().optional(),
 
     // JWT/JWKS（共享库会用）
     // JWKS_URI: z.string().url(),

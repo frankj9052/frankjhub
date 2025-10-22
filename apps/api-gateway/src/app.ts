@@ -9,6 +9,7 @@ import { rateLimiterGlobal } from './infrastructure/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import { mountHealthRoutes } from './routes/health';
 import { gatewayRawRouter } from './gateway/proxyRouter';
+import { mountDebugRoutes } from './routes/debug';
 
 export async function createApp() {
   const app = express();
@@ -30,6 +31,7 @@ export async function createApp() {
 
   // 健康检查
   mountHealthRoutes(app);
+  mountDebugRoutes(app);
 
   // Redis速率限制
   app.use(rateLimiterGlobal);

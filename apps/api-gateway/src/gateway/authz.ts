@@ -7,11 +7,6 @@ import { ForbiddenError, UnauthorizedError } from '@frankjhub/shared-errors';
 import { env } from '../config/env';
 
 export async function verifyAccess(req: Request, expectedAudience: string | string[]) {
-  // 用户会话流验证
-  if (req?.session?.user) {
-    return;
-  }
-
   // 服务间JWT验证
   const auth = req.headers.authorization || '';
   // 如果authorization不存在，则尝试从user登陆的payload获取
@@ -41,14 +36,9 @@ export async function verifyAccess(req: Request, expectedAudience: string | stri
 
 export function checkScopes(req: Request, required: string[]) {
   let scopes: string[] = [];
-  const user = req?.session?.user;
-  if (user) {
-    scopes = user.permissionStrings;
-  } else {
-    scopes = String(req.serviceAuth?.scopes || '')
-      .split(/[ ,]/)
-      .filter(Boolean);
-  }
+  scopes = String(req.serviceAuth?.scopes || '')
+    .split(/[ ,]/)
+    .filter(Boolean);
 
   // 校验所需权限作用域
   const missing = required.filter(required => !hasPermission(scopes, required));

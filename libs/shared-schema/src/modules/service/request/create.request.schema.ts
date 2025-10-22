@@ -13,20 +13,7 @@ export const serviceCreateRequestSchema = serviceSchema
   .extend({
     serviceSecret: serviceSecretSchema,
     audPrefix: serviceSchema.shape.audPrefix.optional(),
-    routes: z
-      .array(
-        serviceRouteSchema
-          .pick({
-            path: true,
-            methods: true,
-            rewrite: true,
-            rateLimit: true,
-          })
-          .extend({
-            requiredScopes: serviceRouteSchema.shape.requiredScopes.optional(),
-          })
-      )
-      .optional(),
+    routes: z.array(serviceRouteSchema).optional(),
     requiredScopes: serviceSchema.shape.requiredScopes.optional(),
   });
 

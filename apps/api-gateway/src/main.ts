@@ -1,56 +1,66 @@
 import { createLoggerWithContext } from './infrastructure/logger';
-import { closeRedisConnection, connectRedis, redisClient } from './infrastructure/redis';
+import {
+  closeRedisConnection,
+  connectRedis,
+  redisClient,
+  redisSubscriber,
+  redisSubscriberService,
+} from './infrastructure/redis';
 import { createApp } from './app';
 import { Server } from 'http';
 import { env } from './config/env';
 import * as Sentry from '@sentry/node';
+import { startSnapshotEventListener, waitUntilSnapshotReady } from './gateway/registry.client';
 
 let server: Server;
 const serverLogger = createLoggerWithContext('Api-Gateway Server');
 let isShuttingDown = false;
 
 async function startServer() {
-  {
-    try {
-      serverLogger.info('🚀 Starting server...');
+  try {
+    serverLogger.info('🚀 Starting server...');
 
-      // 初始化 Redis
-      await connectRedis();
+    // 启动事件监听（会包含启动时首次拉取）
+    await startSnapshotEventListener();
+    await waitUntilSnapshotReady(8000);
 
-      // 创建并配置 Express 应用
-      const app = await createApp();
+    // 初始化 Redis
+    await connectRedis();
+    await redisSubscriberService.connect();
 
-      // 启动 HTTP 服务器
-      server = app.listen(Number(env.PORT), () => {
-        serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
-      });
+    // 创建并配置 Express 应用
+    const app = await createApp();
 
-      /* -------- 全局异常与信号处理(once避免重复触发) -------- */
-      process.once('unhandledRejection', error => {
-        serverLogger.error('❗ Unhandled Rejection:', error);
-        Sentry.captureException(error);
-        shutdown(1);
-      });
+    // 启动 HTTP 服务器
+    server = app.listen(Number(env.PORT), () => {
+      serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
+    });
 
-      process.on('uncaughtException', error => {
-        serverLogger.error('❗ Uncaught Exception:', error);
-        Sentry.captureException(error);
-        shutdown(1);
-      });
+    /* -------- 全局异常与信号处理(once避免重复触发) -------- */
+    process.once('unhandledRejection', error => {
+      serverLogger.error('❗ Unhandled Rejection:', error);
+      Sentry.captureException(error);
+      shutdown(1);
+    });
 
-      process.on('SIGINT', () => {
-        serverLogger.warn('📴 Received SIGINT');
-        shutdown(0);
-      });
+    process.on('uncaughtException', error => {
+      serverLogger.error('❗ Uncaught Exception:', error);
+      Sentry.captureException(error);
+      shutdown(1);
+    });
 
-      process.on('SIGTERM', () => {
-        serverLogger.warn('📴 Received SIGTERM');
-        shutdown(0);
-      });
-    } catch (error) {
-      serverLogger.error('❌ Server failed to start', error);
-      process.exit(1);
-    }
+    process.on('SIGINT', () => {
+      serverLogger.warn('📴 Received SIGINT');
+      shutdown(0);
+    });
+
+    process.on('SIGTERM', () => {
+      serverLogger.warn('📴 Received SIGTERM');
+      shutdown(0);
+    });
+  } catch (error) {
+    serverLogger.error('❌ Server failed to start', error);
+    process.exit(1);
   }
 }
 
@@ -69,6 +79,9 @@ async function shutdown(exitCode: number) {
     }
     if (redisClient) {
       await closeRedisConnection();
+    }
+    if (redisSubscriber) {
+      await redisSubscriberService.close();
     }
   } catch (error) {
     serverLogger.error('❗ Error during shutdown:', error);

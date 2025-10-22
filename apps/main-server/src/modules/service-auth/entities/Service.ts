@@ -1,7 +1,7 @@
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import * as argon2 from 'argon2';
 import { BaseEntity } from '../../common/entities/BaseEntity';
-import { HttpMethod } from '@frankjhub/shared-schema';
+import { ServiceRoute } from '@frankjhub/shared-schema';
 
 @Entity()
 export class Service extends BaseEntity {
@@ -22,13 +22,7 @@ export class Service extends BaseEntity {
   audPrefix!: string; // 例: api://booking
 
   @Column({ type: 'jsonb', default: [] })
-  routes!: Array<{
-    path: string; // '/appointments'
-    methods: HttpMethod[]; // ['GET','POST']
-    requiredScopes: string[]; // ['booking:read']
-    rewrite?: string; // '^/booking' => ''
-    rateLimit?: { windowMs: number; max: number };
-  }>;
+  routes!: ServiceRoute[];
 
   /** 服务级最低要求（网关层，全部路由生效；路由级可叠加覆盖） */
   @Column({ type: 'text', array: true, default: [] })

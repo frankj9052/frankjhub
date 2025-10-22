@@ -52,7 +52,7 @@ export class ServiceAuthService {
     const { serviceId, serviceSecret } = data;
     const service = await this.serviceRepo.findOne({ where: { serviceId } });
 
-    const routesScopes = service?.routes.flatMap(r => r.requiredScopes) ?? [];
+    const routesScopes = service?.routes.flatMap(r => r.requiredScopes ?? []) ?? [];
     const scopes = routesScopes.concat(service?.requiredScopes ?? []);
 
     if (

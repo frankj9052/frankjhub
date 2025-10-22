@@ -36,18 +36,36 @@ export function getMatch(req: import('express').Request): RouteMatchResult | nul
   const method = req.method.toUpperCase() as HttpMethod;
   for (const s of SNAPSHOT.services) {
     for (const r of s.routes) {
-      if (
-        path.startsWith(`/${s.key}`) &&
-        path.replace(`/${s.key}`, '').startsWith(r.path) &&
-        r.methods.includes(method)
-      ) {
-        return {
-          serviceKey: s.key,
-          target: s.baseUrl,
-          audience: s.aud,
-          requiredScopes: (s.requiredScopes || []).concat(r.requiredScopes || []),
-          rewrite: r.rewrite,
-        };
+      const allowMethod = r.methods.includes('*' as HttpMethod) || r.methods.includes(method);
+
+      if (r.type === 'prefix') {
+        if (
+          allowMethod &&
+          path.startsWith(`/${s.key}`) &&
+          path.replace(`/${s.key}`, '').startsWith(r.pathPrefix)
+        ) {
+          return {
+            serviceKey: s.key,
+            target: s.baseUrl,
+            audience: s.aud,
+            requiredScopes: (s.requiredScopes || []).concat(r.requiredScopes || []),
+            rewrite: r.rewrite,
+          };
+        }
+      } else {
+        if (
+          allowMethod &&
+          path.startsWith(`/${s.key}`) &&
+          path.replace(`/${s.key}`, '').startsWith(r.path)
+        ) {
+          return {
+            serviceKey: s.key,
+            target: s.baseUrl,
+            audience: s.aud,
+            requiredScopes: (s.requiredScopes || []).concat(r.requiredScopes || []),
+            rewrite: r.rewrite,
+          };
+        }
       }
     }
   }

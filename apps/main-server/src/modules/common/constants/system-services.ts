@@ -2,6 +2,7 @@ import { ServiceCreateRequest } from '@frankjhub/shared-schema';
 import { buildPermissionName } from '../../codecs/permissionCodec';
 import { SYSTEM_RESOURCES } from './system-resources';
 import { SYSTEM_ACTIONS } from './system-actions';
+import { env } from '../../../config/env';
 
 export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
   BOOKING: {
@@ -11,6 +12,7 @@ export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
     audPrefix: 'api://',
     routes: [
       {
+        type: 'exact',
         path: '/booking',
         methods: ['GET'],
         requiredScopes: [
@@ -19,6 +21,7 @@ export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
         rewrite: '^/booking', // 把前缀 /booking 去掉
       },
       {
+        type: 'exact',
         path: '/health',
         methods: ['GET'],
         requiredScopes: [],
@@ -27,8 +30,27 @@ export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
     ],
     // 服务级通用要求
     requiredScopes: [],
-    serviceSecret: 'booking-service-secret',
+    serviceSecret: 'booking-server-secret',
     description: 'Booking Service',
+  },
+  MAIN: {
+    serviceId: 'main',
+    name: 'Main Service',
+    baseUrl: env.APP_BASE_URL,
+    audPrefix: 'api://',
+    requiredScopes: [],
+    serviceSecret: 'main-server-secret',
+    description: 'Main Service',
+    routes: [
+      /** Auth */
+      {
+        type: 'prefix',
+        pathPrefix: '/api/auth',
+        methods: ['POST', 'GET'],
+        requiredScopes: [],
+        rewrite: '^/main',
+      },
+    ],
   },
 };
 
