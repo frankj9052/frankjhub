@@ -73,7 +73,7 @@ const getOrCreateProxy = (m: RouteMatchResult) => {
         proxyReq.setHeader('x-principal-type', principalType);
 
         if (principalType === 'service') {
-          proxyReq.setHeader('x-forwarded-service', serviceAuth?.serviceId || '');
+          proxyReq.setHeader('x-forwarded-service', serviceAuth?.id || '');
           if (Array.isArray(serviceAuth?.scopes) && serviceAuth.scopes.length > 0) {
             proxyReq.setHeader('x-forwarded-scopes', serviceAuth.scopes.join(' '));
           }

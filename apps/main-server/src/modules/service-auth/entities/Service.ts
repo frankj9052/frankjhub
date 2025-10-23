@@ -19,14 +19,18 @@ export class Service extends BaseEntity {
   baseUrl!: string; // 例: http://booking:4001
 
   @Column({ type: 'varchar', default: 'api://' })
-  audPrefix!: string; // 例: api://booking
+  audPrefix?: string; // 例: api://booking
 
   @Column({ type: 'jsonb', default: [] })
-  routes!: ServiceRoute[];
+  routes?: ServiceRoute[];
 
   /** 服务级最低要求（网关层，全部路由生效；路由级可叠加覆盖） */
   @Column({ type: 'text', array: true, default: [] })
-  requiredScopes!: string[];
+  requiredScopes?: string[];
+
+  /** 签发给调用方服务的 token，可以访问哪些权限 */
+  @Column({ type: 'text', array: true, default: [] })
+  grantedScopes?: string[];
 
   @Column({ type: 'varchar', nullable: true })
   healthCheckPath?: string;
@@ -57,10 +61,10 @@ export class Service extends BaseEntity {
   description?: string;
 
   @Column({ type: 'boolean', default: false })
-  isActive!: boolean;
+  isActive?: boolean;
 
   @Column({ type: 'int', default: 1 })
-  secretVersion!: number;
+  secretVersion?: number;
 
   @Column({ type: 'timestamptz', nullable: true })
   lastRotatedAt?: Date;

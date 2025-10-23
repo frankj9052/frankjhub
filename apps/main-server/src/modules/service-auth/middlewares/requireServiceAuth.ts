@@ -20,15 +20,17 @@ export const requireServiceAuth = (requiredScopes: string[] = []) => {
     }
 
     // 验证 scopes
-    const missing = requiredScopes.filter(scope => !payload.scopes.includes(scope));
+    const scopes = payload.permissions ?? [];
+    const missing = requiredScopes.filter(scope => !scopes.includes(scope));
     if (missing.length > 0) {
       return next(new UnauthorizedError(`Missing required scopes: ${missing.join(', ')}`));
     }
 
     // 注入到 req
     req.serviceAuth = {
-      serviceId: payload.serviceId,
-      scopes: payload.scopes,
+      id: payload.id,
+      type: 'service',
+      scopes,
     };
 
     next();

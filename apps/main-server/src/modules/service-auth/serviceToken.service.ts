@@ -4,7 +4,7 @@ import { env } from '../../config/env';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { getJose } from './libs/lazyJose';
-import { ServiceJwtPayload } from '@frankjhub/shared-schema';
+import { JwtPayload, ServiceJwtPayload } from '@frankjhub/shared-schema';
 
 const logger = createLoggerWithContext('ServiceTokenService');
 
@@ -28,7 +28,7 @@ const getPublicKey = async (): Promise<CryptoKey> => {
 };
 
 export class ServiceTokenService {
-  static async signToken(payload: ServiceJwtPayload): Promise<string> {
+  static async signToken(payload: JwtPayload): Promise<string> {
     const privateKey = await getPrivateKey();
     const { SignJWT } = await getJose();
 
@@ -38,7 +38,7 @@ export class ServiceTokenService {
     const jwt = await new SignJWT(payload)
       .setProtectedHeader({ alg: 'RS256', kid: 'main-key' })
       .setIssuer(env.JWT_ISSUER) // 谁签的
-      .setSubject(payload.serviceId) // 调用方是谁
+      .setSubject(payload.id) // 调用方是谁
       .setAudience(payload.aud) // 目标资源（被调用者）
       .setIssuedAt(nowSec)
       .setNotBefore(nowSec - 5) // 容忍轻微时钟漂移

@@ -1,1 +1,1 @@
-export * from './lib/verifyServiceJwt';
+export * from './lib/verifyJwt';

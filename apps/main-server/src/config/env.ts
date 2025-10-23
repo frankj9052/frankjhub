@@ -44,7 +44,7 @@ const baseSchema = z.object({
   JWT_SERVICE_PUBLIC_KEY_PATH: z
     .string()
     .default('apps/main-server/src/modules/service-auth/keys/public.pem'),
-  SERVICE_AUTH_JWKS_URL: z.string().default('http://localhost:3100/api//.well-known/jwks.json'),
+  JWKS_URI: z.string().default('http://localhost:3100/api/.well-known/jwks.json'),
   // schedule jobs
   ENABLE_SCHEDULERS: z.string().default('false').optional(),
   ENABLE_INVITATION_EXPIRE: z.string().default('true').optional(),
@@ -65,6 +65,7 @@ const baseSchema = z.object({
   REGISTRY_SNAPSHOT_URL: z.string().url(),
   REGISTRY_API_KEY: z.string().min(1),
   JWT_ISSUER: z.string().default('jurong-auth'),
+  GATEWAY_SERVICE_SECRET: z.string().optional(),
 });
 
 // 如果没有 DATABASE_URL，就强制要求 host + user + db

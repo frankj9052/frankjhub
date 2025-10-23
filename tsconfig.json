@@ -86,6 +86,9 @@
     },
     {
       "path": "./libs/shared-perm"
+    },
+    {
+      "path": "./libs/shared-constants"
     }
   ],
   "ts-node": {

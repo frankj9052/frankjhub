@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 import { AuthService } from './auth.service';
-import { loginRequestSchema, UserPayload } from '@frankjhub/shared-schema';
+import { loginRequestSchema, UserJwtPayload, UserPayload } from '@frankjhub/shared-schema';
+import { ServiceTokenService } from '../service-auth/serviceToken.service';
 
 const authService = new AuthService();
 
@@ -27,7 +28,29 @@ export const loginController: RequestHandler = async (
     // currentUser 立即挂载用于响应/中间件使用
     req.currentUser = userPayload;
 
-    res.status(200).json(result);
+    // 生成 JWT（可用于下游服务）
+    const tokenPayload: UserJwtPayload = {
+      id: userPayload.id,
+      type: 'user',
+      email: userPayload.email,
+      emailVerified: userPayload.emailVerified,
+      userName: userPayload.userName,
+      roleCodes: userPayload.orgRoles.flatMap(r => r.roleCode),
+      permissionStrings: userPayload.orgRoles.flatMap(r => r.permissionStrings.flatMap(p => p)),
+      isActive: userPayload.isActive,
+      profileCompleted: userPayload.profileCompleted,
+      aud: ['main'],
+    };
+
+    const jwt = await ServiceTokenService.signToken(tokenPayload);
+
+    res.status(200).json({
+      ...result,
+      data: {
+        ...result.data,
+        token: jwt,
+      },
+    });
   } catch (error) {
     next(error);
   }

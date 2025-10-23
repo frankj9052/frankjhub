@@ -52,6 +52,16 @@ export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
       },
     ],
   },
+  API_GATEWAY: {
+    serviceId: 'api-gateway',
+    name: 'API Gateway',
+    baseUrl: 'api-gateway-secret.dev',
+    audPrefix: 'api://',
+    requiredScopes: [],
+    serviceSecret: env.GATEWAY_SERVICE_SECRET || 'api-gateway-secret',
+    description: 'API Gateway Service',
+    routes: [],
+  },
 };
 
 export type SystemServiceId = (typeof SYSTEM_SERVICES)[keyof typeof SYSTEM_SERVICES]['serviceId'];

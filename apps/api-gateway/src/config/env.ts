@@ -6,6 +6,7 @@ import {
   envRedisSchema,
   envSessionSchema,
   z,
+  zInfer,
 } from '@frankjhub/shared-schema';
 import path from 'path';
 
@@ -21,7 +22,7 @@ const envSchema = envBaseSchema
     REGISTRY_SNAPSHOT_URL: z.string().url(),
     REGISTRY_API_KEY: z.string().min(1),
     SNAPSHOT_REFRESH_INTERVAL_MS: z.coerce.number().int().positive().default(8000),
-    SNAPSHOT_EVENTS_CHANNEL: z.string().optional(),
+    // SNAPSHOT_EVENTS_CHANNEL: z.string().optional(),
     SNAPSHOT_MAX_AGE_MS: z.string().optional(),
 
     // JWT/JWKS（共享库会用）
@@ -37,5 +38,5 @@ const configService = new ConfigService(
   envSchema,
   path.resolve(process.cwd(), 'apps/main-server/')
 );
-
+export type Env = zInfer<typeof envSchema>;
 export const env = configService.getEnv();

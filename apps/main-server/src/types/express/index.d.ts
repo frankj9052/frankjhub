@@ -2,7 +2,7 @@
 // 把你的文件改成下面的结构（关键点是 先 import 'express-session' 再 declare module；这样 TypeScript 会先加载原始声明，再做增量合并）：
 import 'express-session';
 import 'express';
-import { UserPayload } from '@frankjhub/shared-schema';
+import { ServiceJwtPayload, UserPayload } from '@frankjhub/shared-schema';
 // declare module 'express' {
 declare module 'express-serve-static-core' {
   interface Request {
@@ -10,14 +10,7 @@ declare module 'express-serve-static-core' {
 
     // currentUser payload
     currentUser?: UserPayload;
-    serviceAuth?: {
-      serviceId: string;
-      scopes: string[];
-      iss?: string;
-      aud?: string | string[];
-      iat?: number;
-      exp?: number;
-    };
+    serviceAuth?: ServiceJwtPayload;
     rawBody?: string;
   }
 }

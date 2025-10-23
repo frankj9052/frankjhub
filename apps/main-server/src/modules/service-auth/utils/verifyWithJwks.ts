@@ -8,7 +8,7 @@ let JWKS: ReturnType<any> | null = null;
 const getRemoteJWKSet = async () => {
   if (JWKS) return JWKS;
   const { createRemoteJWKSet } = await getJose();
-  JWKS = createRemoteJWKSet(new URL(env.SERVICE_AUTH_JWKS_URL));
+  JWKS = createRemoteJWKSet(new URL(env.JWKS_URI));
   return JWKS;
 };
 

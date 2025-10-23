@@ -9,14 +9,9 @@ import { redisClient, redisSubscriber } from '../infrastructure/redis';
 import { createLoggerWithContext } from '../infrastructure/logger';
 import axios from 'axios';
 import { env } from '../config/env';
+import { Channels, HttpHeaders, RedisKeys, SnapshotEvents } from '@frankjhub/shared-constants';
 
 const log = createLoggerWithContext('RegistryClient');
-
-const SNAPSHOT_CACHE_KEY = 'snapshot:latest';
-const SNAPSHOT_EVENTS_CHANNEL = env.SNAPSHOT_EVENTS_CHANNEL || 'snapshot:events';
-const SNAPSHOT_EVENT = {
-  SNAPSHOT_UPDATE: 'snapshot:update',
-};
 
 let SNAPSHOT: ServiceSnapshotResponseData = { version: 0, services: [] };
 let lastLoadAt = 0;
@@ -40,7 +35,8 @@ export function waitUntilSnapshotReady(timeoutMs = 8000): Promise<void> {
 }
 async function loadFromRedis(): Promise<boolean> {
   try {
-    const str = await redisClient.get(SNAPSHOT_CACHE_KEY);
+    // const str = await redisClient.get(SNAPSHOT_CACHE_KEY);
+    const str = await redisClient.get(RedisKeys.snapshotLatest());
     if (!str) return false;
     const parsed = JSON.parse(str) as ServiceSnapshotResponse;
     if (parsed.status === 'success' && parsed.data?.services) {
@@ -61,7 +57,7 @@ async function loadFromRedis(): Promise<boolean> {
 async function loadFromHttp(): Promise<boolean> {
   try {
     const { data } = await axios.get<ServiceSnapshotResponse>(env.REGISTRY_SNAPSHOT_URL, {
-      headers: { 'x-api-key': env.REGISTRY_API_KEY },
+      headers: { [HttpHeaders.API_KEY]: env.REGISTRY_API_KEY },
       timeout: 4000,
       // 关键：不让 axios 因 4xx/5xx 抛异常
       validateStatus: () => true,
@@ -123,15 +119,15 @@ export async function startSnapshotEventListener() {
   await bootstrapSnapshotOnce();
 
   // 订阅频道
-  await redisSubscriber.subscribe(SNAPSHOT_EVENTS_CHANNEL);
-  log.info('subscribed snapshot channel', { channel: SNAPSHOT_EVENTS_CHANNEL });
+  await redisSubscriber.subscribe(Channels.SNAPSHOT_EVENTS);
+  log.info('subscribed snapshot channel', { channel: Channels.SNAPSHOT_EVENTS });
 
   redisClient.on('message', async (channel, message) => {
-    if (channel !== SNAPSHOT_EVENTS_CHANNEL) return;
+    if (channel !== Channels.SNAPSHOT_EVENTS) return;
     try {
       const evt = JSON.parse(message || '{}');
 
-      if (evt?.type !== SNAPSHOT_EVENT.SNAPSHOT_UPDATE) return;
+      if (evt?.type !== SnapshotEvents.SNAPSHOT_UPDATE) return;
 
       // 有内联 data 就直接用；否则从 Redis 读取
       if (evt?.data?.services && typeof evt?.data?.version === 'number') {

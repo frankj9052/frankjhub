@@ -45,7 +45,7 @@ export const requireServiceJwt = (requiredScopes: string[] = []) => {
 
       // 校验所需权限作用域
       const missingScopes = requiredScopes.filter(
-        required => !hasPermission(payload.scopes, required)
+        required => !hasPermission(payload.permissions ?? [], required)
       );
 
       if (missingScopes.length > 0) {
@@ -54,8 +54,9 @@ export const requireServiceJwt = (requiredScopes: string[] = []) => {
 
       // 写入 req，供后续中间件或控制器使用
       req.serviceAuth = {
-        serviceId: payload.serviceId,
-        scopes: payload.scopes,
+        id: payload.serviceId,
+        permissions: payload.permissions ?? [],
+        type: 'service',
       };
 
       next();

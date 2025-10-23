@@ -22,13 +22,10 @@
       "path": "../../libs/shared-logger"
     },
     {
+      "path": "../../libs/shared-constants"
+    },
+    {
       "path": "../../libs/shared-errors"
-    },
-    {
-      "path": "../../libs/shared-perm"
-    },
-    {
-      "path": "../../libs/shared-auth"
     },
     {
       "path": "../../libs/shared-schema"

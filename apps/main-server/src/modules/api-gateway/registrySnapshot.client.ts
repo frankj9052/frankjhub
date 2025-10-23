@@ -35,7 +35,7 @@ export function getMatch(req: import('express').Request): RouteMatchResult | nul
   const path = req.path || '/';
   const method = req.method.toUpperCase() as HttpMethod;
   for (const s of SNAPSHOT.services) {
-    for (const r of s.routes) {
+    for (const r of s?.routes ?? []) {
       const allowMethod = r.methods.includes('*' as HttpMethod) || r.methods.includes(method);
 
       if (r.type === 'prefix') {

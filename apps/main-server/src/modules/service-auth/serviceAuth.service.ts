@@ -1,6 +1,7 @@
 import {
   ServiceCreateRequest,
   ServiceDto,
+  ServiceJwtPayload,
   ServiceListRequest,
   ServiceListResponse,
   ServiceLogin,
@@ -16,7 +17,6 @@ import { Service } from './entities/Service';
 import * as argon2 from 'argon2';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { ServiceTokenService } from './serviceToken.service';
-import { env } from '../../config/env';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
@@ -52,8 +52,7 @@ export class ServiceAuthService {
     const { serviceId, serviceSecret } = data;
     const service = await this.serviceRepo.findOne({ where: { serviceId } });
 
-    const routesScopes = service?.routes.flatMap(r => r.requiredScopes ?? []) ?? [];
-    const scopes = routesScopes.concat(service?.requiredScopes ?? []);
+    const permissions = service?.grantedScopes ?? [];
 
     if (
       !service ||
@@ -63,13 +62,15 @@ export class ServiceAuthService {
       throw new UnauthorizedError('Invalid service credentials');
     }
 
-    const token = await ServiceTokenService.signToken({
-      serviceId,
-      scopes,
-      iss: env.JWT_ISSUER,
+    const servicePayload: ServiceJwtPayload = {
+      id: serviceId,
+      type: 'service',
+      permissions,
       sub: service.serviceId,
       aud: service.audPrefix + service.serviceId,
-    });
+    };
+
+    const token = await ServiceTokenService.signToken(servicePayload);
 
     return {
       status: 'success',
