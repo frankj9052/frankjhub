@@ -1,12 +1,9 @@
 import { z } from 'zod';
-import { resourceSchema } from '../entity';
+import { resourceRefSchema } from '../entity';
 import { createSuccessResponseSchema } from '../../../factories';
 import { zInfer } from '../../../libs/z';
 
-export const resourceOptionSchema = resourceSchema.pick({
-  id: true,
-  name: true,
-});
+export const resourceOptionSchema = resourceRefSchema;
 
 export const resourceOptionListSchema = z.array(resourceOptionSchema);
 

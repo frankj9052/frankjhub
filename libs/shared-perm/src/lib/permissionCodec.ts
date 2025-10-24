@@ -2,101 +2,268 @@
 import { RoleSource } from '@frankjhub/shared-schema';
 
 /** -----------------------------
- * Permission Name <==> Parsed Form
+ * Scope Key <==> Parsed Form
+ * 规范：<resourceKey>:<action>
+ * - resourceKey: namespace.entity[.qualifier]  (已在上方实现)
+ * - action     : 建议与 Action.name 对齐（小写、数字、下划线/中划线）
  * ------------------------------ */
-export interface ParsedPermission {
-  resource: string;
-  actions: string[] | '*';
-  fields?: string[] | '*';
-  conditions?: Record<string, string>;
+export interface ScopeKeyParts {
+  resource: ResourceKeyParts;
+  action: string;
 }
 
+/** Action 名称规范：小写字母/数字/下划线/中划线，且非空 */
+const ACTION_RE = /^[a-z0-9_-]+$/;
+
 /**
- * 构建权限字符串
- * @param resource - 资源名称，例如 'user'
- * @param actions - 动作数组或通配符 '*'，例如 ['read', 'update'] 或 '*'
- * @param fields - 可选字段数组或通配符 '*'，例如 ['name', 'email'] 或 '*'
- * @param conditions - 可选条件对象，例如 { orgId: '123' }
- * @returns 构建后的权限字符串
- *
+ * 构建 scope key
  * @example
- * buildPermissionName('user', ['read'], ['name'], { orgId: '123' })
- * // => 'user:[read]@name?orgId=123'
+ * buildScopeKey({ resource: { namespace:'main', entity:'user' }, action:'read' })
+ * // => 'main.user:read'
  */
-export const buildPermissionName = (
-  resource: string,
-  actions: string[] | '*',
-  fields?: string[] | '*',
-  conditions?: Record<string, unknown>
-): string => {
-  const actionPart = Array.isArray(actions) ? `[${actions.join(',')}]` : '[*]';
+export const buildScopeKey = (parts: ScopeKeyParts): string => {
+  const resourceKey = buildResourceKey(parts.resource);
+  const action = String(parts.action || '').trim();
 
-  const fieldPart =
-    fields === undefined || (Array.isArray(fields) && fields.length === 0)
-      ? ''
-      : `@${Array.isArray(fields) ? fields.join(',') : '*'}`;
-
-  const conditionPart =
-    conditions && Object.keys(conditions).length > 0
-      ? '?' +
-        Object.entries(conditions)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([key, value]) => `${key}=${String(value)}`)
-          .join('&')
-      : '';
-
-  return `${resource}:${actionPart}${fieldPart}${conditionPart}`;
+  if (!ACTION_RE.test(action)) {
+    throw new Error(`Invalid action for scopeKey: "${parts.action}"`);
+  }
+  return `${resourceKey}:${action}`;
 };
 
 /**
- * 解析权限字符串为结构化对象
- * @param permissionName - 权限字符串
- * @returns 结构化的权限对象
- *
+ * 解析 scope key 为结构化对象（并校验）
  * @example
- * parsePermissionName('user:[read,update]@name,email?orgId=123')
- * // =>
- * // {
- * //   resource: 'user',
- * //   actions: ['read', 'update'],
- * //   fields: ['name', 'email'],
- * //   conditions: { orgId: '123' }
- * // }
+ * parseScopeKey('main.user:read')
+ * // => { resource: { namespace:'main', entity:'user' }, action:'read' }
+ */
+export const parseScopeKey = (scopeKey: string): ScopeKeyParts => {
+  const s = (scopeKey || '').trim();
+
+  // 拆成 "<resourceKey>:<action>"
+  const idx = s.lastIndexOf(':');
+  if (idx <= 0 || idx === s.length - 1) {
+    throw new Error(`Invalid scopeKey format: "${scopeKey}"`);
+  }
+
+  const resourceRaw = s.slice(0, idx);
+  const action = s.slice(idx + 1).trim();
+
+  // 校验 resourceKey 与 action
+  const resource = parseResourceKey(resourceRaw);
+  if (!ACTION_RE.test(action)) {
+    throw new Error(`Invalid action for scopeKey: "${action}"`);
+  }
+
+  return { resource, action };
+};
+
+/** 规范化（失败抛错，成功返回 canonical 字符串） */
+export const normalizeScopeKey = (scopeKey: string): string =>
+  buildScopeKey(parseScopeKey(scopeKey));
+
+/**
+ * 便捷重载：直接用字符串参数构建
+ * @example
+ * buildScopeKeyFrom('main', 'user', 'read') => 'main.user:read'
+ * buildScopeKeyFrom('booking', 'appointment', 'create', ':id') => 'booking.appointment.:id:create'
+ */
+export const buildScopeKeyFrom = (
+  namespace: string,
+  entity: string,
+  action: string,
+  qualifier?: '*' | ':id'
+): string =>
+  buildScopeKey({
+    resource: { namespace, entity, ...(qualifier ? { qualifier } : {}) },
+    action,
+  });
+
+/** -----------------------------
+ * Resource Key 生成 / 解析
+ * 规范：namespace.entity[.qualifier]
+ * 限定：qualifier ∈ { undefined/空, '*', ':id' }
+ * ------------------------------ */
+export interface ResourceKeyParts {
+  namespace: string; // = serviceId
+  entity: string; // 表/聚合根
+  qualifier?: '*' | ':id';
+}
+
+/** 简单的 camel/标识符约束：首字母小写，字母数字 identifier regular expression */
+const IDENT_RE = /^[a-z][a-zA-Z0-9]*$/;
+
+export const buildResourceKey = (parts: ResourceKeyParts): string => {
+  const namespace = (parts.namespace || '').trim();
+  const entity = (parts.entity || '').trim();
+  const qualifier = (parts.qualifier || '').trim();
+
+  if (!IDENT_RE.test(namespace)) {
+    throw new Error(`Invalid namespace for resourceKey: "${parts.namespace}"`);
+  }
+  if (!IDENT_RE.test(entity)) {
+    throw new Error(`Invalid entity for resourceKey: "${parts.entity}"`);
+  }
+  if (qualifier && qualifier !== '*' && qualifier !== ':id') {
+    throw new Error(
+      `Invalid qualifier for resourceKey: "${parts.qualifier}" (allowed: "*", ":id")`
+    );
+  }
+
+  return qualifier ? `${namespace}.${entity}.${qualifier}` : `${namespace}.${entity}`;
+};
+
+export const parseResourceKey = (resourceKey: string): ResourceKeyParts => {
+  const key = (resourceKey || '').trim();
+  // 允许：ns.entity 或 ns.entity.* 或 ns.entity.:id
+  const m = key.match(/^([a-z][a-zA-Z0-9]*)\.([a-z][a-zA-Z0-9]*)(?:\.(\*|:id))?$/);
+  if (!m) throw new Error(`Invalid resourceKey format: "${resourceKey}"`);
+
+  const [, namespace, entity, q] = m;
+  const qualifier = (q as '*' | ':id' | undefined) || undefined;
+  return { namespace, entity, ...(qualifier ? { qualifier } : {}) };
+};
+
+/** 校验与规范化（失败抛错，成功返回 canonical 字符串） */
+export const normalizeResourceKey = (resourceKey: string): string =>
+  buildResourceKey(parseResourceKey(resourceKey));
+
+/** -----------------------------
+ * Permission Name <==> Parsed Form
+ * 规范：<resourceKey>:[action1,action2]@field1,field2?key=val&foo=bar
+ * - actions: 必填；可为 '*' 或去重+排序后的数组
+ * - fields : 可缺省；'*' 或 数组；空数组视为“未指定”，不出现在串中
+ * - condition（建议统一用单数命名）会进行 URL 安全编码
+ * ------------------------------ */
+export interface ParsedPermission {
+  resourceKey: string; // resourceKey (canonical)
+  actions: string[] | '*';
+  fields?: string[] | '*';
+  condition?: Record<string, string>; // 单数命名，与实体字段对齐
+}
+
+/** 工具：去重+排序（稳定、大小写敏感维持按字典序） */
+const uniqSort = (arr: string[]) =>
+  Array.from(new Set(arr.map(s => s.trim()).filter(Boolean))).sort();
+
+/** 工具：CSV 切分为数组 */
+const splitCSV = (s: string) =>
+  s
+    ? s
+        .split(',')
+        .map(x => x.trim())
+        .filter(Boolean)
+    : [];
+
+/**
+ * 构建权限字符串
+ * @param resourceKey - 资源键（namespace.entity[.qualifier]）
+ * @param actions     - 动作数组或 '*'（数组必须非空）
+ * @param fields      - 可选字段数组或 '*'（空数组等价未指定）
+ * @param condition   - 可选条件对象，按 key 排序并进行 URL 安全编码
+ * @example
+ * buildPermissionName('main.user', ['read'], ['name','email'], { orgId: '123' })
+ * // => 'main.user:[read]@name,email?orgId=123'
+ */
+export const buildPermissionName = (
+  resourceKey: string,
+  actions: string[] | '*',
+  fields?: string[] | '*',
+  condition?: Record<string, unknown>
+): string => {
+  // 1) 规范化 resourceKey
+  const canonicalResource = normalizeResourceKey(resourceKey);
+
+  // 2) actions
+  let actionPart: string;
+  if (actions === '*') {
+    actionPart = '[*]';
+  } else {
+    const cleaned = uniqSort(actions);
+    if (cleaned.length === 0) {
+      throw new Error('actions must be non-empty array or "*"');
+    }
+    actionPart = `[${cleaned.join(',')}]`;
+  }
+
+  // 3) fields
+  const fieldPart =
+    fields === undefined
+      ? '' // 不出现
+      : fields === '*'
+      ? '@*'
+      : (() => {
+          const cleaned = uniqSort(fields);
+          return cleaned.length > 0 ? `@${cleaned.join(',')}` : '';
+        })();
+
+  // 4) condition（URL 安全编码 + 按 key 排序）
+  const conditionPart =
+    condition && Object.keys(condition).length > 0
+      ? '?' +
+        Object.entries(condition)
+          .map(([k, v]) => [k, v] as [string, unknown])
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`)
+          .join('&')
+      : '';
+
+  return `${canonicalResource}:${actionPart}${fieldPart}${conditionPart}`;
+};
+
+/**
+ * 解析权限字符串为结构化对象（并校验 resourceKey）
+ * @example
+ * parsePermissionName('main.user:[read,update]@name,email?orgId=123')
  */
 export const parsePermissionName = (permissionName: string): ParsedPermission => {
-  const match = permissionName.match(/^([^:]+):\[(.*?)\](?:@([^?]+))?(?:\?(.*))?$/);
-
-  if (!match) {
+  const name = (permissionName || '').trim();
+  // 资源键使用“最宽松”的捕获，后续会 normalize 校验
+  const m = name.match(/^([^:]+):\[(.*?)\](?:@([^?]+))?(?:\?(.*))?$/);
+  if (!m) {
     throw new Error(`Invalid permission string format: ${permissionName}`);
   }
 
-  const [, resource, actionStr, fieldStr, conditionStr] = match;
+  const [resourceRaw, actionStr, fieldStr, conditionStr] = m;
 
-  const actions: string[] | '*' =
-    actionStr.trim() === '*' ? '*' : actionStr.split(',').map(s => s.trim());
+  // 校验 + 规范化 resourceKey
+  const resourceKey = resourceRaw.trim() === '*' ? '*' : normalizeResourceKey(resourceRaw);
 
+  // actions
+  const actions: string[] | '*' = actionStr.trim() === '*' ? '*' : uniqSort(splitCSV(actionStr));
+
+  if (actions !== '*' && actions.length === 0) {
+    throw new Error('Parsed actions is an empty list');
+  }
+
+  // fields
   const fields: string[] | '*' | undefined =
     fieldStr === undefined
       ? undefined
       : fieldStr.trim() === '*'
       ? '*'
-      : fieldStr.split(',').map(s => s.trim());
+      : uniqSort(splitCSV(fieldStr));
 
-  const conditions: Record<string, string> = {};
+  // condition（URL 解码）
+  let condition: Record<string, string> | undefined;
   if (conditionStr) {
+    const obj: Record<string, string> = {};
     conditionStr.split('&').forEach(part => {
-      const [key, value] = part.split('=');
-      if (key && value !== undefined) {
-        conditions[key.trim()] = value.trim();
+      const eq = part.indexOf('=');
+      if (eq >= 0) {
+        const k = decodeURIComponent(part.slice(0, eq));
+        const v = decodeURIComponent(part.slice(eq + 1));
+        if (k) obj[k] = v;
       }
     });
+    if (Object.keys(obj).length > 0) condition = obj;
   }
 
   return {
-    resource,
+    resourceKey,
     actions,
     ...(fields !== undefined && { fields }),
-    ...(Object.keys(conditions).length > 0 && { conditions }),
+    ...(condition && { condition }),
   };
 };
 
@@ -168,14 +335,15 @@ export const buildRolePermissionName = (roleCode: string, permissionName: string
  * @returns 解析后的对象 { roleCode, permissionName }
  */
 export const parseRolePermissionName = (name: string): ParsedRolePermissionName => {
-  const separatorIndex = name.indexOf('=>');
+  const s = (name || '').trim();
+  const separatorIndex = s.indexOf('=>');
 
   if (separatorIndex === -1) {
     throw new Error(`Invalid rolePermission name format: ${name}`);
   }
 
-  const roleCode = name.slice(0, separatorIndex).trim();
-  const permissionName = name.slice(separatorIndex + 2).trim();
+  const roleCode = s.slice(0, separatorIndex).trim();
+  const permissionName = s.slice(separatorIndex + 2).trim();
 
   if (!roleCode || !permissionName) {
     throw new Error(`Incomplete rolePermission name: ${name}`);
@@ -209,7 +377,8 @@ export const buildFullUserOrgRoleName = (userId: string, orgId: string, roleCode
  * @returns 结构化对象 { userId, orgId, roleCode }
  */
 export const parseFullUserOrgRoleName = (name: string): ParsedFullUserOrgRoleName => {
-  const [userAndOrg, roleCode] = name.split('#');
+  const s = (name || '').trim();
+  const [userAndOrg, roleCode] = s.split('#');
   if (!userAndOrg || !roleCode) {
     throw new Error(`Invalid fullUserOrgRole name format: ${name}`);
   }

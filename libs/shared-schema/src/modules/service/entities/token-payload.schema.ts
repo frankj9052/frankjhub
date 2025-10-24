@@ -1,5 +1,6 @@
 import { baseJwtPayloadSchema } from '../../../modules/common/entity/baseJwtPayload.schema';
 import { z, zInfer } from '../../../libs/z';
+import { userPayloadSchema } from '../../../modules/auth';
 
 export const serviceJwtPayloadSchema = baseJwtPayloadSchema
   .extend({
@@ -11,12 +12,13 @@ export const userJwtPayloadSchema = baseJwtPayloadSchema
   .extend({
     type: z.literal('user'),
     roleCodes: z.array(z.string()).default([]).optional(),
-    userName: z.string(),
-    email: z.string().email().optional(),
-    emailVerified: z.boolean().optional(),
-    profileCompleted: z.boolean().optional(),
-    isActive: z.boolean().optional(),
-    sessionVersion: z.number().optional(),
+    userName: userPayloadSchema.shape.userName,
+    email: userPayloadSchema.shape.userName,
+    emailVerified: userPayloadSchema.shape.emailVerified,
+    profileCompleted: userPayloadSchema.shape.profileCompleted,
+    isActive: userPayloadSchema.shape.isActive,
+    sessionVersion: userPayloadSchema.shape.sessionVersion,
+    orgRoles: userPayloadSchema.shape.orgRoles,
   })
   .catchall(z.unknown());
 

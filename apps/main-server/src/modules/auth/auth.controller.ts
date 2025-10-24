@@ -32,13 +32,14 @@ export const loginController: RequestHandler = async (
     const tokenPayload: UserJwtPayload = {
       id: userPayload.id,
       type: 'user',
-      email: userPayload.email,
+      email: userPayload.email ?? '',
       emailVerified: userPayload.emailVerified,
       userName: userPayload.userName,
-      roleCodes: userPayload.orgRoles.flatMap(r => r.roleCode),
+      orgRoles: userPayload.orgRoles,
       permissionStrings: userPayload.orgRoles.flatMap(r => r.permissionStrings.flatMap(p => p)),
       isActive: userPayload.isActive,
       profileCompleted: userPayload.profileCompleted,
+      sessionVersion: userPayload.sessionVersion,
       aud: ['main'],
     };
 

@@ -17,18 +17,6 @@ const authService = new AuthService();
  * ⚠️ 注意：必须在 sessionMiddleware 之后注册本中间件！
  */
 export const currentUser = async (req: Request, res: Response, next: NextFunction) => {
-  // const sessionUser = req.session?.user as
-  //   | {
-  //       id: string;
-  //       sessionVersion: string;
-  //     }
-  //   | undefined;
-
-  // if (!sessionUser?.id || !sessionUser?.sessionVersion) {
-  //   // logger.debug('No session user found. Skipping currentUser injection.');
-  //   return next(); // 用户未登录，不挂载 currentUser
-  // }
-
   try {
     /** =========================
      *  1️⃣ 优先使用 session
@@ -64,13 +52,13 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
     // 验证 JWT 签名
     const payload = await verifyJwt(token, 'main', env);
 
-    // if(payload.type === 'user') {
-    //   req.currentUser = {
-    //     id: payload.id,
-    //     userName: payload.userName,
-
-    //   }
-    // }
+    if (payload.type === 'user') {
+      req.currentUser = {
+        id: payload.id,
+        userName: payload.userName,
+        sessionVersion: payload.sessionVersion,
+      };
+    }
 
     // req.currentUser = fullUser;
     return next();

@@ -4,10 +4,16 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared-utils"
+      "path": "../../libs/shared-perm"
     },
     {
       "path": "../../libs/shared-schema"
+    },
+    {
+      "path": "../../libs/shared-auth"
+    },
+    {
+      "path": "../../libs/shared-utils"
     },
     {
       "path": "./tsconfig.app.json"
