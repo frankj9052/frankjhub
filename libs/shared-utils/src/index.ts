@@ -16,3 +16,5 @@ export * from './utils/updateEntityUtils';
 export * from './utils/cookieDomain.util';
 export * from './utils/heroui.utils';
 export * from './utils/token.util';
+export * from './utils/json.utils';
+export * from './utils/array.utils';

@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AutoMigration1761338748696 implements MigrationInterface {
-  name = 'AutoMigration1761338748696';
+export class AutoMigration1761343115679 implements MigrationInterface {
+  name = 'AutoMigration1761343115679';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -28,9 +28,6 @@ export class AutoMigration1761338748696 implements MigrationInterface {
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "ux_service_service_id_not_deleted" ON "service" ("service_id") WHERE "deleted_at" IS NULL`
-    );
-    await queryRunner.query(
-      `CREATE TYPE "public"."resource_fields_mode_enum" AS ENUM('all', 'whitelist')`
     );
     await queryRunner.query(
       `INSERT INTO "typeorm_metadata"("database", "schema", "table", "type", "name", "value") VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -69,10 +66,7 @@ export class AutoMigration1761338748696 implements MigrationInterface {
       `CREATE UNIQUE INDEX "ux_action_name_not_deleted" ON "action" ("name") WHERE "deleted_at" IS NULL`
     );
     await queryRunner.query(
-      `CREATE TABLE "permission_action" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "is_active" boolean NOT NULL DEFAULT true, "permission_id" uuid NOT NULL, "action_id" uuid NOT NULL, CONSTRAINT "PK_558a8b5ec76ab386a4c2e903f39" PRIMARY KEY ("id"))`
-    );
-    await queryRunner.query(
-      `CREATE TABLE "permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "fields" text array NOT NULL DEFAULT '{}', "condition" jsonb, "is_active" boolean NOT NULL DEFAULT true, "version" integer NOT NULL, "resourceId" uuid NOT NULL, CONSTRAINT "PK_3b8b97af9d9d8807e41e6f48362" PRIMARY KEY ("id"))`
+      `CREATE TABLE "permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "fields" text array NOT NULL DEFAULT '{}', "fields_hash" character varying(256) NOT NULL DEFAULT '', "condition" jsonb, "condition_hash" character varying(1024) NOT NULL DEFAULT '', "resource_id" uuid NOT NULL, "action_id" uuid NOT NULL, "action_name" character varying(64) NOT NULL, "effect" "public"."permission_effect_enum" NOT NULL DEFAULT 'allow', "is_active" boolean NOT NULL DEFAULT true, "version" integer NOT NULL, "resourceId" uuid NOT NULL, "actionId" uuid NOT NULL, CONSTRAINT "ux_perm_resource_action_fields_cond_eff" UNIQUE ("resource_id", "action_id", "fields_hash", "condition_hash", "effect"), CONSTRAINT "PK_3b8b97af9d9d8807e41e6f48362" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_240853a0c3353c25fb12434ad3" ON "permission" ("name") `
@@ -130,13 +124,6 @@ export class AutoMigration1761338748696 implements MigrationInterface {
       `CREATE INDEX "IDX_6463cd0c29ed19c57b895d8c2d" ON "email_receipt" ("event") `
     );
     await queryRunner.query(
-      `CREATE TABLE "clinic" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "org_id" uuid NOT NULL, "display_name" character varying(255) NOT NULL, "legal_name" character varying(255), "slug" character varying(160), "status" "public"."clinic_status_enum" NOT NULL DEFAULT 'active', "phones" jsonb, "emails" jsonb, "website_url" text, "booking_url" text, "social_links" jsonb, "address_line1" character varying(255) NOT NULL, "address_line2" character varying(255), "unit" character varying(50), "city" character varying(120) NOT NULL, "province" character varying(50) NOT NULL, "postal_code" character varying(20) NOT NULL, "country_code" character(2) NOT NULL DEFAULT 'CA', "formatted_address" text, "place_id" character varying(120), "timezone" character varying(60), "lat" numeric(9,6), "lng" numeric(9,6), "location" geography(Point,4326), "open_hours" jsonb, "services" text array NOT NULL DEFAULT '{}', "insurances" text array NOT NULL DEFAULT '{}', "languages" text array NOT NULL DEFAULT '{}', "amenities" jsonb, "wheelchair_accessible" boolean NOT NULL DEFAULT false, "accepts_new_patients" boolean NOT NULL DEFAULT true, "walk_in" boolean NOT NULL DEFAULT false, "telehealth" boolean NOT NULL DEFAULT false, "emergency" boolean NOT NULL DEFAULT false, "avg_wait_minutes" smallint, "specialties" text array NOT NULL DEFAULT '{}', "rating_avg" numeric(3,2) NOT NULL DEFAULT '0', "review_count" integer NOT NULL DEFAULT '0', "logo_url" text, "photo_urls" text array NOT NULL DEFAULT '{}', "short_description" character varying(280), "description" text, "tags" text array NOT NULL DEFAULT '{}', "license_number" character varying(120), "accreditations" text array NOT NULL DEFAULT '{}', "established_year" smallint, "tax_number" character varying(120), "embedding" vector(1536), "data_source" character varying(60) NOT NULL DEFAULT 'manual', "source_updated_at" TIMESTAMP WITH TIME ZONE, "last_synced_at" TIMESTAMP WITH TIME ZONE, "data_version" integer NOT NULL DEFAULT '1', CONSTRAINT "UQ_0b620bc70a113b7909eeca1e60f" UNIQUE ("slug"), CONSTRAINT "PK_d7f10e5499997eba0b14b785d58" PRIMARY KEY ("org_id")); COMMENT ON COLUMN "clinic"."rating_avg" IS '0.00 ~ 5.00'`
-    );
-    await queryRunner.query(`CREATE INDEX "ix_clinic_status" ON "clinic" ("status") `);
-    await queryRunner.query(`CREATE INDEX "ix_clinic_postal_code" ON "clinic" ("postal_code") `);
-    await queryRunner.query(`CREATE INDEX "ix_clinic_city" ON "clinic" ("city") `);
-    await queryRunner.query(`CREATE UNIQUE INDEX "uq_clinic_slug" ON "clinic" ("slug") `);
-    await queryRunner.query(
       `CREATE TABLE "email_outbox" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "to" character varying(320) NOT NULL, "cc" character varying(320), "bcc" character varying(320), "from" character varying(320) NOT NULL, "reply_to" character varying(320), "subject" character varying(512) NOT NULL, "template_key" character varying(128), "template_vars" jsonb, "html_body" text, "text_body" text, "channel" "public"."email_outbox_channel_enum" NOT NULL DEFAULT 'transactional', "status" "public"."email_outbox_status_enum" NOT NULL DEFAULT 'queued', "provider_message_id" character varying(256), "provider" "public"."email_outbox_provider_enum" NOT NULL DEFAULT 'resend', "idempotency_key" character varying(128), "attempt" integer NOT NULL DEFAULT '0', "last_error" text, "trace_id" character varying(128), CONSTRAINT "UQ_0916a28c43b791fd0ea78d74718" UNIQUE ("idempotency_key"), CONSTRAINT "PK_b6fbfc201f705fbf1ac87bd7197" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
@@ -154,6 +141,13 @@ export class AutoMigration1761338748696 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_6a98524a9826ee6ba486cb6027" ON "email_outbox" ("trace_id") `
     );
+    await queryRunner.query(
+      `CREATE TABLE "clinic" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "org_id" uuid NOT NULL, "display_name" character varying(255) NOT NULL, "legal_name" character varying(255), "slug" character varying(160), "status" "public"."clinic_status_enum" NOT NULL DEFAULT 'active', "phones" jsonb, "emails" jsonb, "website_url" text, "booking_url" text, "social_links" jsonb, "address_line1" character varying(255) NOT NULL, "address_line2" character varying(255), "unit" character varying(50), "city" character varying(120) NOT NULL, "province" character varying(50) NOT NULL, "postal_code" character varying(20) NOT NULL, "country_code" character(2) NOT NULL DEFAULT 'CA', "formatted_address" text, "place_id" character varying(120), "timezone" character varying(60), "lat" numeric(9,6), "lng" numeric(9,6), "location" geography(Point,4326), "open_hours" jsonb, "services" text array NOT NULL DEFAULT '{}', "insurances" text array NOT NULL DEFAULT '{}', "languages" text array NOT NULL DEFAULT '{}', "amenities" jsonb, "wheelchair_accessible" boolean NOT NULL DEFAULT false, "accepts_new_patients" boolean NOT NULL DEFAULT true, "walk_in" boolean NOT NULL DEFAULT false, "telehealth" boolean NOT NULL DEFAULT false, "emergency" boolean NOT NULL DEFAULT false, "avg_wait_minutes" smallint, "specialties" text array NOT NULL DEFAULT '{}', "rating_avg" numeric(3,2) NOT NULL DEFAULT '0', "review_count" integer NOT NULL DEFAULT '0', "logo_url" text, "photo_urls" text array NOT NULL DEFAULT '{}', "short_description" character varying(280), "description" text, "tags" text array NOT NULL DEFAULT '{}', "license_number" character varying(120), "accreditations" text array NOT NULL DEFAULT '{}', "established_year" smallint, "tax_number" character varying(120), "embedding" vector(1536), "data_source" character varying(60) NOT NULL DEFAULT 'manual', "source_updated_at" TIMESTAMP WITH TIME ZONE, "last_synced_at" TIMESTAMP WITH TIME ZONE, "data_version" integer NOT NULL DEFAULT '1', CONSTRAINT "UQ_0b620bc70a113b7909eeca1e60f" UNIQUE ("slug"), CONSTRAINT "PK_d7f10e5499997eba0b14b785d58" PRIMARY KEY ("org_id")); COMMENT ON COLUMN "clinic"."rating_avg" IS '0.00 ~ 5.00'`
+    );
+    await queryRunner.query(`CREATE INDEX "ix_clinic_status" ON "clinic" ("status") `);
+    await queryRunner.query(`CREATE INDEX "ix_clinic_postal_code" ON "clinic" ("postal_code") `);
+    await queryRunner.query(`CREATE INDEX "ix_clinic_city" ON "clinic" ("city") `);
+    await queryRunner.query(`CREATE UNIQUE INDEX "uq_clinic_slug" ON "clinic" ("slug") `);
     await queryRunner.query(
       `CREATE TABLE "invitation" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "organization_id" uuid NOT NULL, "target_role_id" uuid NOT NULL, "email" character varying(320) NOT NULL, "status" "public"."invitation_status_enum" NOT NULL DEFAULT 'pending', "inviter_user_id" uuid, "accepted_user_id" uuid, "expires_at" TIMESTAMP WITH TIME ZONE NOT NULL, "token_hash" character varying(255) NOT NULL, "accept_url_base" character varying(512) NOT NULL, "meta" jsonb, "organizationId" uuid NOT NULL, "targetRoleId" uuid NOT NULL, "inviterUserId" uuid NOT NULL, "acceptedUserId" uuid, CONSTRAINT "uq_inv_pending_org_email_role" UNIQUE ("organizationId", "email", "targetRoleId"), CONSTRAINT "PK_beb994737756c0f18a1c1f8669c" PRIMARY KEY ("id"))`
     );
@@ -175,13 +169,10 @@ export class AutoMigration1761338748696 implements MigrationInterface {
       `ALTER TABLE "resource" ADD CONSTRAINT "FK_4bbbb68f9b40ccd42647707a523" FOREIGN KEY ("namespace") REFERENCES "service"("service_id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "permission_action" ADD CONSTRAINT "FK_e7c0659735f8c0d9a77bce95170" FOREIGN KEY ("permission_id") REFERENCES "permission"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "permission_action" ADD CONSTRAINT "FK_8d6892f5dba9517b009bab7f764" FOREIGN KEY ("action_id") REFERENCES "action"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
-    );
-    await queryRunner.query(
       `ALTER TABLE "permission" ADD CONSTRAINT "FK_287fe7669c4035bba465728974c" FOREIGN KEY ("resourceId") REFERENCES "resource"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+    );
+    await queryRunner.query(
+      `ALTER TABLE "permission" ADD CONSTRAINT "FK_54b459f3ffe8a2420c1bb0aea5a" FOREIGN KEY ("actionId") REFERENCES "action"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE "role_permission" ADD CONSTRAINT "FK_72e80be86cab0e93e67ed1a7a9a" FOREIGN KEY ("permissionId") REFERENCES "permission"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
@@ -281,13 +272,10 @@ export class AutoMigration1761338748696 implements MigrationInterface {
       `ALTER TABLE "role_permission" DROP CONSTRAINT "FK_72e80be86cab0e93e67ed1a7a9a"`
     );
     await queryRunner.query(
+      `ALTER TABLE "permission" DROP CONSTRAINT "FK_54b459f3ffe8a2420c1bb0aea5a"`
+    );
+    await queryRunner.query(
       `ALTER TABLE "permission" DROP CONSTRAINT "FK_287fe7669c4035bba465728974c"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "permission_action" DROP CONSTRAINT "FK_8d6892f5dba9517b009bab7f764"`
-    );
-    await queryRunner.query(
-      `ALTER TABLE "permission_action" DROP CONSTRAINT "FK_e7c0659735f8c0d9a77bce95170"`
     );
     await queryRunner.query(
       `ALTER TABLE "resource" DROP CONSTRAINT "FK_4bbbb68f9b40ccd42647707a523"`
@@ -305,17 +293,17 @@ export class AutoMigration1761338748696 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."ix_inv_token_hash"`);
     await queryRunner.query(`DROP INDEX "public"."ix_inv_accept_url_base"`);
     await queryRunner.query(`DROP TABLE "invitation"`);
+    await queryRunner.query(`DROP INDEX "public"."uq_clinic_slug"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_clinic_city"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_clinic_postal_code"`);
+    await queryRunner.query(`DROP INDEX "public"."ix_clinic_status"`);
+    await queryRunner.query(`DROP TABLE "clinic"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_6a98524a9826ee6ba486cb6027"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_0916a28c43b791fd0ea78d7471"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_a131f9addc4fa1eb04bbdc5c3b"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_3e1cafb815a8666793a7d9bd8b"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_648db1d4551b4ed132beebbf30"`);
     await queryRunner.query(`DROP TABLE "email_outbox"`);
-    await queryRunner.query(`DROP INDEX "public"."uq_clinic_slug"`);
-    await queryRunner.query(`DROP INDEX "public"."ix_clinic_city"`);
-    await queryRunner.query(`DROP INDEX "public"."ix_clinic_postal_code"`);
-    await queryRunner.query(`DROP INDEX "public"."ix_clinic_status"`);
-    await queryRunner.query(`DROP TABLE "clinic"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_6463cd0c29ed19c57b895d8c2d"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_8b37f8d324287f49ffb44550a2"`);
     await queryRunner.query(`DROP TABLE "email_receipt"`);
@@ -338,7 +326,6 @@ export class AutoMigration1761338748696 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "role_permission"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_240853a0c3353c25fb12434ad3"`);
     await queryRunner.query(`DROP TABLE "permission"`);
-    await queryRunner.query(`DROP TABLE "permission_action"`);
     await queryRunner.query(`DROP INDEX "public"."ux_action_name_not_deleted"`);
     await queryRunner.query(`DROP TABLE "action"`);
     await queryRunner.query(`DROP INDEX "public"."ux_resource_ns_entity_qualifier_not_deleted"`);
@@ -350,7 +337,6 @@ export class AutoMigration1761338748696 implements MigrationInterface {
       `DELETE FROM "typeorm_metadata" WHERE "type" = $1 AND "name" = $2 AND "database" = $3 AND "schema" = $4 AND "table" = $5`,
       ['GENERATED_COLUMN', 'resource_key', 'maindb', 'public', 'resource']
     );
-    await queryRunner.query(`DROP TYPE "public"."resource_fields_mode_enum"`);
     await queryRunner.query(`DROP INDEX "public"."ux_service_service_id_not_deleted"`);
     await queryRunner.query(`DROP TABLE "service"`);
     await queryRunner.query(`DROP INDEX "public"."ix_route_service"`);

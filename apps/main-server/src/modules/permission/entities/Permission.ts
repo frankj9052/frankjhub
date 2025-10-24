@@ -6,24 +6,32 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   VersionColumn,
 } from 'typeorm';
-import { buildPermissionName } from '../../codecs/permissionCodec';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Resource } from '../../resource/entities/Resource';
-import { PermissionAction } from './PermissionAction';
+import { Action } from '../../action/entities/Action';
+import { PERMISSION_EFFECT, PermissionEffect } from '@frankjhub/shared-schema';
+import { arrayToString, safeJsonStringify } from '@frankjhub/shared-utils';
+import { buildSingleActionPermissionName } from '@frankjhub/shared-perm';
 
 @Entity()
 @Index(['name'], { unique: true })
+@Unique('ux_perm_resource_action_fields_cond_eff', [
+  'resourceId',
+  'actionId',
+  'fieldsHash',
+  'conditionHash',
+  'effect',
+])
 export class Permission extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  /**
-   * 全局唯一（在未删除状态下）：
-   * 约定使用 canonical resource key + actions (+ fields/condition) 生成
+  /** 规范化权限名（展示/外键友好），例如：
+   *  main.user:[read]@name,email?orgId=123
    */
   @Column({ type: 'varchar', length: 512 })
   name!: string;
@@ -38,9 +46,17 @@ export class Permission extends BaseEntity {
   @Column('text', { array: true, default: () => `'{}'` })
   fields?: string[]; // ['email', 'phone']
 
-  // { "ownerOnly": true }
+  /** 为唯一约束预计算的“字段哈希”（简单版：排序后用逗号连接；需要可换成真正哈希） */
+  @Column({ type: 'varchar', length: 256, default: '' })
+  fieldsHash!: string;
+
+  /** ABAC 条件（JSON，可空） */
   @Column({ type: 'jsonb', nullable: true })
   condition?: Record<string, unknown>;
+
+  /** 条件“哈希”（简单版：稳定 JSON 字符串；需要可换成真正哈希） */
+  @Column({ type: 'varchar', length: 1024, default: '' })
+  conditionHash!: string;
 
   /**
    * 归属资源
@@ -51,16 +67,24 @@ export class Permission extends BaseEntity {
   @JoinColumn({ name: 'resourceId' })
   resource!: Resource;
 
-  /**
-   * 关联的动作集合
-   * - 这里仅声明反向关系；真正的外键/删除级联应在 PermissionAction 上定义
-   * - 为了在 @BeforeInsert/@BeforeUpdate 中拿到 actionNames，开启 eager 或在服务层手动装载
-   */
-  @OneToMany(() => PermissionAction, pa => pa.permission, {
-    cascade: ['insert', 'update'],
-    eager: true,
-  })
-  permissionActions!: PermissionAction[];
+  @Column({ type: 'uuid' })
+  resourceId!: string;
+
+  /** 动作（统一指向全局 Action 字典；建议 onDelete: RESTRICT 防止误删动作） */
+  @ManyToOne(() => Action, { nullable: false, onDelete: 'RESTRICT', eager: true })
+  @JoinColumn({ name: 'actionId' })
+  action!: Action;
+
+  @Column({ type: 'uuid' })
+  actionId!: string;
+
+  /** 冗余缓存动作名（与 Action.name 一致，便于拼 name/少 join） */
+  @Column({ type: 'varchar', length: 64 })
+  actionName!: string;
+
+  /** 允许/拒绝此permission, deny优先allow */
+  @Column({ type: 'enum', enum: PERMISSION_EFFECT, default: PERMISSION_EFFECT.ALLOW })
+  effect!: PermissionEffect;
 
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
@@ -69,24 +93,30 @@ export class Permission extends BaseEntity {
   @VersionColumn()
   version!: number;
 
-  /**
-   * 在插入/更新前生成规范化权限名
-   * 规则：buildPermissionName(resourceKey, actionNames, fields?, condition?)
-   * - resourceKey 采用 Resource 的 canonical key：
-   *   优先用实例方法 key()，否则回退到存储列 resource_key（生成列）
-   */
   @BeforeInsert()
   @BeforeUpdate()
-  public setName(): void {
-    // 尝试拿到 canonical key
+  hydrateAndSetName() {
+    // 1) 同步 actionName
+    const an = this.action?.name || '';
+    if (an) this.actionName = an;
+
+    this.fieldsHash = arrayToString(this.fields); // 需要更强一致性可换 sha1
+
+    this.conditionHash = safeJsonStringify(this.condition);
+
+    // 4) 生成规范化权限名
     const resourceKey =
       (typeof this.resource?.key === 'function' ? this.resource.key() : undefined) ||
-      this.resource.resource_key ||
+      this.resource?.resource_key ||
       '';
-    const actionNames = this.permissionActions?.map(pa => pa.action?.name).filter(Boolean);
 
-    if (!resourceKey || !actionNames?.length) return;
-
-    this.name = buildPermissionName(resourceKey, actionNames, this.fields, this.condition);
+    if (resourceKey && this.actionName) {
+      this.name = buildSingleActionPermissionName(
+        resourceKey,
+        this.actionName,
+        this.fields,
+        this.condition ?? undefined
+      );
+    }
   }
 }

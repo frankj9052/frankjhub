@@ -141,6 +141,13 @@ export interface ParsedPermission {
   fields?: string[] | '*';
   condition?: Record<string, string>; // 单数命名，与实体字段对齐
 }
+/** 单动作 Permission 解析结果 */
+export interface ParsedSinglePermission {
+  resourceKey: string; // canonical
+  action: string; // 单个
+  fields?: string[] | '*';
+  condition?: Record<string, string>;
+}
 
 /** 工具：去重+排序（稳定、大小写敏感维持按字典序） */
 const uniqSort = (arr: string[]) =>
@@ -154,6 +161,47 @@ const splitCSV = (s: string) =>
         .map(x => x.trim())
         .filter(Boolean)
     : [];
+
+/** 单动作：构建权限名
+ *  例：buildSingleActionPermissionName('main.user', 'read', ['name'], {orgId:'123'})
+ *   => 'main.user:[read]@name?orgId=123'
+ */
+export const buildSingleActionPermissionName = (
+  resourceKey: string,
+  action: string,
+  fields?: string[] | '*',
+  condition?: Record<string, unknown>
+): string => {
+  const a = String(action || '').trim();
+  if (!ACTION_RE.test(a)) {
+    throw new Error(`Invalid action for permission: "${action}"`);
+  }
+  // 复用原多动作构造器（数组里只有 1 个 action）
+  return buildPermissionName(resourceKey, [a], fields, condition);
+};
+
+/** 单动作：解析权限名（若包含多个动作或 '*' 则抛错）
+ *  例：parseSingleActionPermissionName('main.user:[read]@*?orgId=123')
+ */
+export const parseSingleActionPermissionName = (permissionName: string): ParsedSinglePermission => {
+  const parsed = parsePermissionName(permissionName); // 复用原解析
+  if (parsed.actions === '*') {
+    throw new Error('Single-action permission cannot use "*" actions');
+  }
+  if (!parsed.actions || parsed.actions.length !== 1) {
+    throw new Error(`Expected exactly one action, got: ${parsed.actions?.join(',') || 'none'}`);
+  }
+  const [action] = parsed.actions;
+  if (!ACTION_RE.test(action)) {
+    throw new Error(`Invalid action for permission: "${action}"`);
+  }
+  return {
+    resourceKey: parsed.resourceKey,
+    action,
+    ...(parsed.fields !== undefined && { fields: parsed.fields }),
+    ...(parsed.condition && { condition: parsed.condition }),
+  };
+};
 
 /**
  * 构建权限字符串
