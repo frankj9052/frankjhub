@@ -2,12 +2,12 @@ import {
   createOffsetPaginatedResponseSchema,
   createSuccessResponseSchema,
 } from '../../../factories';
-import { resourceSchema } from '../entity';
 import { resourceFilterListSchema } from '../constants';
 import { zInfer } from '../../../libs/z';
+import { resourceDetailSchema } from './detail.response.schema';
 
 export const resourceListPageDataSchema = createOffsetPaginatedResponseSchema(
-  resourceSchema,
+  resourceDetailSchema,
   resourceFilterListSchema
 );
 

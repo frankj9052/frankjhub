@@ -5,6 +5,7 @@ import { actionSchema } from '../entity/schema';
 export const actionOptionSchema = actionSchema.pick({
   id: true,
   name: true,
+  displayName: true,
 });
 
 export const actionOptionListSchema = z.array(actionOptionSchema);

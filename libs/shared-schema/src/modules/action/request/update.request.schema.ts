@@ -9,6 +9,7 @@ export const actionUpdateRequestSchema = z
     actionSchema
       .pick({
         name: true,
+        displayName: true,
         description: true,
         isActive: true,
       })
