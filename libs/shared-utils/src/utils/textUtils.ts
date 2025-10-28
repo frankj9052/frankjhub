@@ -51,4 +51,8 @@ function formatNumberString(input: string | number, length: number): string {
   return numericString.padStart(length, '0');
 }
 
-export { truncateString, capitalize, formatNumberString };
+function trim(v: unknown) {
+  return typeof v === 'string' ? v.trim() : v;
+}
+
+export { truncateString, capitalize, formatNumberString, trim };

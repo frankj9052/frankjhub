@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "zod": "^3.25.42",
-    "@asteasolutions/zod-to-openapi": "7.3.2"
+    "@asteasolutions/zod-to-openapi": "7.3.2",
+    "@frankjhub/shared-utils": "0.0.9"
   },
   "nx": {
     "projectType": "library",

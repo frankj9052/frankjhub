@@ -1,6 +1,6 @@
-import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { Brackets, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 
-/** 结构化 filters 的形状（与你的 schema 对齐） */
+/** 结构化 filters 的形状（与 schema 对齐） */
 export type StructuredFilters = {
   any?: Array<{ key: string; values: string[] }>;
   all?: Array<{ key: string; values: string[] }>;
@@ -10,10 +10,14 @@ function isStructuredFilters(f: unknown): f is StructuredFilters {
   return !!f && typeof f === 'object' && !Array.isArray(f);
 }
 
+type SqlPart = string | Brackets;
+
+type FilterDefs = Record<string, Record<string, SqlPart>>;
+
 /** 传入配置：维度 → 值 → SQL 条件片段；以及统一的 query 参数 */
 export type FilterConfig = {
   /** 维度映射：例如 { status:{active:'...',...}, source:{source_organization:'...',...} } */
-  byKey: Record<string, Record<string, string>>;
+  byKey: FilterDefs;
   /** andWhere 时统一注入的参数（如 { srcOrg: RoleSource.ORG } ） */
   params?: Record<string, any>;
 };
@@ -30,42 +34,59 @@ export function applyFilters<T extends ObjectLiteral>(
 ) {
   if (!filters) return qb;
 
-  // 1) 合并扁平映射（跨维度值必须唯一；你的 createFiltersSchema 已经保证重名会报错）
-  const flatCondMap: Record<string, string> = {};
+  // 1) 合并扁平映射（跨维度值必须唯一；createFiltersSchema 已经保证重名会报错）
+  const flatCondMap: Record<string, SqlPart> = {};
   for (const condMap of Object.values(cfg.byKey)) {
     for (const [val, sql] of Object.entries(condMap)) {
-      if (flatCondMap[val]) {
-        throw new Error(
-          `Duplicate filter literal "${val}" across dimensions in FilterConfig.byKey`
-        );
-      }
       flatCondMap[val] = sql;
     }
   }
 
   // 2) 扁平 OR：['active','source_organization', ...]
   if (Array.isArray(filters)) {
-    const parts = filters.map(v => flatCondMap[v]).filter(Boolean);
-    if (parts.length) qb.andWhere(`(${parts.join(' OR ')})`, cfg.params ?? {});
+    const parts = filters.map(v => flatCondMap[v]).filter(Boolean) as SqlPart[];
+    if (parts.length) {
+      qb.andWhere(
+        new Brackets(b => {
+          for (const p of parts) {
+            b.orWhere(p as any);
+          }
+        }),
+        cfg.params ?? {}
+      );
+    }
     return qb;
   }
 
   // 3) 结构化：{ any:[{key,values}], all:[{key,values}] }
   if (isStructuredFilters(filters)) {
-    const toSql = (clause: { key: string; values: string[] }) => {
+    // 将某一维度 clause 转成 “该维度内部的 OR 组合”
+    const clauseToBrackets = (clause: { key: string; values: string[] }): Brackets | null => {
       const condMap = cfg.byKey[clause.key] || {};
-      const subs = clause.values.map(v => condMap[v]).filter(Boolean);
-      return subs.length ? `(${subs.join(' OR ')})` : null;
+      const subs = clause.values.map(v => condMap[v]).filter(Boolean) as SqlPart[];
+      if (!subs.length) return null;
+      return new Brackets(bb => {
+        for (const p of subs) {
+          bb.orWhere(p as any);
+        }
+      });
     };
 
-    const anyParts = (filters.any ?? []).map(toSql).filter(Boolean) as string[];
-    const allParts = (filters.all ?? []).map(toSql).filter(Boolean) as string[];
+    const anyGroups = (filters.any ?? []).map(clauseToBrackets).filter(Boolean) as Brackets[];
+    const allGroups = (filters.all ?? []).map(clauseToBrackets).filter(Boolean) as Brackets[];
 
-    const whereParts: string[] = [];
-    if (anyParts.length) whereParts.push(`(${anyParts.join(' OR ')})`);
-    if (allParts.length) whereParts.push(`(${allParts.join(' AND ')})`);
-
-    if (whereParts.length) qb.andWhere(whereParts.join(' AND '), cfg.params ?? {});
+    // (OR(any...)) AND (AND(all...))
+    if (anyGroups.length) {
+      qb.andWhere(
+        new Brackets(b => {
+          for (const g of anyGroups) b.orWhere(g);
+        }),
+        cfg.params ?? {}
+      );
+    }
+    for (const g of allGroups) {
+      qb.andWhere(g, cfg.params ?? {});
+    }
     return qb;
   }
 

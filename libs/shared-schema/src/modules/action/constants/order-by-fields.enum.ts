@@ -1,5 +1,6 @@
 export const ACTION_ORDER_BY_FIELDS = {
   NAME: 'name',
+  SORT_ORDER: 'sortOrder',
   CREATED_AT: 'createdAt',
   UPDATED_AT: 'updatedAt',
 } as const;

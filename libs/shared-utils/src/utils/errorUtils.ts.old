@@ -1,0 +1,205 @@
+// import { FieldValues, Path, UseFormSetError } from 'react-hook-form';
+// import type { ZodError, ZodIssue } from 'zod';
+// import axios from 'axios';
+// import { BaseErrorResponse, baseErrorResponseSchema } from '@frankjhub/shared-schema';
+
+// // export function handleFormServerErrors<TFieldValues extends FieldValues>(
+// //   errorResponse: { error: string | ZodIssue[] },
+// //   setError: UseFormSetError<TFieldValues>
+// // ) {
+// //   if (Array.isArray(errorResponse.error)) {
+// //     errorResponse.error.forEach(e => {
+// //       const fieldName = e.path.join('.') as Path<TFieldValues>;
+// //       setError(fieldName, { message: e.message });
+// //     });
+// //   } else {
+// //     setError('root.serverError', { message: errorResponse.error });
+// //   }
+// // } 过时版本，用下面的
+
+// export function handleFormServerErrors<TFieldValues extends FieldValues>(
+//   errorResponse: BaseErrorResponse,
+//   setError: UseFormSetError<TFieldValues>
+// ) {
+//   const details = errorResponse.details;
+//   const message = errorResponse.message;
+
+//   // 如果是 Zod-like 错误数组
+//   if (
+//     Array.isArray(details) &&
+//     details.every(e => Array.isArray(e.path) && typeof e.message === 'string')
+//   ) {
+//     const issues = details as ZodIssue[];
+//     issues.forEach(issue => {
+//       const field = issue.path.join('.') as Path<TFieldValues>;
+//       setError(field, { message: issue.message });
+//     });
+//     return;
+//   }
+
+//   // 如果是简单字符串消息
+//   if (typeof details === 'string') {
+//     setError('root.serverError', { message: details });
+//     return;
+//   }
+
+//   // fallback: 显示 message 或兜底
+//   setError('root.serverError', {
+//     message: message || 'An unknown error occurred.',
+//   });
+// }
+
+// /**
+//  * 尝试解析服务器返回的错误对象为 BaseErrorResponse
+//  */
+// export function parseError(error: unknown): BaseErrorResponse {
+//   if (
+//     axios.isAxiosError(error) &&
+//     error.response?.data &&
+//     typeof error.response.data === 'object'
+//   ) {
+//     const parsed = baseErrorResponseSchema.safeParse(error.response.data);
+//     if (parsed.success) return parsed.data;
+//   }
+//   return {
+//     status: 500,
+//     code: 'UNHANDLED_CLIENT_ERROR',
+//     message: error instanceof Error ? error.message : 'Unknown error',
+//     timestamp: new Date().toISOString(),
+//   };
+// }
+
+// /**
+//  * 从未知错误对象中提取可展示的用户友好错误消息。
+//  *
+//  * 适用于处理 Axios 请求错误、标准后端错误响应（符合 BaseError 格式）、
+//  * 原生 Error 对象以及未知错误格式的情况。
+//  *
+//  * 处理逻辑：
+//  * - 若为 AxiosError 且响应体符合 BaseErrorResponseSchema，则返回标准 message 字段
+//  * - 若响应体包含通用 message 字段，则返回它
+//  * - 若以上不满足，则返回 Axios 的原始错误 message
+//  * - 若为普通 Error 对象，返回其 message
+//  * - 若无法识别错误结构，返回传入的 fallbackMessage（默认为 'Unexpected error'）
+//  *
+//  * @param error - 任意未知错误对象（可能来自 Axios、服务端、代码抛出等）
+//  * @param fallbackMessage - 无法提取具体信息时使用的默认错误信息
+//  * @returns 提取到的用户可读错误信息字符串
+//  */
+// export function getErrorMessage(error: unknown, fallbackMessage = 'Unexpected error'): string {
+//   // axios 错误
+//   if (axios.isAxiosError(error)) {
+//     const responseData = error.response?.data;
+
+//     // 尝试匹配符合 BaseError 结构的后端响应
+//     const parsed = baseErrorResponseSchema.safeParse(responseData);
+//     if (parsed.success) {
+//       return parsed.data.message;
+//     }
+//     // 若 response.data 是普通对象且含有 message 字段
+//     if (
+//       responseData &&
+//       typeof responseData === 'object' &&
+//       'message' in responseData &&
+//       typeof responseData.message === 'string'
+//     ) {
+//       return responseData.message;
+//     }
+
+//     // fallback: axios 自带 message
+//     return error.message;
+//   }
+
+//   // 原生 Error 对象
+//   if (error instanceof Error) {
+//     return error.message;
+//   }
+
+//   // fallback
+//   return fallbackMessage;
+// }
+
+// export function convertZodIssuesToErrorDetails(error: ZodError): Record<string, string> {
+//   const result: Record<string, string> = {};
+//   for (const issue of error.issues) {
+//     const path = issue.path.join('.') || 'root';
+//     result[path] = issue.message;
+//   }
+//   return result;
+// }
+
+// /** 以下工具来处理aggregate error, 方便找到原因 */
+// type AnyErr = unknown & {
+//   code?: string;
+//   errno?: number;
+//   syscall?: string;
+//   address?: string;
+//   port?: number;
+//   name?: string;
+//   message?: string;
+//   stack?: string;
+//   cause?: unknown;
+// };
+
+// export interface InnerNetError {
+//   name?: string;
+//   code?: string;
+//   errno?: number;
+//   syscall?: string;
+//   address?: string;
+//   port?: number;
+//   message?: string;
+//   stack?: string;
+// }
+
+// const NET_ERROR_CODES = new Set([
+//   'ECONNREFUSED',
+//   'ETIMEDOUT',
+//   'EHOSTUNREACH',
+//   'ENETUNREACH',
+//   'ECONNRESET',
+// ]);
+
+// /** 递归沿着 cause 链找到第一个 AggregateError（如果有） */
+// export function findAggregateError(err: AnyErr | null | undefined): AggregateError | null {
+//   if (!err) return null;
+//   if (typeof AggregateError !== 'undefined' && err instanceof AggregateError)
+//     return err as AggregateError;
+//   // 某些库会把 AggregateError 放在 cause 里
+//   const cause = (err as AnyErr)?.cause as AnyErr | undefined;
+//   if (cause && typeof AggregateError !== 'undefined' && cause instanceof AggregateError)
+//     return cause as AggregateError;
+//   // 再往下走一层（最多两层够用了，避免深递归带来的风险）
+//   const cause2 = (cause as AnyErr)?.cause as AnyErr | undefined;
+//   if (cause2 && typeof AggregateError !== 'undefined' && cause2 instanceof AggregateError)
+//     return cause2 as AggregateError;
+//   return null;
+// }
+
+// /** 把 AggregateError.errors 展开为便于记录的结构 */
+// export function flattenAggregateErrors(agg: AggregateError): InnerNetError[] {
+//   const list: InnerNetError[] = [];
+//   const errors = Array.from(agg.errors || []);
+//   for (const e of errors) {
+//     const obj = e as AnyErr;
+//     list.push({
+//       name: obj?.name,
+//       code: obj?.code,
+//       errno: obj?.errno,
+//       syscall: obj?.syscall,
+//       address: obj?.address,
+//       port: obj?.port,
+//       message: obj?.message,
+//       stack: obj?.stack,
+//     });
+//   }
+//   return list;
+// }
+
+// /** 判断一个错误（或其 cause 链/聚合内层）是否为常见网络类错误 */
+// export function isNetLike(err: AnyErr | null | undefined, inner?: InnerNetError[]): boolean {
+//   const code = err?.code;
+//   if (code && NET_ERROR_CODES.has(code)) return true;
+//   if (inner?.some(i => i.code && NET_ERROR_CODES.has(i.code))) return true;
+//   return false;
+// }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { resourceRefSchema } from '../entity';
 import { createSuccessResponseSchema } from '../../../factories';
 import { zInfer } from '../../../libs/z';
+import { resourceRefSchema } from './ref.response.schema';
 
 export const resourceOptionSchema = resourceRefSchema;
 

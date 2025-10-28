@@ -1,0 +1,35 @@
+{
+  "name": "@frankjhub/shared-table-utils",
+  "version": "0.0.1",
+  "main": "./dist/index.esm.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    }
+  },
+  "dependencies": {
+    "@frankjhub/shared-schema": "0.0.4"
+  },
+  "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-table-utils",
+    "targets": {
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm publish libs/shared-table-utils/dist --access public",
+          "cwd": "."
+        }
+      }
+    }
+  }
+}

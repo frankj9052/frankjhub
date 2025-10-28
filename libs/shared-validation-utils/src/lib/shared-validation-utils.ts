@@ -1,7 +1,7 @@
 import { ApiResponse, BaseErrorResponse } from '@frankjhub/shared-schema';
 import { ZodSchema } from 'zod';
 import { ValidationError } from '@frankjhub/shared-errors';
-import { convertZodIssuesToErrorDetails } from './errorUtils';
+import { convertZodIssuesToErrorDetails } from '@frankjhub/shared-error-utils';
 
 /**
  * Validates input data against a given Zod schema and returns a typed result.

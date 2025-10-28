@@ -1,6 +1,35 @@
+import { input, output, ZodObject } from 'zod';
 import { OrderEnum } from '../enums/order.enum';
 import { z } from '../libs/z';
 import { createFiltersSchema, FilterDefsInput } from './createFilters.schema';
+
+// 取对象 value 联合类型的小工具
+// utils
+type ValueOf<T> = T[keyof T];
+type FilterValues<D> = {
+  [K in keyof D]: ValueOf<D[K]>; // 将每个 key 对应的对象值取联合
+};
+
+type FiltersFromDefs<D> = D extends Record<string, Record<string, string>>
+  ? {
+      filters?: {
+        any?: { key: keyof D; values: FilterValues<D>[keyof D][] }[];
+        all?: { key: keyof D; values: FilterValues<D>[keyof D][] }[];
+      };
+    }
+  : D extends Record<string, string>
+  ? {
+      filters?: {
+        any?: { key: keyof D; values: D[keyof D][] }[];
+        all?: { key: keyof D; values: D[keyof D][] }[];
+      };
+    }
+  : {
+      filters?: {
+        any?: { key: string; values: string[] }[];
+        all?: { key: string; values: string[] }[];
+      };
+    };
 
 /**
  * 创建基于 limit/offset 分页模式的 Zod 校验 schema。
@@ -13,6 +42,7 @@ import { createFiltersSchema, FilterDefsInput } from './createFilters.schema';
  *
  * @returns Zod schema，可直接用于请求参数验证。
  *
+ * ---
  * ### 功能概述
  * 生成的 schema 支持：
  * 1. **分页参数**（limit、offset）
@@ -24,44 +54,40 @@ import { createFiltersSchema, FilterDefsInput } from './createFilters.schema';
  * ### 字段说明
  *
  * #### 分页
- * - `limit`：每页条数，1~100 之间，默认 20
- * - `offset`：跳过的记录条数，≥ 0，默认 0
+ * - limit：每页条数，1~100 之间，默认 20
+ * - offset：跳过的记录条数，≥ 0，默认 0
  *
  * #### 排序
- * - `order`：排序方向，'ASC' 或 'DESC'（大小写不敏感），默认 'DESC'
- * - `orderBy`：排序字段，必须是 `orderByEnum` 枚举值之一，默认取枚举的第一个值
+ * - order：排序方向，'ASC' 或 'DESC'（大小写不敏感），默认 'DESC'
+ * - orderBy：排序字段，必须是 orderByEnum 枚举值之一，默认取枚举的第一个值
  *
  * #### 搜索
- * - `search`：搜索关键词，最大长度 100，默认不传
+ * - search：搜索关键词，最大长度 100，默认不传
  *
  * #### 筛选（filters）
- * 如果 `filterDefs` 为空，则不生成 `filters` 校验字段。
- * 如果提供了 `filterDefs`，`filters` 支持两种模式：
+ * 如果 filterDefs 为空，则不生成 filters 校验字段。
+ * 如果提供了 filterDefs，filters 支持两种模式：
  *
  * 1. **扁平并集（OR）模式**
- *    ```json
- *    ["active", "source_organization"]
- *    ```
- *    - 直接传一个字符串数组，元素必须属于所有维度枚举值的合集
- *    - 至少一个值
- *    - 当枚举值在不同维度重复时会抛错（避免歧义）
+ * ```json
+ * ["active", "source_organization"]
+ * ```
+ * - 直接传一个字符串数组，元素必须属于所有维度枚举值的合集
+ * - 至少一个值
+ * - 当枚举值在不同维度重复时会抛错（避免歧义）
  *
  * 2. **结构化模式**
- *    ```json
- *    {
- *      "any": [
- *        { "key": "status", "values": ["active"] }
- *      ],
- *      "all": [
- *        { "key": "source", "values": ["source_organization"] }
- *      ]
- *    }
- *    ```
- *    - `any`：任意一个子条件匹配（OR 关系）
- *    - `all`：所有子条件必须同时匹配（AND 关系）
- *    - `key` 必须是 `filterDefs` 的维度名
- *    - `values` 必须是对应维度枚举值之一，且至少一个值
- *    - `any` 和 `all` 至少要提供一个
+ * ```json
+ * {
+ *   "any": [{ "key": "status", "values": ["active"] }],
+ *   "all": [{ "key": "source", "values": ["source_organization"] }]
+ * }
+ * ```
+ * - any：任意一个子条件匹配（OR 关系）
+ * - all：所有子条件必须同时匹配（AND 关系）
+ * - key 必须是 filterDefs 的维度名
+ * - values 必须是对应维度枚举值之一，且至少一个值
+ * - any 和 all 至少要提供一个
  *
  * ---
  * ### 使用示例
@@ -96,14 +122,13 @@ import { createFiltersSchema, FilterDefsInput } from './createFilters.schema';
  * });
  * ```
  */
-
 export function createOffsetPaginationSchema<
   T extends Record<string, string>,
   D extends FilterDefsInput | undefined = undefined
 >(orderByEnum: T, filterDefs?: D) {
   const filtersSchema = createFiltersSchema(filterDefs) ?? z.undefined();
 
-  return z.object({
+  const base = z.object({
     /**
      * 每页条数限制
      * - 类型：number 或 string（自动转换）
@@ -162,10 +187,17 @@ export function createOffsetPaginationSchema<
      * - 限制：最少 1 个字符，最多 100 个字符
      */
     search: z.string().trim().max(100, { message: 'Search keyword too long' }).optional(),
-
-    /**
-     * 筛选（可选 + 通用）
-     */
-    filters: filtersSchema,
   });
+
+  // 如果提供了 filterDefs，则合并 filters 字段；否则直接返回 base
+
+  const withFilters = filtersSchema ? base.merge(z.object({ filters: filtersSchema })) : base;
+
+  return withFilters as unknown as ZodObject<
+    any, // ZodRawShape（这里不用深究，保持 any）
+    any, // UnknownKeysParam
+    any, // Catchall
+    output<typeof base> & FiltersFromDefs<D>, // 输出类型附着 FiltersFromDefs<D>
+    input<typeof base> & FiltersFromDefs<D> // 输入类型附着 FiltersFromDefs<D>
+  >;
 }

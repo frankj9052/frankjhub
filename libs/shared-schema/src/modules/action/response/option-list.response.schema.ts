@@ -1,12 +1,8 @@
 import { createSuccessResponseSchema } from '../../../factories';
 import { z, zInfer } from '../../../libs/z';
-import { actionSchema } from '../entity/schema';
+import { actionRefSchema } from './ref.response.schema';
 
-export const actionOptionSchema = actionSchema.pick({
-  id: true,
-  name: true,
-  displayName: true,
-});
+export const actionOptionSchema = actionRefSchema;
 
 export const actionOptionListSchema = z.array(actionOptionSchema);
 

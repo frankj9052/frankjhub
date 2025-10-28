@@ -1,14 +1,18 @@
 import { zInfer } from '../../../libs/z';
 import {
+  createFiltersSchema,
   createOffsetPaginatedResponseSchema,
   createSuccessResponseSchema,
 } from '../../../factories';
-import { actionFilterListSchema } from '../constants';
-import { actionSchema } from '../entity';
+import { ACTION_STATUS_FILTER, ACTION_SYSTEM_FILTER } from '../constants';
+import { actionSummarySchema } from './summary.response.schema';
 
 export const actionListPageDataSchema = createOffsetPaginatedResponseSchema(
-  actionSchema,
-  actionFilterListSchema
+  actionSummarySchema,
+  createFiltersSchema({
+    status: ACTION_STATUS_FILTER,
+    system: ACTION_SYSTEM_FILTER,
+  })
 );
 
 export const actionListResponseSchema = createSuccessResponseSchema(actionListPageDataSchema);

@@ -89,6 +89,18 @@
     },
     {
       "path": "./libs/shared-constants"
+    },
+    {
+      "path": "./libs/shared-table-utils"
+    },
+    {
+      "path": "./libs/shared-error-utils"
+    },
+    {
+      "path": "./libs/shared-validation-utils"
+    },
+    {
+      "path": "./libs/shared-typeorm-utils"
     }
   ],
   "ts-node": {

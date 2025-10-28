@@ -1,0 +1,38 @@
+{
+  "name": "@frankjhub/shared-validation-utils",
+  "version": "0.0.1",
+  "main": "./dist/index.esm.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    }
+  },
+  "dependencies": {
+    "@frankjhub/shared-schema": "0.0.4",
+    "zod": "3.25.42",
+    "@frankjhub/shared-errors": "0.0.2",
+    "@frankjhub/shared-error-utils": "0.0.1"
+  },
+  "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-validation-utils",
+    "targets": {
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm publish libs/shared-validation-utils/dist --access public",
+          "cwd": "."
+        }
+      }
+    }
+  }
+}

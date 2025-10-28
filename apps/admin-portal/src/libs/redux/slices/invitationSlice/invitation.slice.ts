@@ -13,7 +13,7 @@ import {
   TableColumn,
 } from '@frankjhub/shared-schema';
 import { Status } from '@frankjhub/shared-ui-hero-ssr';
-import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
+import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-table-utils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Key } from 'react';
 import { getInvitationListAsync } from './thunk';

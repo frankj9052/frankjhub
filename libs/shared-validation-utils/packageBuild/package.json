@@ -1,0 +1,21 @@
+{
+  "name": "@frankjhub/shared-validation-utils",
+  "version": "0.0.1",
+  "main": "./index.esm.js",
+  "module": "./index.esm.js",
+  "types": "./index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./index.esm.d.ts",
+      "import": "./index.esm.js",
+      "default": "./index.esm.js"
+    }
+  },
+  "dependencies": {
+    "@frankjhub/shared-schema": "0.0.4",
+    "zod": "3.25.42",
+    "@frankjhub/shared-errors": "0.0.2",
+    "@frankjhub/shared-error-utils": "0.0.1"
+  }
+}

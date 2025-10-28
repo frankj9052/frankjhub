@@ -28,9 +28,9 @@ export async function createApp() {
   app.use(currentUser);
 
   // 挂载网关
-  const { gatewayRawRouter } = await import('./modules/api-gateway/proxyRouter.js');
+  // const { gatewayRawRouter } = await import('./modules/api-gateway/proxyRouter.js');
   // 给网关挂载需要的轻中间件
-  app.use('/gw', requestId, sessionMiddleware, currentUser, gatewayRawRouter);
+  // app.use('/gw', requestId, sessionMiddleware, currentUser, gatewayRawRouter);
 
   // body解析放网关后面
   app.use(

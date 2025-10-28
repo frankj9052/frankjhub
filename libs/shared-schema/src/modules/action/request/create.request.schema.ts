@@ -1,26 +1,26 @@
-import { z, zInfer } from '../../../libs/z';
-import { actionSchema } from '../entity';
+import { zInfer } from '../../../libs/z';
+import { withActionFieldsConsistency } from '../entity/validation/action.validation';
+import { baseActionSchema } from '../entity';
 
-/**
- * 创建 Action 时允许传入的字段：
- * - name：必填，小写、规范化
- * - displayName：可选
- * - description：可选
- * - aliases：可选（string[] 或 null）
- * 其余字段如 isSystem / sortOrder / isActive 由系统自动处理
- */
-export const actionCreateRequestSchema = actionSchema
+export const baseActionCreateRequestSchema = baseActionSchema
   .pick({
-    name: true,
-    displayName: true,
     description: true,
     aliases: true,
+    sortOrder: true,
+    isActive: true,
   })
-  .extend({
-    // 创建时不允许传 isSystem、sortOrder、isActive 等字段
-    isSystem: z.boolean().default(false),
-    sortOrder: z.number().int().default(0),
-    isActive: z.boolean().default(true),
-  });
+  .partial()
+  .extend(
+    baseActionSchema
+      .pick({
+        id: true,
+        name: true,
+        displayName: true,
+      })
+      .required().shape
+  )
+  .strict();
+
+export const actionCreateRequestSchema = withActionFieldsConsistency(baseActionCreateRequestSchema);
 
 export type ActionCreateRequest = zInfer<typeof actionCreateRequestSchema>;

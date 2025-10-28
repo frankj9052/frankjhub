@@ -1,7 +1,8 @@
 import { z, zInfer } from '../../../libs';
 import { fieldsModeSchema } from '../constants';
-import { fieldNameSchema, resourceRefSchema } from '../entity';
+import { fieldNameSchema } from '../entity';
 import { withFieldsConsistency } from '../entity/resource.validation';
+import { resourceRefSchema } from './ref.response.schema';
 
 export const baseResourceSummarySchema = resourceRefSchema.extend({
   fieldsMode: fieldsModeSchema,

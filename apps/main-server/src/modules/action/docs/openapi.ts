@@ -8,8 +8,11 @@ import {
   actionDataExample,
   actionListResponseSchema,
   actionListResponseExample,
-  actionSingleResponseSchema,
   buildErrorResponses,
+  actionCreateRequestData,
+  simpleResponseSchema,
+  actionListRequestData,
+  actionDetailResponse,
 } from '@frankjhub/shared-schema';
 
 // ----------------- PATH REGISTRATIONS -----------------
@@ -25,10 +28,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: actionCreateRequestSchema.openapi({
-            example: {
-              name: 'read',
-              description: 'Allows reading the resource',
-            },
+            example: actionCreateRequestData,
           }),
         },
       },
@@ -39,11 +39,10 @@ registry.registerPath({
       description: 'Action created successfully',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Action create successful',
-              data: actionDataExample,
             },
           }),
         },
@@ -66,12 +65,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: actionListRequestSchema.openapi({
-      example: {
-        limit: 10,
-        offset: 0,
-        search: 'read',
-        filters: ['active'],
-      },
+      example: actionListRequestData,
     }),
   },
   responses: {
@@ -115,7 +109,7 @@ registry.registerPath({
       description: 'Action found',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: actionDetailResponse.openapi({
             example: {
               status: 'success',
               message: 'Action get successful',
@@ -159,11 +153,10 @@ registry.registerPath({
       description: 'Updated successfully',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Action update successful',
-              data: actionDataExample,
             },
           }),
         },
@@ -199,11 +192,10 @@ registry.registerPath({
       description: 'Soft deleted successfully',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Action delete successful',
-              data: actionDataExample,
             },
           }),
         },
@@ -239,11 +231,10 @@ registry.registerPath({
       description: 'Restored successfully',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Action restore successful',
-              data: actionDataExample,
             },
           }),
         },
@@ -273,11 +264,10 @@ registry.registerPath({
       description: 'Deleted permanently',
       content: {
         'application/json': {
-          schema: actionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Action permanent delete successful',
-              data: actionDataExample,
             },
           }),
         },
@@ -308,8 +298,8 @@ registry.registerPath({
             example: {
               status: 'success',
               data: [
-                { id: 'action-uuid-123', name: 'read' },
-                { id: 'action-uuid-456', name: 'update' },
+                { id: 'action-uuid-123', name: 'read', displayName: 'read' },
+                { id: 'action-uuid-456', name: 'update', displayName: 'update' },
               ],
             },
           }),

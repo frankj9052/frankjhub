@@ -1,4 +1,4 @@
-import { ZodDiscriminatedUnion, ZodDiscriminatedUnionOption, ZodEnum, ZodTypeAny } from 'zod';
+import { ZodEnum, ZodType } from 'zod';
 import { toZodEnum } from './enumUtils';
 import { z } from '../libs/z';
 
@@ -64,62 +64,73 @@ export function buildFilterIndexes(filterDefs?: FilterDefsInput) {
 }
 
 /** 使用同一套索引，生成 filters 的 Zod schema（扁平 OR / 结构化 any+all） */
-export function createFiltersSchema(filterDefs?: FilterDefsInput) {
-  const { defs, keys } = buildFilterIndexes(filterDefs);
-  if (!defs || keys.length === 0) return undefined;
+export function createFiltersSchema<D extends FilterDefsInput | undefined = undefined>(
+  filterDefs?: D
+): D extends undefined
+  ? undefined
+  :
+      | ZodType<
+          D extends Record<string, Record<string, string>>
+            ? {
+                any?: { key: keyof D; values: (keyof D[keyof D])[] }[];
+                all?: { key: keyof D; values: (keyof D[keyof D])[] }[];
+              }
+            : D extends Record<string, string>
+            ? {
+                any?: { key: keyof D; values: (keyof D)[] }[];
+                all?: { key: keyof D; values: (keyof D)[] }[];
+              }
+            : {
+                any?: { key: string; values: string[] }[];
+                all?: { key: string; values: string[] }[];
+              }
+        >
+      | undefined {
+  if (!filterDefs) return undefined as any;
 
-  // 为每个 key 生成枚举 schema
+  const defs: Record<string, Record<string, string>> = Object.values(filterDefs).every(
+    v => typeof v === 'string'
+  )
+    ? { default: filterDefs as Record<string, string> }
+    : (filterDefs as Record<string, Record<string, string>>);
+
+  const keys = Object.keys(defs);
   const byKeyEnum: Record<string, ZodEnum<[string, ...string[]]>> = {};
   const enumList: ZodEnum<[string, ...string[]]>[] = [];
 
   for (const key of keys) {
-    const zEnum = toZodEnum(defs[key]); // 将 {literal: label} -> z.enum([...literal])
+    const zEnum = toZodEnum(defs[key]);
     byKeyEnum[key] = zEnum;
     enumList.push(zEnum);
   }
 
-  // 扁平 OR：["ACTIVE", "ORG", ...]，多维时用 union
-  const flatOR: ZodTypeAny =
-    enumList.length === 1
-      ? z.array(enumList[0])
-      : z.array(z.union(enumList as unknown as [ZodTypeAny, ZodTypeAny, ...ZodTypeAny[]]));
+  const flatOR = enumList.length === 1 ? z.array(enumList[0]) : z.array(z.union(enumList as any));
 
-  // 结构化：{ any?: Clause[]; all?: Clause[] } 且至少提供一个字段
   const perKeyClauseSchemas = keys.map(key =>
     z.object({
       key: z.literal(key),
       values: z.array(byKeyEnum[key]).min(1),
     })
-  ) as unknown as ZodDiscriminatedUnionOption<'key'>[];
+  );
 
-  const clauseSchema:
-    | ZodDiscriminatedUnionOption<'key'>
-    | ZodDiscriminatedUnion<
-        'key',
-        [ZodDiscriminatedUnionOption<'key'>, ...ZodDiscriminatedUnionOption<'key'>[]]
-      > =
+  const structured =
     perKeyClauseSchemas.length === 1
-      ? perKeyClauseSchemas[0]
-      : z.discriminatedUnion(
-          'key',
-          perKeyClauseSchemas as [
-            ZodDiscriminatedUnionOption<'key'>,
-            ...ZodDiscriminatedUnionOption<'key'>[]
-          ]
-        );
+      ? z.object({
+          any: z.array(perKeyClauseSchemas[0]).min(1).optional(),
+          all: z.array(perKeyClauseSchemas[0]).min(1).optional(),
+        })
+      : z.object({
+          any: z
+            .array(z.union(perKeyClauseSchemas as any))
+            .min(1)
+            .optional(),
+          all: z
+            .array(z.union(perKeyClauseSchemas as any))
+            .min(1)
+            .optional(),
+        });
 
-  const structured = z
-    .object({
-      any: z.array(clauseSchema).min(1).optional(),
-      all: z.array(clauseSchema).min(1).optional(),
-    })
-    .refine(o => {
-      const hasAny = Array.isArray(o.any) && o.any.length > 0;
-      const hasAll = Array.isArray(o.all) && o.all.length > 0;
-      return hasAny || hasAll;
-    }, 'Either "any" or "all" must be provided.');
-
-  return z.union([flatOR, structured]).optional();
+  return z.union([flatOR, structured]).optional() as any;
 }
 
 /** 把输入整形为结构化（与 schema 约束一致），并返回可变副本 */

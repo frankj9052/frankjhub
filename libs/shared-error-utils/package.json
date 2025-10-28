@@ -1,0 +1,38 @@
+{
+  "name": "@frankjhub/shared-error-utils",
+  "version": "0.0.1",
+  "main": "./dist/index.esm.js",
+  "module": "./dist/index.esm.js",
+  "types": "./dist/index.esm.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.esm.d.ts",
+      "import": "./dist/index.esm.js",
+      "default": "./dist/index.esm.js"
+    }
+  },
+  "dependencies": {
+    "react-hook-form": "7.57.0",
+    "zod": "3.25.42",
+    "axios": "1.9.0",
+    "@frankjhub/shared-schema": "0.0.4"
+  },
+  "nx": {
+    "projectType": "library",
+    "sourceRoot": "libs/shared-error-utils",
+    "targets": {
+      "deploy": {
+        "dependsOn": [
+          "build"
+        ],
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "npm publish libs/shared-error-utils/dist --access public",
+          "cwd": "."
+        }
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ import {
   makeFiltersToolkit,
   RoleSourceFilter,
 } from '@frankjhub/shared-schema';
-import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-utils';
+import { generateColumnsFromData, getLabeledEnumList } from '@frankjhub/shared-table-utils';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Key } from 'react';
 import { ZodIssue } from 'zod';

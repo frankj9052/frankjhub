@@ -1,1 +1,2 @@
-export * from './schema';
+export * from './action.schema';
+export * from './fields';

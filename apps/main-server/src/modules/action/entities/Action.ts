@@ -11,6 +11,7 @@ import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 @Index('ux_action_name_not_deleted', ['name'], { unique: true, where: `"deleted_at" IS NULL` })
+@Index('idx_action_aliases_gin', { synchronize: false }) // 这里只做标记，实际用 migration 建
 @Check(
   // 仅允许小写字母/数字/下划线/中划线，且非空
   'ck_action_name_format',

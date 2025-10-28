@@ -1,50 +1,74 @@
-import { ActionDto, ActionRef } from '../entity';
-import { ActionListPageData, ActionListResponse } from '../response';
+import { ActionDetail, ActionListPageData, ActionListResponse, ActionRef } from '../response';
 
-export const actionDataExample: ActionDto = {
-  id: 'a3e1b2c4-7d56-42f9-a938-9a5c6b1a2f3d',
-  name: 'create_appointment',
-  description: 'Allows users to create a new appointment',
-  isActive: true,
-  createdAt: '2025-07-05T15:00:00.000Z',
-  createdBy: 'user_123',
-  updatedAt: '2025-07-05T16:00:00.000Z',
-  updatedBy: 'user_123',
-  deletedAt: null,
-  deletedBy: null,
+export const actionDataExample: ActionDetail = {
+  id: 'f1e2d3c4-b5a6-7890-abcd-0987654321fe',
+  name: 'DELETE_USER',
+  displayName: 'Delete User',
+  aliases: ['REMOVE_USER'],
+  isSystem: true,
+  sortOrder: 2,
+  isActive: false,
+  createdAt: new Date('2025-01-01T08:00:00Z').toISOString(),
+  createdBy: 'admin',
+  updatedAt: new Date('2025-05-01T10:00:00Z').toISOString(),
+  updatedBy: 'admin',
+  deletedAt: new Date('2025-06-01T09:00:00Z').toISOString(),
+  deletedBy: 'admin',
+  description: 'Allows deletion of a user from the system',
 };
 
 export const actionRefDataExample: ActionRef = {
   id: actionDataExample.id,
   name: actionDataExample.name,
-  description: actionDataExample.description,
+  displayName: actionDataExample.displayName,
 };
 
 export const actionListPageDataExample: ActionListPageData = {
   data: [
     {
-      id: 'b1e2a3f4-5c6d-7e8f-9012-3456789abcde',
-      name: 'create_appointment',
-      description: 'Allows users to create a new appointment',
+      id: 'a1b2c3d4-e5f6-7890-abcd-1234567890ef',
+      name: 'CREATE_USER',
+      displayName: 'Create User',
+      isSystem: true,
+      sortOrder: 1,
       isActive: true,
-      createdAt: '2025-07-01T10:00:00.000Z',
-      createdBy: 'user_001',
-      updatedAt: '2025-07-02T11:00:00.000Z',
-      updatedBy: 'user_001',
       deletedAt: null,
-      deletedBy: null,
     },
     {
-      id: 'c2f3b4a5-6d7e-8f90-1234-56789abcdef0',
-      name: 'delete_appointment',
-      description: 'Allows admins to delete existing appointments',
+      id: 'b2c3d4e5-f6a7-8901-bcde-2345678901fa',
+      name: 'UPDATE_USER',
+      displayName: 'Update User',
+      isSystem: true,
+      sortOrder: 2,
+      isActive: true,
+      deletedAt: null,
+    },
+    {
+      id: 'c3d4e5f6-a7b8-9012-cdef-3456789012ab',
+      name: 'DELETE_USER',
+      displayName: 'Delete User',
+      isSystem: true,
+      sortOrder: 3,
       isActive: false,
-      createdAt: '2025-06-15T09:30:00.000Z',
-      createdBy: 'user_002',
-      updatedAt: '2025-06-20T13:45:00.000Z',
-      updatedBy: 'user_003',
-      deletedAt: '2025-07-01T08:00:00.000Z',
-      deletedBy: 'user_004',
+      deletedAt: '2025-06-01T09:00:00Z',
+    },
+    {
+      id: 'd4e5f6a7-b8c9-0123-def0-4567890123cd',
+      name: 'READ_USER',
+      displayName: 'Read User',
+      isSystem: false,
+      sortOrder: 4,
+      isActive: true,
+      deletedAt: null,
+    },
+    {
+      id: 'e5f6a7b8-c9d0-1234-ef01-5678901234de',
+      name: 'MANAGE_ROLES',
+      displayName: 'Manage Roles',
+      isSystem: false,
+      sortOrder: 5,
+      isActive: true,
+      deletedAt: null,
     },
   ],
   total: 2,
@@ -52,7 +76,19 @@ export const actionListPageDataExample: ActionListPageData = {
   currentPage: 1,
   pageSize: 10,
   search: 'appointment',
-  filters: ['active', 'deleted'],
+  filters: {
+    any: [
+      {
+        key: 'status',
+        values: [], // 可以填 ['active','inactive','deleted'] 之类
+      },
+      {
+        key: 'system',
+        values: [], // 可以填 ['system','non_system']
+      },
+    ],
+    all: [],
+  },
 };
 
 export const actionListResponseExample: ActionListResponse = {

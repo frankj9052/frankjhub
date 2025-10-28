@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../shared-error-utils"
+    },
+    {
       "path": "../shared-errors"
     },
     {

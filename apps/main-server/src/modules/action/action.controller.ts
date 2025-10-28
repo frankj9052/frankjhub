@@ -113,7 +113,9 @@ export const hardDeleteActionController: RequestHandler = async (
 ) => {
   try {
     const { id } = idParamsSchema.parse(req.query);
-    const result = await actionService.hardDeleteAction(id);
+    const performedBy = req.currentUser?.userName;
+    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
+    const result = await actionService.hardDeleteAction(id, performedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);

@@ -1,7 +1,11 @@
 import { Logger } from 'winston';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import { EnvBase, UserPayload } from '@frankjhub/shared-schema';
-import { findAggregateError, flattenAggregateErrors, isNetLike } from '@frankjhub/shared-utils';
+import {
+  findAggregateError,
+  flattenAggregateErrors,
+  isNetLike,
+} from '@frankjhub/shared-error-utils';
 import { SessionData } from 'express-session';
 import { BaseError, InternalServerError, UnauthorizedError } from '@frankjhub/shared-errors';
 import * as Sentry from '@sentry/node';
