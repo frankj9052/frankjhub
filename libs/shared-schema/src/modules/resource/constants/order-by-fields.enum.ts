@@ -1,5 +1,8 @@
 export const RESOURCE_ORDER_BY_FIELDS = {
-  NAME: 'name',
+  NAMESPACE: 'namespace',
+  ENTITY: 'entity',
+  QUALIFIER: 'qualifier',
+  RESOURCE_KEY: 'resourceKey',
   CREATED_AT: 'createdAt',
   UPDATED_AT: 'updatedAt',
 } as const;

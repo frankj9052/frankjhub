@@ -10,6 +10,8 @@ export const actionSummarySchema = baseActionSchema.pick({
   sortOrder: true,
   isActive: true,
   deletedAt: true,
+  updatedAt: true,
+  createdAt: true,
 });
 
 export const actionSummaryResponseSchema = createSuccessResponseSchema(actionSummarySchema);

@@ -1,11 +1,11 @@
 import { baseEntitySchema } from '../../../modules/common';
 import { z, zInfer } from '../../../libs/z';
-import { namespaceSchema } from './namespace.schema';
-import { entitySchema } from './entity.schema';
 import { qualifierSchema } from '../constants/qualifier.enum';
 import { FIELDS_MODE, fieldsModeSchema } from '../constants/fields-mode.enum';
-import { fieldNameSchema } from './fieldName.schema';
-import { withFieldsConsistency } from './resource.validation';
+import { namespaceSchema } from './fields/namespace.schema';
+import { entitySchema } from './fields/entity.schema';
+import { fieldNameSchema } from './fields/fieldName.schema';
+import { withResourceFieldsConsistency } from './validation/resource.validation';
 
 /**
  * 等价实体 DTO 的“基础对象 schema”
@@ -57,10 +57,11 @@ export const baseResourceSchema = z.object({
 
   /** 乐观锁版本号 */
   version: z.number().int().nonnegative(),
+
+  // TODO:Add Service here
 });
 
-export const resourceSchema = withFieldsConsistency(baseResourceSchema);
+export const resourceSchema = withResourceFieldsConsistency(baseResourceSchema);
 
 /** 类型导出 */
 export type ResourceDto = zInfer<typeof resourceSchema>;
-export type BaseResourceDto = zInfer<typeof baseResourceSchema>;

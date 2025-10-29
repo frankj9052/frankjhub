@@ -1,9 +1,23 @@
 import type { ZodEffects, ZodTypeAny } from 'zod';
-import { FIELDS_MODE, FieldsMode } from '../constants';
-import { z } from '../../../libs/z';
+import { FIELDS_MODE, FieldsMode } from '../../constants';
+import { z } from '../../../../libs/z';
 
-// 抽交叉校验 helper（withFieldsConsistency）
-export const withFieldsConsistency = <S extends ZodTypeAny>(schema: S): ZodEffects<S> =>
+/**
+ * 抽交叉校验 helper（withResourceFieldsConsistency）
+ *
+ * - 约束1：当 fieldsMode = 'all' 时，fields 必须为空
+ * - 约束2：当 fieldsMode = 'whitelist' 时，fields 必须非空
+ *
+ * 用法示例：
+ * const schema = withResourceFieldsConsistency(
+ *   z.object({
+ *     fieldsMode: fieldsModeSchema,
+ *     fields: fieldsArraySchema,
+ *     // ...其他字段
+ *   })
+ * );
+ */
+export const withResourceFieldsConsistency = <S extends ZodTypeAny>(schema: S): ZodEffects<S> =>
   schema.superRefine((val: any, ctx) => {
     const mode = val?.fieldsMode as FieldsMode;
     const len = Array.isArray(val?.fields) ? val.fields.length : 0;
