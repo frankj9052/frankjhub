@@ -13,7 +13,6 @@ export const baseActionCreateRequestSchema = baseActionSchema
   .extend(
     baseActionSchema
       .pick({
-        id: true,
         name: true,
         displayName: true,
       })

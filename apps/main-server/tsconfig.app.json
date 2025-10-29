@@ -27,6 +27,12 @@
       "path": "../../libs/shared-perm/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared-errors/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-typeorm-utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared-schema/tsconfig.lib.json"
     },
     {

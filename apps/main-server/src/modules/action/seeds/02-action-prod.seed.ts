@@ -14,13 +14,7 @@ export default class ActionProdSeed extends BaseSeeder {
     return dataSource.getRepository(Action);
   }
 
-  private readonly actions: Array<Pick<Action, 'name' | 'description'>> = [
-    SYSTEM_ACTIONS.ALL,
-    SYSTEM_ACTIONS.CREATE,
-    SYSTEM_ACTIONS.READ,
-    SYSTEM_ACTIONS.UPDATE,
-    SYSTEM_ACTIONS.DELETE,
-  ];
+  private readonly actions = SYSTEM_ACTIONS;
 
   private missingActions: Array<Pick<Action, 'name' | 'description'>> = [];
 
@@ -28,12 +22,12 @@ export default class ActionProdSeed extends BaseSeeder {
     this.logger.info('🔍 Checking for required actions...');
     const repo = this.getRepository(dataSource);
     this.missingActions = [];
-
-    for (const action of this.actions) {
-      const exists = await repo.exists({ where: { name: action.name } });
+    const actionKeys: (keyof typeof SYSTEM_ACTIONS)[] = Object.keys(this.actions);
+    for (const key of actionKeys) {
+      const exists = await repo.exists({ where: { name: this.actions[key].name } });
       if (!exists) {
-        this.missingActions.push(action);
-        this.logger.warn(`❌ Missing action: "${action.name}"`);
+        this.missingActions.push(this.actions[key]);
+        this.logger.warn(`❌ Missing action: "${this.actions[key].name}"`);
       }
     }
 

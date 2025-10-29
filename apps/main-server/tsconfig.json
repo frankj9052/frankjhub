@@ -7,6 +7,12 @@
       "path": "../../libs/shared-perm"
     },
     {
+      "path": "../../libs/shared-errors"
+    },
+    {
+      "path": "../../libs/shared-typeorm-utils"
+    },
+    {
       "path": "../../libs/shared-schema"
     },
     {

@@ -50,6 +50,9 @@
       "path": "../../libs/shared-errors"
     },
     {
+      "path": "../../libs/shared-table-utils"
+    },
+    {
       "path": "../../libs/shared-ui-client"
     },
     {
