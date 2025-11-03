@@ -13,6 +13,7 @@ export const resourceSummarySchema = baseResourceSchema.pick({
   isActive: true,
   deletedAt: true,
   createdAt: true,
+  updatedAt: true,
 });
 
 export const resourceSummaryResponseSchema = createSuccessResponseSchema(resourceSummarySchema);
