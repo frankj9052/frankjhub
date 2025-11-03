@@ -10,5 +10,5 @@ export const serviceRefSchema = serviceSchema.pick({
 
 export const serviceRefResponseSchema = createSuccessResponseSchema(serviceRefSchema);
 
-export type serviceRef = zInfer<typeof serviceRefSchema>;
-export type serviceRefResponse = zInfer<typeof serviceRefResponseSchema>;
+export type ServiceRef = zInfer<typeof serviceRefSchema>;
+export type ServiceRefResponse = zInfer<typeof serviceRefResponseSchema>;

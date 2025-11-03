@@ -1,10 +1,10 @@
 import { createSuccessResponseSchema } from '../../../factories';
 import { serviceSchema } from '../entities';
 import { z, zInfer } from '../../../libs';
+import { serviceRouteSummarySchema } from 'src/modules/service-route/response/summary.response.schema';
 
 export const serviceDetailSchema = serviceSchema.extend({
-  // TODO: 占位，完成routes后引用routesRef或Summary待定
-  routes: z.array(z.any()),
+  routes: z.array(serviceRouteSummarySchema),
 });
 
 export const serviceDetailResponseSchema = createSuccessResponseSchema(serviceDetailSchema);

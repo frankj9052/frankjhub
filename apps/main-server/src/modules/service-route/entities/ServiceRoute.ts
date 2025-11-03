@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Service } from '../../service-auth/entities/Service';
+import { ROUTE_RULE_TYPE, RouteRuleType } from '@frankjhub/shared-schema';
 /** 路由清单 */
 @Entity()
 @Unique('ux_route_service_path_rewrite_not_deleted', ['service', 'path', 'rewrite'])
@@ -29,6 +30,10 @@ export class ServiceRoute extends BaseEntity {
   /** 路由路径（网关对外暴露，如 /booking、/users/:id） */
   @Column({ type: 'text' })
   path!: string;
+
+  /** 路由匹配类型（exact/prefix） */
+  @Column({ type: 'text', default: ROUTE_RULE_TYPE.EXACT })
+  routeRuleType!: RouteRuleType;
 
   /** 允许方法集合（如 ['GET','POST']） */
   @Check('ck_route_methods_nonempty', `cardinality("methods") > 0`)

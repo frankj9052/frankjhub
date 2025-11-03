@@ -1,4 +1,4 @@
-import { ZodTypeAny } from 'zod';
+import { ZodObject, ZodTypeAny } from 'zod';
 import { z, zInfer } from '../libs/z';
 
 /**
@@ -20,9 +20,10 @@ import { z, zInfer } from '../libs/z';
  */
 export function createOffsetPaginatedResponseSchema<
   T extends ZodTypeAny,
-  F extends ZodTypeAny = ReturnType<typeof z.array> // 泛型只为占位，真正的默认值在实现里内联
->(itemSchema: T, filtersSchema?: F) {
-  return z.object({
+  F extends ZodTypeAny = ReturnType<typeof z.array>, // 泛型只为占位，真正的默认值在实现里内联
+  DynamicKeys extends readonly string[] = []
+>(itemSchema: T, filtersSchema?: F, dynamicFilterKeys?: DynamicKeys) {
+  let base = z.object({
     /**
      * 当前页数据数组
      */
@@ -59,6 +60,24 @@ export function createOffsetPaginatedResponseSchema<
      */
     filters: (filtersSchema ?? z.array(z.string())).optional(),
   });
+
+  // 如果有动态 filters，添加对应可选字段
+  if (dynamicFilterKeys && dynamicFilterKeys.length > 0) {
+    const dynamicShape = dynamicFilterKeys.reduce((acc, key) => {
+      acc[key] = z.string().optional();
+      return acc;
+    }, {} as Record<string, ZodTypeAny>);
+
+    base = base.merge(z.object(dynamicShape));
+  }
+  return base as unknown as ZodObject<
+    any,
+    any,
+    any,
+    // 输出类型附加动态字段
+    zInfer<typeof base> & Record<DynamicKeys[number], string | undefined>,
+    zInfer<typeof base> & Record<DynamicKeys[number], string | undefined>
+  >;
 }
 
 /**

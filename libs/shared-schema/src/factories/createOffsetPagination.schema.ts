@@ -1,4 +1,4 @@
-import { input, output, ZodObject } from 'zod';
+import { input, output, ZodObject, ZodTypeAny } from 'zod';
 import { OrderEnum } from '../enums/order.enum';
 import { z } from '../libs/z';
 import { createFiltersSchema, FilterDefsInput } from './createFilters.schema';
@@ -124,11 +124,29 @@ type FiltersFromDefs<D> = D extends Record<string, Record<string, string>>
  */
 export function createOffsetPaginationSchema<
   T extends Record<string, string>,
-  D extends FilterDefsInput | undefined = undefined
->(orderByEnum: T, filterDefs?: D) {
-  const filtersSchema = createFiltersSchema(filterDefs) ?? z.undefined();
+  D extends FilterDefsInput | undefined = undefined,
+  DynamicFields extends readonly string[] = []
+>(
+  orderByEnum: T,
+  filterDefs?: D,
+  dynamicFields?: DynamicFields // 动态字符串维度，比如 ['serviceId', 'teamId']
+) {
+  // const filtersSchema = createFiltersSchema(filterDefs) ?? z.undefined();
+  let filtersSchema: ReturnType<typeof createFiltersSchema> | undefined;
 
-  const base = z.object({
+  if (filterDefs) {
+    const isSingleDim = Object.values(filterDefs).every(v => typeof v === 'string');
+    if (isSingleDim) {
+      // 单维
+      filtersSchema = createFiltersSchema(filterDefs as Record<string, string>);
+    } else {
+      // 多维
+      filtersSchema = createFiltersSchema(filterDefs as Record<string, Record<string, string>>);
+    }
+  } else {
+    filtersSchema = undefined;
+  }
+  let base = z.object({
     /**
      * 每页条数限制
      * - 类型：number 或 string（自动转换）
@@ -189,15 +207,23 @@ export function createOffsetPaginationSchema<
     search: z.string().trim().max(100, { message: 'Search keyword too long' }).optional(),
   });
 
-  // 如果提供了 filterDefs，则合并 filters 字段；否则直接返回 base
+  // 动态字段
+  if (dynamicFields && dynamicFields.length > 0) {
+    const dynamicShape = dynamicFields.reduce((acc, key) => {
+      acc[key] = z.string().optional();
+      return acc;
+    }, {} as Record<string, ZodTypeAny>);
+    base = base.merge(z.object(dynamicShape));
+  }
 
+  // 如果提供了 filterDefs，则合并 filters 字段；否则直接返回 base
   const withFilters = filtersSchema ? base.merge(z.object({ filters: filtersSchema })) : base;
 
   return withFilters as unknown as ZodObject<
-    any, // ZodRawShape（这里不用深究，保持 any）
-    any, // UnknownKeysParam
-    any, // Catchall
-    output<typeof base> & FiltersFromDefs<D>, // 输出类型附着 FiltersFromDefs<D>
-    input<typeof base> & FiltersFromDefs<D> // 输入类型附着 FiltersFromDefs<D>
+    any,
+    any,
+    any,
+    output<typeof base> & FiltersFromDefs<D> & Record<DynamicFields[number], string | undefined>,
+    input<typeof base> & FiltersFromDefs<D> & Record<DynamicFields[number], string | undefined>
   >;
 }
