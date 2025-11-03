@@ -1,11 +1,15 @@
 import {
   ResourceCreateRequest,
+  ResourceDetail,
   ResourceDto,
   ResourceListRequest,
   ResourceListResponse,
   ResourceOptionListResponse,
+  ResourceRef,
   ResourceSingleResponse,
+  ResourceSummary,
   ResourceUpdateRequest,
+  SimpleResponse,
 } from '@frankjhub/shared-schema';
 import AppDataSource from '../../config/data-source';
 import { createLoggerWithContext } from '../common/libs/logger';
@@ -16,6 +20,7 @@ import { NotFoundError } from '../common/errors/NotFoundError';
 import { Permission } from '../permission/entities/Permission';
 import { updateEntityFields } from '@frankjhub/shared-utils';
 import { applyFilters } from '../common/utils/applyFilters';
+import { ResourceRepository } from './resource.repo';
 
 const logger = createLoggerWithContext('ActionService');
 
@@ -26,27 +31,48 @@ const filterConditionMap: Record<string, string> = {
 };
 
 export class ResourceService {
-  private resourceRepo = AppDataSource.getRepository(Resource);
+  private resourceRepo = new ResourceRepository(AppDataSource);
 
-  buildResource(resource: Resource): ResourceDto {
+  buildResourceRef({ id, resource_key }: Resource): ResourceRef {
+    return { id, resource_key };
+  }
+
+  buildResourceSummary({
+    createdAt,
+    id,
+    namespace,
+    entity,
+    qualifier,
+    fieldsMode,
+    fields,
+    isActive,
+    resource_key,
+    deletedAt,
+  }: Resource): ResourceSummary {
     return {
-      id: resource.id,
-      name: resource.name,
-      description: resource.description ?? '',
-      isActive: resource.isActive,
-      createdAt: resource.createdAt.toISOString(),
-      updatedAt: resource.updatedAt.toISOString(),
-      deletedAt: resource.deletedAt?.toISOString() ?? null,
-      createdBy: resource.createdBy ?? null,
-      updatedBy: resource.updatedBy ?? null,
-      deletedBy: resource.deletedBy ?? null,
+      createdAt: createdAt?.toISOString(),
+      id,
+      namespace,
+      entity,
+      qualifier,
+      fields,
+      fieldsMode,
+      isActive,
+      resource_key,
+      deletedAt: deletedAt?.toISOString(),
     };
   }
 
-  async createResource(
-    data: ResourceCreateRequest,
-    createdBy: string
-  ): Promise<ResourceSingleResponse> {
+  buildResourceDetail(resource: Resource): ResourceDetail {
+    return {
+      ...resource,
+      createdAt: resource.createdAt.toISOString(),
+      updatedAt: resource.updatedAt.toISOString(),
+      deletedAt: resource.deletedAt?.toISOString(),
+    };
+  }
+
+  async createResource(data: ResourceCreateRequest, createdBy: string): Promise<SimpleResponse> {
     const { name, description } = data;
     const log = logger.child({ method: 'createResource', name });
 

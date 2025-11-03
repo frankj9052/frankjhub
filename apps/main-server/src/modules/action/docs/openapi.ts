@@ -5,14 +5,14 @@ import {
   actionListRequestSchema,
   idParamsSchema,
   actionOptionListResponseSchema,
-  actionDataExample,
   actionListResponseSchema,
-  actionListResponseExample,
   buildErrorResponses,
   actionCreateRequestData,
   simpleResponseSchema,
   actionListRequestData,
   actionDetailResponse,
+  actionListResponseData,
+  actionDetailData,
 } from '@frankjhub/shared-schema';
 
 // ----------------- PATH REGISTRATIONS -----------------
@@ -74,7 +74,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: actionListResponseSchema.openapi({
-            example: actionListResponseExample,
+            example: actionListResponseData,
           }),
         },
       },
@@ -113,7 +113,7 @@ registry.registerPath({
             example: {
               status: 'success',
               message: 'Action get successful',
-              data: actionDataExample,
+              data: actionDetailData,
             },
           }),
         },
@@ -134,12 +134,16 @@ registry.registerPath({
   summary: 'Update action',
   security: [{ bearerAuth: [] }],
   request: {
+    params: idParamsSchema.openapi({
+      example: {
+        id: 'action-uuid-123',
+      },
+    }),
     body: {
       content: {
         'application/json': {
           schema: actionUpdateRequestSchema.openapi({
             example: {
-              id: 'action-uuid-123',
               name: 'read',
               description: 'Updated description',
             },

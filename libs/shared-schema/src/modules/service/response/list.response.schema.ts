@@ -1,14 +1,17 @@
 import {
+  createFiltersSchema,
   createOffsetPaginatedResponseSchema,
   createSuccessResponseSchema,
 } from '../../../factories';
-import { serviceSchema } from '../entities';
-import { serviceFilterSchema } from '../constants';
 import { zInfer } from '../../../libs/z';
+import { SERVICE_STATUS_FILTER } from '../constants';
+import { serviceSummarySchema } from './summary.response.schema';
 
 export const serviceListPageDataSchema = createOffsetPaginatedResponseSchema(
-  serviceSchema,
-  serviceFilterSchema
+  serviceSummarySchema,
+  createFiltersSchema({
+    status: SERVICE_STATUS_FILTER,
+  })
 );
 export const serviceListResponseSchema = createSuccessResponseSchema(serviceListPageDataSchema);
 

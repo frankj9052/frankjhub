@@ -61,11 +61,12 @@ export const updateActionController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
+    const { id } = idParamsSchema.parse(req.params);
     const parsed = actionUpdateRequestSchema.parse(req.body);
     const performedBy = req.currentUser?.userName;
     if (!performedBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await actionService.updateAction(parsed, performedBy);
+    const result = await actionService.updateAction(id, parsed, performedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);

@@ -50,7 +50,7 @@ export const baseResourceSchema = z.object({
    * 生成列（只读输出）：namespace.entity[.qualifier]
    * - DB 列名为 resource_key（snake），DTO 采用 camel：resourceKey
    */
-  resourceKey: z
+  resource_key: z
     .string()
     .min(3)
     .refine(v => v.includes('.'), 'resourceKey must be "namespace.entity[.qualifier]"'),

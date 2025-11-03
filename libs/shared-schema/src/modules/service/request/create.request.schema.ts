@@ -1,20 +1,30 @@
-import { z, zInfer } from '../../../libs/z';
-import { serviceRouteSchema, serviceSchema, serviceSecretSchema } from '../entities';
+import { zInfer } from '../../../libs/z';
+import { serviceSchema } from '../entities';
+import { serviceSecretSchema } from '../entities/fields/serviceSecret.schema';
 
 export const serviceCreateRequestSchema = serviceSchema
   .pick({
-    serviceId: true,
-    name: true,
-    baseUrl: true,
+    audPrefix: true,
+    baselineRequiredScopes: true,
+    grantedScopes: true,
     healthCheckPath: true,
     ownerTeam: true,
     description: true,
+    isActive: true,
   })
+  .partial()
+  .extend(
+    serviceSchema
+      .pick({
+        serviceId: true,
+        name: true,
+        baseUrl: true,
+      })
+      .required().shape
+  )
   .extend({
     serviceSecret: serviceSecretSchema,
-    audPrefix: serviceSchema.shape.audPrefix.optional(),
-    routes: z.array(serviceRouteSchema).optional(),
-    requiredScopes: serviceSchema.shape.requiredScopes.optional(),
-  });
+  })
+  .strict();
 
 export type ServiceCreateRequest = zInfer<typeof serviceCreateRequestSchema>;

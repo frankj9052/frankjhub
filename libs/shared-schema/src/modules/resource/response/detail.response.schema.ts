@@ -1,11 +1,10 @@
+import { createSuccessResponseSchema } from '../../../factories';
 import { zInfer } from '../../../libs';
-import { baseResourceSummarySchema } from './summary.response.schema';
-import { withFieldsConsistency } from '../entity/resource.validation';
+import { baseResourceSchema } from '../entity';
 
-export const resourceDetailSchema = withFieldsConsistency(
-  baseResourceSummarySchema.extend({
-    // service: serviceRefSchema
-  })
-);
+export const resourceDetailSchema = baseResourceSchema;
+
+export const resourceDetailResponseSchema = createSuccessResponseSchema(resourceDetailSchema);
 
 export type ResourceDetail = zInfer<typeof resourceDetailSchema>;
+export type ResourceDetailResponse = zInfer<typeof resourceDetailResponseSchema>;

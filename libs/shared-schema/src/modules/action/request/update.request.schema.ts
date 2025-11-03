@@ -12,13 +12,6 @@ export const baseActionUpdateRequestSchema = baseActionSchema
     isActive: true,
   })
   .partial()
-  .extend(
-    baseActionSchema
-      .pick({
-        id: true,
-      })
-      .required().shape
-  )
   .strict();
 
 export const actionUpdateRequestSchema = withActionFieldsConsistency(baseActionUpdateRequestSchema);

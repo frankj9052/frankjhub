@@ -1,32 +1,25 @@
-import { z, zInfer } from '../../../libs/z';
-import { serviceSchema } from '../entities';
-import { serviceCreateRequestSchema } from './create.request.schema';
+import { zInfer } from '../../../libs/z';
+import { serviceSchema, serviceSecretSchema } from '../entities';
 
-export const serviceUpdateRequestSchema = z
-  .object({
-    id: serviceSchema.shape.id,
+export const serviceUpdateRequestSchema = serviceSchema
+  .pick({
+    name: true,
+    baseUrl: true,
+    audPrefix: true,
+    baselineRequiredScopes: true,
+    grantedScopes: true,
+    healthCheckPath: true,
+    ownerTeam: true,
+    description: true,
+    isActive: true,
   })
-  .extend(serviceCreateRequestSchema.partial().shape)
+  .partial()
   .extend({
-    serviceSecret: z
-      .string()
-      .nullable()
-      .optional()
-      .refine(
-        v => {
-          if (!v) {
-            return true;
-          } else if (v.startsWith('$argon2') || v.length >= 8) {
-            return true;
-          }
-          return false;
-        },
-        {
-          message: 'serviceSecret must be plaintext string of at least 8 characters.',
-        }
-      ),
-    deletedAt: serviceSchema.shape.deletedAt.optional(),
-    isActive: serviceSchema.shape.isActive.optional(),
-  });
+    serviceSecret: serviceSecretSchema.optional(),
+  })
+  .refine(
+    data => Object.keys(data).length > 0,
+    'At least one field must be provided to update service'
+  );
 
 export type ServiceUpdateRequest = zInfer<typeof serviceUpdateRequestSchema>;

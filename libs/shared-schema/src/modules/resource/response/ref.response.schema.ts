@@ -1,14 +1,13 @@
-import { z, zInfer } from '../../../libs';
-import { entitySchema, namespaceSchema } from '../entity';
-import { qualifierSchema } from '../constants';
+import { createSuccessResponseSchema } from '../../../factories';
+import { zInfer } from '../../../libs';
+import { baseResourceSchema } from '../entity';
 
-export const resourceRefSchema = z.object({
-  id: z.string().uuid(),
-  namespace: namespaceSchema,
-  entity: entitySchema,
-  qualifier: qualifierSchema.nullable().optional().default(null),
-  resourceKey: z.string(),
-  isActive: z.boolean(),
+export const resourceRefSchema = baseResourceSchema.pick({
+  id: true,
+  resource_key: true,
 });
 
+export const resourceRefResponseSchema = createSuccessResponseSchema(resourceRefSchema);
+
 export type ResourceRef = zInfer<typeof resourceRefSchema>;
+export type ResourceRefResponse = zInfer<typeof resourceRefResponseSchema>;

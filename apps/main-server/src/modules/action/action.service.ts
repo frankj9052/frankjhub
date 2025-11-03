@@ -33,6 +33,7 @@ export class ActionService {
     sortOrder,
     isActive,
     deletedAt,
+    createdAt,
   }: Action): ActionSummary {
     return {
       id,
@@ -42,6 +43,7 @@ export class ActionService {
       sortOrder,
       isActive,
       deletedAt: deletedAt?.toISOString(),
+      createdAt: createdAt?.toISOString(),
     };
   }
 
@@ -94,12 +96,16 @@ export class ActionService {
     return result;
   }
 
-  async updateAction(update: ActionUpdateRequest, updatedBy: string): Promise<SimpleResponse> {
-    const log = logger.child({ method: 'updateAction', id: update.id, updatedBy });
+  async updateAction(
+    id: string,
+    update: ActionUpdateRequest,
+    updatedBy: string
+  ): Promise<SimpleResponse> {
+    const log = logger.child({ method: 'updateAction', id, updatedBy });
     // transaction management
     const result = await AppDataSource.transaction(async manager => {
       // 更新字段
-      const result = await this.actionRepo.update(update, {
+      const result = await this.actionRepo.update(id, update, {
         updatedBy,
         withDeleted: true,
         manager,

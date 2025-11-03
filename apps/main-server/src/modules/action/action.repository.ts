@@ -135,10 +135,10 @@ export class ActionRepository {
   }
 
   async update(
+    id: string,
     update: ActionUpdateRequest,
     options?: { updatedBy?: string; withDeleted?: boolean; manager?: EntityManager }
   ) {
-    const { id, ...rest } = update;
     let changed = false;
     let nameChanged = false;
 
@@ -158,10 +158,27 @@ export class ActionRepository {
       );
     }
 
-    nameChanged = update.name !== action.name;
+    // 检查 name 是否变化
+    if (update.name && update.name !== action.name) {
+      nameChanged = true;
 
-    // 更新字段
-    Object.entries(rest).forEach(([key, value]) => {
+      // 初始化 aliases 数组
+      if (!Array.isArray(action.aliases)) {
+        action.aliases = [];
+      }
+
+      // 把旧名字加入 aliases，去重
+      if (!action.aliases.includes(action.name)) {
+        action.aliases.push(action.name);
+      }
+
+      action.name = update.name;
+      changed = true;
+    }
+
+    // 更新其它字段（不包含 name）
+    Object.entries(update).forEach(([key, value]) => {
+      if (key === 'name') return; // name 已处理
       if (value !== undefined && (action as any)[key] !== value) {
         (action as any)[key] = value;
         changed = true;

@@ -1,0 +1,208 @@
+import { Brackets, DataSource, EntityManager, FindOneOptions } from 'typeorm';
+import { Resource } from './entities/Resource';
+import { Service } from '../service-auth/entities/Service';
+import {
+  ResourceCreateRequest,
+  ResourceListRequest,
+  ResourceUpdateRequest,
+} from '@frankjhub/shared-schema';
+import { paginateWithOffset } from '../common/utils/paginateWithOffset';
+import { applyFilters } from '../common/utils/applyFilters';
+import { col } from '@frankjhub/shared-typeorm-utils';
+import { BadRequestError, ForbiddenError, NotFoundError } from '@frankjhub/shared-errors';
+import { buildResourceKey } from '@frankjhub/shared-perm';
+
+export class ResourceRepository {
+  constructor(private dataSource: DataSource) {}
+
+  private repo(manager?: EntityManager) {
+    return (manager ?? this.dataSource.manager).getRepository(Resource);
+  }
+
+  async create(
+    service: Service,
+    resource: ResourceCreateRequest,
+    options?: { createdBy?: string; manager?: EntityManager }
+  ) {
+    const manager = options?.manager;
+    const key = buildResourceKey({
+      namespace: service.serviceId,
+      entity: resource.entity,
+      qualifier: resource.qualifier ?? undefined,
+    });
+
+    const exists = await this.existsByKey(key, { manager, withDeleted: true });
+    if (exists) {
+      throw new BadRequestError(`Resource "${key}" already exists`);
+    }
+
+    const repo = this.repo(manager);
+    const entity = Resource.createSafe({
+      service,
+      entity: resource.entity,
+      qualifier: resource.qualifier,
+      fieldsMode: resource.fieldsMode,
+      fields: resource.fields,
+      isActive: resource.isActive,
+      metadata: resource.metadata,
+    });
+
+    if (options?.createdBy) {
+      entity.createdBy = options.createdBy;
+      entity.updatedBy = options.createdBy;
+    }
+
+    return repo.save(entity);
+  }
+
+  async getById(
+    id: string,
+    options?: { withDeleted?: boolean; manager?: EntityManager }
+  ): Promise<Resource | null> {
+    const repo = this.repo(options?.manager);
+    const findOptions: FindOneOptions<Resource> = {
+      where: { id },
+      withDeleted: !!options?.withDeleted,
+    };
+    if (options?.manager) {
+      findOptions.lock = { mode: 'pessimistic_write' };
+    }
+    return repo.findOne(findOptions);
+  }
+
+  async existsByKey(
+    resourceKey: string,
+    options?: { withDeleted?: boolean; manager?: EntityManager }
+  ) {
+    const repo = this.repo(options?.manager);
+    return repo.exists({
+      where: { resource_key: resourceKey },
+      withDeleted: !!options?.withDeleted,
+    });
+  }
+
+  async existsById(id: string, options?: { withDeleted?: boolean; manager?: EntityManager }) {
+    const repo = this.repo(options?.manager);
+    return repo.exists({ where: { id }, withDeleted: !!options?.withDeleted });
+  }
+
+  async getPaginatedList(
+    data: ResourceListRequest,
+    options?: { withDeleted?: boolean; manager?: EntityManager }
+  ) {
+    const { search, filters } = data;
+    const withDeleted = !!options?.withDeleted;
+
+    return paginateWithOffset({
+      repo: this.repo(options?.manager),
+      pagination: data,
+      modifyQueryBuilder: qb => {
+        if (withDeleted) {
+          qb.withDeleted();
+        } else {
+          qb.andWhere(`${col<Resource>('deletedAt')} IS NULL`);
+        }
+
+        if (search) {
+          qb.andWhere(
+            new Brackets(qb1 => {
+              qb1
+                .where(`${col<Resource>('namespace')} ILIKE :search`)
+                .orWhere(`${col<Resource>('entity')} ILIKE :search`)
+                .orWhere(`${col<Resource>('qualifier')} ILIKE :search`);
+            })
+          ).setParameter('search', search);
+        }
+
+        applyFilters(qb, filters, {
+          byKey: {
+            status: {
+              active: new Brackets(qb1 => {
+                qb1
+                  .where(`${col<Resource>('isActive')} = true`)
+                  .andWhere(`${col<Resource>('deletedAt')} IS NULL`);
+              }),
+              inactive: new Brackets(qb1 => {
+                qb1
+                  .where(`${col<Resource>('isActive')} = false`)
+                  .andWhere(`${col<Resource>('deletedAt')} IS NULL`);
+              }),
+              deleted: new Brackets(qb1 => {
+                qb1.where(`${col<Resource>('deletedAt')} IS NOT NULL`);
+              }),
+            },
+          },
+        });
+
+        return qb;
+      },
+    });
+  }
+
+  async update(
+    id: string,
+    update: ResourceUpdateRequest,
+    options?: { updatedBy?: string; withDeleted?: boolean; manager?: EntityManager }
+  ) {
+    let changed = false;
+
+    const resource = await this.getById(id, {
+      withDeleted: options?.withDeleted,
+      manager: options?.manager,
+    });
+    if (!resource) throw new NotFoundError(`Resource ${id} not found`);
+
+    // 这里涉及到source_key权限的都不允许改
+    Object.entries(update).forEach(([key, value]) => {
+      if (key === 'name') return; // name 已处理
+      if (value !== undefined && (resource as any)[key] !== value) {
+        (resource as any)[key] = value;
+        changed = true;
+      }
+    });
+
+    if (!changed) return resource;
+
+    resource.updatedAt = new Date();
+    if (options?.updatedBy) resource.updatedBy = options.updatedBy;
+
+    return this.repo(options?.manager).save(resource);
+  }
+
+  async softDelete(id: string, options?: { deletedBy?: string; manager?: EntityManager }) {
+    const resource = await this.getById(id, { withDeleted: true, manager: options?.manager });
+    if (!resource) throw new NotFoundError(`Resource ${id} not found`);
+    if (resource.deletedAt) throw new ForbiddenError(`Resource ${id} has been deleted`);
+
+    resource.deletedAt = new Date();
+    resource.deletedBy = options?.deletedBy ?? resource.deletedBy;
+
+    return this.repo(options?.manager).save(resource);
+  }
+
+  async restore(id: string, options?: { restoredBy?: string; manager?: EntityManager }) {
+    const resource = await this.getById(id, { withDeleted: true, manager: options?.manager });
+    if (!resource) throw new NotFoundError(`Resource ${id} not found`);
+    if (!resource.deletedAt) throw new ForbiddenError(`Resource ${id} has not been deleted`);
+
+    resource.deletedAt = null;
+    resource.deletedBy = null;
+    resource.updatedBy = options?.restoredBy ?? resource.updatedBy;
+
+    return this.repo(options?.manager).save(resource);
+  }
+
+  async hardDelete(id: string, options?: { deletedBy?: string; manager?: EntityManager }) {
+    const resource = await this.getById(id, { withDeleted: true, manager: options?.manager });
+    if (!resource) throw new NotFoundError(`Resource ${id} not found`);
+    return this.repo(options?.manager).remove(resource);
+  }
+
+  async getOptionList(options?: { manager?: EntityManager }) {
+    return this.repo(options?.manager).find({
+      where: { isActive: true },
+      select: ['id', 'resource_key'],
+      order: { namespace: 'ASC', entity: 'ASC' },
+    });
+  }
+}

@@ -1,11 +1,10 @@
-import { z } from '../../../libs/z';
+import { z, zInfer } from '../../../libs/z';
 
-export const RESOURCE_FILTER = {
+export const RESOURCE_STATUS_FILTER = {
   ACTIVE: 'active',
   INACTIVE: 'inactive',
   DELETED: 'deleted',
 } as const;
 
-export type ResourceFilter = (typeof RESOURCE_FILTER)[keyof typeof RESOURCE_FILTER];
-export const resourceFilterSchema = z.nativeEnum(RESOURCE_FILTER);
-export const resourceFilterListSchema = z.array(resourceFilterSchema);
+export const resourceStatusFilterSchema = z.nativeEnum(RESOURCE_STATUS_FILTER);
+export type ResourceStatusFilter = zInfer<typeof resourceStatusFilterSchema>;

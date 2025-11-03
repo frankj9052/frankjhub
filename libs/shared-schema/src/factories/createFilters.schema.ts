@@ -1,4 +1,4 @@
-import { ZodEnum, ZodType } from 'zod';
+import { ZodType } from 'zod';
 import { toZodEnum } from './enumUtils';
 import { z } from '../libs/z';
 
@@ -63,74 +63,115 @@ export function buildFilterIndexes(filterDefs?: FilterDefsInput) {
   return { defs, keys, valueToKey, byKeyValues };
 }
 
+/** ------------ 重载部分 START ------------ */
+// 1) 没传 defs：返回 undefined
+export function createFiltersSchema(): undefined;
+
+// 2) 传的是单维：Record<string, string>
+export function createFiltersSchema<D extends Record<string, string>>(
+  filterDefs: D
+): ZodType<{
+  any?: { key: keyof D; values: (keyof D)[] }[];
+  all?: { key: keyof D; values: (keyof D)[] }[];
+}>;
+
+// 3) 传的是多维：Record<string, Record<string, string>>
+export function createFiltersSchema<const D extends Record<string, Record<string, string>>>(
+  filterDefs: D
+): ZodType<{
+  any?: {
+    [K in keyof D]: {
+      key: K;
+      values: (keyof D[K])[];
+    };
+  }[keyof D][];
+  all?: {
+    [K in keyof D]: {
+      key: K;
+      values: (keyof D[K])[];
+    };
+  }[keyof D][];
+}>;
+/** ------------ 重载部分 END ------------ */
+
 /** 使用同一套索引，生成 filters 的 Zod schema（扁平 OR / 结构化 any+all） */
-export function createFiltersSchema<D extends FilterDefsInput | undefined = undefined>(
-  filterDefs?: D
-): D extends undefined
-  ? undefined
-  :
-      | ZodType<
-          D extends Record<string, Record<string, string>>
-            ? {
-                any?: { key: keyof D; values: (keyof D[keyof D])[] }[];
-                all?: { key: keyof D; values: (keyof D[keyof D])[] }[];
-              }
-            : D extends Record<string, string>
-            ? {
-                any?: { key: keyof D; values: (keyof D)[] }[];
-                all?: { key: keyof D; values: (keyof D)[] }[];
-              }
-            : {
-                any?: { key: string; values: string[] }[];
-                all?: { key: string; values: string[] }[];
-              }
-        >
-      | undefined {
-  if (!filterDefs) return undefined as any;
 
-  const defs: Record<string, Record<string, string>> = Object.values(filterDefs).every(
-    v => typeof v === 'string'
-  )
-    ? { default: filterDefs as Record<string, string> }
-    : (filterDefs as Record<string, Record<string, string>>);
+export function createFiltersSchema(filterDefs?: FilterDefsInput): ZodType<any> | undefined {
+  if (!filterDefs) return undefined;
 
-  const keys = Object.keys(defs);
-  const byKeyEnum: Record<string, ZodEnum<[string, ...string[]]>> = {};
-  const enumList: ZodEnum<[string, ...string[]]>[] = [];
+  const isSingleDim = Object.values(filterDefs).every(v => typeof v === 'string');
 
-  for (const key of keys) {
-    const zEnum = toZodEnum(defs[key]);
-    byKeyEnum[key] = zEnum;
-    enumList.push(zEnum);
+  // ---------- 单维 ----------
+  if (isSingleDim) {
+    const defs = filterDefs as Record<string, string>;
+    const zEnum = toZodEnum(defs);
+
+    const flatOR = z.array(zEnum);
+    const structured = z.object({
+      any: z
+        .array(
+          z.object({
+            key: z.literal('default'),
+            values: z.array(zEnum).min(1),
+          })
+        )
+        .min(1)
+        .optional(),
+      all: z
+        .array(
+          z.object({
+            key: z.literal('default'),
+            values: z.array(zEnum).min(1),
+          })
+        )
+        .min(1)
+        .optional(),
+    });
+
+    return z.union([flatOR, structured]).optional();
   }
 
-  const flatOR = enumList.length === 1 ? z.array(enumList[0]) : z.array(z.union(enumList as any));
+  // ---------- 多维 ----------
+  // 这里我们确定它就是多维了，所以直接用刚才重载 2 的结构
+  const defs = filterDefs as Record<string, Record<string, string>>;
+  const keys = Object.keys(defs) as (keyof typeof defs)[];
 
-  const perKeyClauseSchemas = keys.map(key =>
-    z.object({
+  // 每一维的子 schema
+  const perKeySchemas = keys.map(key => {
+    const valueMap = defs[key]; // e.g. { ACTIVE: 'active', ... }
+    // ⭐⭐ 注意：这里用的是“内层 key”做枚举，也就是 'ACTIVE' | 'INACTIVE' ...
+    const zEnum = toZodEnum(valueMap);
+
+    return z.object({
       key: z.literal(key),
-      values: z.array(byKeyEnum[key]).min(1),
-    })
-  );
+      values: z.array(zEnum).min(1),
+    });
+  });
 
   const structured =
-    perKeyClauseSchemas.length === 1
+    perKeySchemas.length === 1
       ? z.object({
-          any: z.array(perKeyClauseSchemas[0]).min(1).optional(),
-          all: z.array(perKeyClauseSchemas[0]).min(1).optional(),
+          any: z.array(perKeySchemas[0]).min(1).optional(),
+          all: z.array(perKeySchemas[0]).min(1).optional(),
         })
       : z.object({
           any: z
-            .array(z.union(perKeyClauseSchemas as any))
+            .array(z.union(perKeySchemas as any))
             .min(1)
             .optional(),
           all: z
-            .array(z.union(perKeyClauseSchemas as any))
+            .array(z.union(perKeySchemas as any))
             .min(1)
             .optional(),
         });
 
-  return z.union([flatOR, structured]).optional() as any;
+  // 扁平（可选，如果你不想要可以去掉）
+  const flatOR =
+    perKeySchemas.length === 1
+      ? z.array(toZodEnum(defs[keys[0]]))
+      : z.array(z.union(keys.map(key => toZodEnum(defs[key])) as any));
+
+  return z.union([flatOR, structured]).optional();
 }
 
 /** 把输入整形为结构化（与 schema 约束一致），并返回可变副本 */
@@ -194,15 +235,35 @@ export function ensureStructuredFiltersFromDefs(
 
 /** 与 schema 绑定的工具包：创建、整形、校验一站式 */
 export function makeFiltersToolkit(filterDefs?: FilterDefsInput) {
-  const schema = createFiltersSchema(filterDefs);
+  // 分支 1：没传 defs
+  if (!filterDefs) {
+    const schema = createFiltersSchema(); // ✅ 命中无参重载，返回 undefined
+    return {
+      schema,
+      ensureStructured: (input: FiltersInput, policy?: UnknownValuePolicy) =>
+        ensureStructuredFiltersFromDefs(input, undefined, policy ?? { onUnknown: 'error' }),
+      parse: (input: unknown) => input, // 没 schema，直接回传
+    };
+  }
 
+  // 分支 2：传的是“单维”
+  if (Object.values(filterDefs).every(v => typeof v === 'string')) {
+    const schema = createFiltersSchema(filterDefs as Record<string, string>);
+    return {
+      schema,
+      ensureStructured: (input: FiltersInput, policy?: UnknownValuePolicy) =>
+        ensureStructuredFiltersFromDefs(input, filterDefs, policy ?? { onUnknown: 'error' }),
+      parse: (input: unknown) => schema.parse(input),
+    };
+  }
+
+  // 分支 3：传的是“多维”
+  const schema = createFiltersSchema(filterDefs as Record<string, Record<string, string>>);
   return {
     schema,
-    /** 扁平/结构化输入 -> 结构化（可变副本） */
     ensureStructured: (input: FiltersInput, policy?: UnknownValuePolicy) =>
       ensureStructuredFiltersFromDefs(input, filterDefs, policy ?? { onUnknown: 'error' }),
-    /** 可选：严格校验（若未提供 defs，schema 为 undefined） */
-    parse: (input: unknown) => (schema ? schema.parse(input) : input),
+    parse: (input: unknown) => schema.parse(input),
   };
 }
 

@@ -1,14 +1,17 @@
 import {
+  createFiltersSchema,
   createOffsetPaginatedResponseSchema,
   createSuccessResponseSchema,
 } from '../../../factories';
-import { resourceFilterListSchema } from '../constants';
 import { zInfer } from '../../../libs/z';
-import { resourceDetailSchema } from './detail.response.schema';
+import { RESOURCE_STATUS_FILTER } from '../constants';
+import { resourceSummarySchema } from './summary.response.schema';
 
 export const resourceListPageDataSchema = createOffsetPaginatedResponseSchema(
-  resourceDetailSchema,
-  resourceFilterListSchema
+  resourceSummarySchema,
+  createFiltersSchema({
+    status: RESOURCE_STATUS_FILTER,
+  })
 );
 
 export const resourceListResponseSchema = createSuccessResponseSchema(resourceListPageDataSchema);

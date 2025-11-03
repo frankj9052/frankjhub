@@ -1,6 +1,5 @@
-import { z } from 'zod';
 import { createSuccessResponseSchema } from '../../../factories';
-import { zInfer } from '../../../libs/z';
+import { z, zInfer } from '../../../libs/z';
 import { resourceRefSchema } from './ref.response.schema';
 
 export const resourceOptionSchema = resourceRefSchema;
