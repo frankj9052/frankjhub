@@ -1,8 +1,6 @@
 import { createFiltersSchema } from '../../../factories/createFilters.schema';
 
 export const SCOPE_STATUS_FILTER = {
-  ACTIVE: 'active',
-  INACTIVE: 'inactive',
   DELETED: 'deleted',
 } as const;
 
