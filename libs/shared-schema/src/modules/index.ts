@@ -17,3 +17,4 @@ export * from './service';
 export * from './api-gateway';
 export * from './env';
 export * from './service-route';
+export * from './scope';

@@ -18,7 +18,7 @@ export const serviceListRequestData: ServiceListRequest = {
   },
 };
 
-export const ServiceListResponseData: ServiceListResponse = {
+export const serviceListResponseData: ServiceListResponse = {
   status: 'success',
   message: 'Fetched service list successfully.',
   data: {

@@ -13,4 +13,4 @@ export const serviceRouteFiltersSchema = createFiltersSchema({
   status: SERVICE_ROUTE_STATUS_FILTER,
 });
 
-export const dynamicFilterKeys = ['serviceId'] as const;
+export const serviceRouteDynamicFilterKeys = ['serviceId'] as const;
