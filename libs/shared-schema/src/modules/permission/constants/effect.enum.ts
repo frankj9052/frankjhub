@@ -5,5 +5,7 @@ export const PERMISSION_EFFECT = {
   DENY: 'deny',
 } as const;
 
-export const permissionEffectSchema = z.nativeEnum(PERMISSION_EFFECT);
+export const permissionEffectSchema = z
+  .nativeEnum(PERMISSION_EFFECT)
+  .default(PERMISSION_EFFECT.ALLOW);
 export type PermissionEffect = zInfer<typeof permissionEffectSchema>;

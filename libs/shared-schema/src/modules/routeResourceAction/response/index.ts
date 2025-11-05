@@ -1,4 +1,4 @@
-export * from './detail.reponse.schema';
+export * from './detail.response.schema';
 export * from './list.response.schema';
 export * from './option-list.response.schema';
 export * from './ref.response.schema';

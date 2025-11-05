@@ -1,15 +1,23 @@
-import { z, zInfer } from '../../../libs/z';
-import { permissionSchema } from '../entity';
+import { zInfer } from '../../../libs/z';
+import { permissionSchema } from '../entity/permission.schema';
 
 export const permissionCreateRequestSchema = permissionSchema
   .pick({
     description: true,
     fields: true,
     condition: true,
+    effect: true,
+    isActive: true,
   })
-  .extend({
-    resourceId: z.string().uuid(),
-    actionIds: z.array(z.string().uuid()).min(1, 'At least one action must be selected'),
-  });
+  .partial()
+  .extend(
+    permissionSchema
+      .pick({
+        resourceId: true,
+        actionId: true,
+      })
+      .required().shape
+  )
+  .strict();
 
 export type PermissionCreateRequest = zInfer<typeof permissionCreateRequestSchema>;

@@ -3,12 +3,12 @@ import {
   createOffsetPaginatedResponseSchema,
   createSuccessResponseSchema,
 } from '../../../factories';
-import { permissionFilterListSchema } from '../constants/filter.enum';
-import { permissionSchema } from '../entity/schema';
+import { permissionFiltersSchema } from '../constants';
+import { permissionSummarySchema } from './summary.response.schema';
 
 export const permissionListPageDataSchema = createOffsetPaginatedResponseSchema(
-  permissionSchema,
-  permissionFilterListSchema
+  permissionSummarySchema,
+  permissionFiltersSchema
 );
 
 export const permissionListResponseSchema = createSuccessResponseSchema(
