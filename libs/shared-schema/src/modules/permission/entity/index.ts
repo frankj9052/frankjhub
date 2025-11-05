@@ -1,1 +1,2 @@
-export * from './schema';
+export * from './fields';
+export * from './permission.schema';

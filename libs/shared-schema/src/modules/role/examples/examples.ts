@@ -3,8 +3,8 @@ import { RoleListPageData, RoleListResponse } from '../response/list.response.sc
 import { RoleSingleResponse } from '../response/single.response.schema';
 import { RoleOptionListResponse } from '../response/option-list.response.schema';
 import { RoleSource } from '../../../enums';
-import { permissionRefDataExample } from '../../../modules/permission/examples/examples';
 import { organizationRefDataExample } from '../../../modules/organization/examples/examples';
+import { permissionRefData } from '../../../modules/permission';
 
 export const roleDataExample: RoleDto = {
   id: '6b7f4e8d-1234-4cde-9abc-9876543210ff',
@@ -21,7 +21,7 @@ export const roleDataExample: RoleDto = {
   deletedBy: null,
   organization: organizationRefDataExample,
   organizationType: undefined,
-  permissions: [permissionRefDataExample],
+  permissions: [permissionRefData],
 };
 
 export const roleRefDataExample: RoleRef = {

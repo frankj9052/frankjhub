@@ -1,6 +1,6 @@
 import { createSuccessResponseSchema } from '../../../factories';
 import { z, zInfer } from '../../../libs/z';
-import { permissionSchema } from '../entity/schema';
+import { permissionSchema } from '../entity/permission.schema';
 
 export const permissionOptionSchema = permissionSchema.pick({
   id: true,
