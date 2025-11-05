@@ -1,12 +1,12 @@
 import {
   ResourceCreateRequest,
   ResourceDetail,
+  ResourceDetailResponse,
   ResourceDto,
   ResourceListRequest,
   ResourceListResponse,
   ResourceOptionListResponse,
   ResourceRef,
-  ResourceSingleResponse,
   ResourceSummary,
   ResourceUpdateRequest,
   SimpleResponse,
@@ -20,15 +20,15 @@ import { NotFoundError } from '../common/errors/NotFoundError';
 import { Permission } from '../permission/entities/Permission';
 import { updateEntityFields } from '@frankjhub/shared-utils';
 import { applyFilters } from '../common/utils/applyFilters';
-import { ResourceRepository } from './resource.repo';
+import { ResourceRepository } from './resource.repository';
 
 const logger = createLoggerWithContext('ActionService');
 
-const filterConditionMap: Record<string, string> = {
-  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
-  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
-  deleted: `(t."deleted_at" IS NOT NULL)`,
-};
+// const filterConditionMap: Record<string, string> = {
+//   active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
+//   inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
+//   deleted: `(t."deleted_at" IS NOT NULL)`,
+// };
 
 export class ResourceService {
   private resourceRepo = new ResourceRepository(AppDataSource);
@@ -69,171 +69,111 @@ export class ResourceService {
       createdAt: resource.createdAt.toISOString(),
       updatedAt: resource.updatedAt.toISOString(),
       deletedAt: resource.deletedAt?.toISOString(),
+      service: {
+        createdAt: resource.service.createdAt.toISOString(),
+        id: resource.service.id,
+        name: resource.service.name,
+        isActive: !!resource.service.isActive,
+        serviceId: resource.service.serviceId,
+        baseUrl: resource.service.baseUrl,
+        ownerTeam: resource.service.ownerTeam,
+        lastRotatedAt: resource.service.lastRotatedAt?.toISOString() ?? null,
+        updatedAt: resource.service.updatedAt.toISOString(),
+        deletedAt: resource.service.deletedAt?.toISOString(),
+      },
     };
   }
 
-  async createResource(data: ResourceCreateRequest, createdBy: string): Promise<SimpleResponse> {
-    const { name, description } = data;
-    const log = logger.child({ method: 'createResource', name });
+  // 这里不再创建resource, 通过创建service快照和routes自动生成
+  // async createResource(data: ResourceCreateRequest, createdBy: string): Promise<SimpleResponse> {
+  //   const { name, description } = data;
+  //   const log = logger.child({ method: 'createResource', name });
 
-    const existing = await this.resourceRepo.findOne({ where: { name } });
-    if (existing) {
-      throw new BadRequestError(`Resource "${name}" already exists`);
-    }
+  //   const existing = await this.resourceRepo.findOne({ where: { name } });
+  //   if (existing) {
+  //     throw new BadRequestError(`Resource "${name}" already exists`);
+  //   }
 
-    const newResource = this.resourceRepo.create({
-      name,
-      description: description ?? undefined,
-      createdBy,
-    });
-    const savedResource = await this.resourceRepo.save(newResource);
+  //   const newResource = this.resourceRepo.create({
+  //     name,
+  //     description: description ?? undefined,
+  //     createdBy,
+  //   });
+  //   const savedResource = await this.resourceRepo.save(newResource);
 
-    log.info(`Created resource "${name}" by "${createdBy}"`);
-    const result: ResourceSingleResponse = {
-      status: 'success',
-      message: `Created resource "${name}" by "${createdBy}"`,
-      data: this.buildResource(savedResource),
-    };
-    return result;
-  }
+  //   log.info(`Created resource "${name}" by "${createdBy}"`);
+  //   const result: ResourceSingleResponse = {
+  //     status: 'success',
+  //     message: `Created resource "${name}" by "${createdBy}"`,
+  //     data: this.buildResource(savedResource),
+  //   };
+  //   return result;
+  // }
 
   async getResourceList(pagination: ResourceListRequest): Promise<ResourceListResponse> {
-    const result = await paginateWithOffset({
-      repo: this.resourceRepo,
-      pagination,
-      modifyQueryBuilder: qb => {
-        const { search, filters } = pagination;
-        if (search) {
-          qb.where('t.name ILIKE :search OR t.description ILIKE :search', {
-            search: `%${search.trim()}%`,
-          });
-        }
-        applyFilters(qb, filters, {
-          byKey: {
-            status: filterConditionMap,
-          },
-        });
-        return qb.withDeleted();
-      },
-    });
+    const result = await this.resourceRepo.getPaginatedList(pagination, { withDeleted: true });
 
     const response: ResourceListResponse = {
       status: 'success',
       message: 'Get resource list successful',
       data: {
         ...result,
-        data: result.data.map(action => this.buildResource(action)),
+        data: result.data.map(resource => this.buildResourceSummary(resource)),
       },
     };
     return response;
   }
 
-  async getResourceById(id: string): Promise<ResourceSingleResponse> {
-    const resource = await this.resourceRepo.findOne({
-      where: { id },
+  async getResourceById(id: string): Promise<ResourceDetailResponse> {
+    const resource = await this.resourceRepo.getById(id, {
       withDeleted: true,
+      withRelations: ['service'],
     });
     if (!resource) {
       throw new NotFoundError(`Resource ${id} not found`);
     }
 
-    const result: ResourceSingleResponse = {
+    return {
       status: 'success',
       message: 'Get resource success',
-      data: this.buildResource(resource),
+      data: this.buildResourceDetail(resource),
     };
-    return result;
   }
 
   async updateResource(
+    id: string,
     update: ResourceUpdateRequest,
-    performedBy: string
-  ): Promise<ResourceSingleResponse> {
-    const log = logger.child({ method: 'updateResource', id: update.id, performedBy });
-    const { id } = update;
-
-    const allowedFields: (keyof ResourceDto)[] = [
-      'createdAt',
-      'createdBy',
-      'deletedAt',
-      'deletedBy',
-      'description',
-      'isActive',
-      'name',
-      'updatedAt',
-      'updatedBy',
-    ];
+    updatedBy: string
+  ): Promise<SimpleResponse> {
+    const log = logger.child({ method: 'updateResource', id, updatedBy });
 
     // 事务处理 Transaction Management
-    await AppDataSource.transaction(async manager => {
-      const resourceRepo = manager.getRepository(Resource);
-      const permissionRepo = manager.getRepository(Permission);
+    const result = await AppDataSource.transaction(async manager => {
+      const result = await this.resourceRepo.update(id, update, {
+        updatedBy,
+        withDeleted: true,
+        manager,
+      });
 
-      const resource = await resourceRepo.findOne({ where: { id }, withDeleted: true });
-      if (!resource) {
-        throw new NotFoundError(`Resource ${id} not found`);
-      }
+      // 如果有同步需要更新的内容放这里
 
-      // 判断name是否被更改
-      const nameChanged = update.name !== resource.name;
-
-      // 更新字段
-      updateEntityFields(resource, update, allowedFields);
-      resource.updatedBy = performedBy;
-      resource.updatedAt = new Date();
-
-      const savedResource = await resourceRepo.save(resource);
-
-      // 同步更新权限名称
-      if (nameChanged) {
-        const permissions = await permissionRepo.find({
-          where: { resource: { id } },
-          relations: {
-            resource: true,
-            permissionActions: { action: true },
-          },
-          withDeleted: true,
-        });
-
-        await Promise.all(
-          permissions.map(async permission => {
-            permission.setName();
-            await permissionRepo.save(permission);
-          })
-        );
-      }
-
-      log.info(`Resource ${savedResource.name} updated By ${performedBy}`);
+      log.info(`Resource ${result.namespace} updated By ${updatedBy}`);
+      return result;
     });
-
-    const updated = await this.resourceRepo.findOneOrFail({ where: { id }, withDeleted: true });
-    const result: ResourceSingleResponse = {
+    return {
       status: 'success',
-      message: `Resource ${updated.name} updated By ${performedBy}`,
-      data: this.buildResource(updated),
+      message: `Resource ${result.namespace} updated By ${updatedBy}`,
     };
-    return result;
   }
 
-  async softDeleteResource(id: string, performedBy: string): Promise<ResourceSingleResponse> {
-    const log = logger.child({ method: 'softDeleteResource', id, performedBy });
-    const resource = await this.resourceRepo.findOne({ where: { id } });
-    if (!resource) {
-      throw new NotFoundError(`Resource ${id} not found`);
-    }
-
-    resource.deletedAt = new Date();
-    resource.deletedBy = performedBy;
-
-    const savedResource = await this.resourceRepo.save(resource);
-
-    log.info(`Resource ${resource.name} deleted by ${performedBy}`);
-    const result: ResourceSingleResponse = {
+  async softDeleteResource(id: string, deletedBy: string): Promise<SimpleResponse> {
+    const log = logger.child({ method: 'softDeleteResource', id, deletedBy });
+    await this.resourceRepo.softDelete(id, { deletedBy });
+    log.info(`Resource ${id} deleted by ${deletedBy}`);
+    return {
       status: 'success',
-      message: `Resource ${resource.name} deleted by ${performedBy}`,
-      data: this.buildResource(savedResource),
+      message: `Resource ${id} deleted by ${deletedBy}`,
     };
-    return result;
   }
 
   async restoreResource(id: string, performedBy: string): Promise<ResourceSingleResponse> {

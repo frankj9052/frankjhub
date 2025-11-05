@@ -27,7 +27,7 @@ export class ActionRepository {
     const manager = options?.manager;
     const exist = await this.existsByName(action.name, { withDeleted: true, manager });
     if (exist) {
-      throw new BadRequestError(`Action "${name}" already exists`);
+      throw new BadRequestError(`Action "${action.name}" already exists`);
     }
     const repo = this.repo(manager);
     const entity = repo.create(action);

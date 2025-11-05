@@ -129,10 +129,10 @@ export class ActionService {
   }
 
   async softDeleteAction(id: string, deletedBy: string): Promise<SimpleResponse> {
-    const result = await this.actionRepo.softDelete(id, { deletedBy });
+    await this.actionRepo.softDelete(id, { deletedBy });
     return {
       status: 'success',
-      message: `Action ${result.name} deleted by ${deletedBy}`,
+      message: `Action ${id} deleted by ${deletedBy}`,
     };
   }
 
