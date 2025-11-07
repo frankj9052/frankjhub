@@ -12,7 +12,7 @@ function isStructuredFilters(f: unknown): f is StructuredFilters {
 
 type SqlPart = string | Brackets;
 
-type FilterDefs = Record<string, Record<string, SqlPart>>;
+type FilterDefs = Record<string, Record<string, SqlPart> | ((value: any) => SqlPart)>;
 
 /** 传入配置：维度 → 值 → SQL 条件片段；以及统一的 query 参数 */
 export type FilterConfig = {
@@ -29,7 +29,7 @@ export type FilterConfig = {
  */
 export function applyFilters<T extends ObjectLiteral>(
   qb: SelectQueryBuilder<T>,
-  filters: unknown,
+  filters: Record<string, any> | undefined,
   cfg: FilterConfig
 ) {
   if (!filters) return qb;
@@ -61,10 +61,21 @@ export function applyFilters<T extends ObjectLiteral>(
   // 3) 结构化：{ any:[{key,values}], all:[{key,values}] }
   if (isStructuredFilters(filters)) {
     // 将某一维度 clause 转成 “该维度内部的 OR 组合”
-    const clauseToBrackets = (clause: { key: string; values: string[] }): Brackets | null => {
-      const condMap = cfg.byKey[clause.key] || {};
+    const clauseToBrackets = (clause: { key: string; values: string[] }): SqlPart | null => {
+      const handler = cfg.byKey[clause.key];
+      if (!handler) return null;
+
+      // ✅ 支持函数式动态过滤
+      if (typeof handler === 'function') {
+        const part = handler(clause.values);
+        return typeof part === 'string' ? new Brackets(qb => qb.where(part)) : part;
+      }
+
+      // ✅ 保留原本静态映射逻辑
+      const condMap = handler || {};
       const subs = clause.values.map(v => condMap[v]).filter(Boolean) as SqlPart[];
       if (!subs.length) return null;
+
       return new Brackets(bb => {
         for (const p of subs) {
           bb.orWhere(p as any);

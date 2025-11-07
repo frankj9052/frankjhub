@@ -1,5 +1,6 @@
 import {
   HttpMethod,
+  ResourceCreateRequest,
   ServiceCreateRequest,
   ServiceDetail,
   ServiceJwtPayload,
@@ -20,13 +21,13 @@ import * as argon2 from 'argon2';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { ServiceTokenService } from './serviceToken.service';
 import { createLoggerWithContext } from '../common/libs/logger';
-import { BadRequestError } from '../common/errors/BadRequestError';
 import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { applyFilters } from '../common/utils/applyFilters';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { getSnapshotFromCache } from '../api-gateway/snapshotCache';
 import { redisClient } from '../../infrastructure/redis';
 import { ServiceRepository } from './service.repository';
+import { ResourceRepository } from '../resource/resource.repository';
 
 const logger = createLoggerWithContext('ServiceAuthService');
 const filterConditionMap: Record<string, string> = {
@@ -37,6 +38,7 @@ const filterConditionMap: Record<string, string> = {
 
 export class ServiceAuthService {
   private serviceRepo = new ServiceRepository(AppDataSource);
+  private resourceRepo = new ResourceRepository(AppDataSource);
 
   buildServiceRef({ id, serviceId, name }: Service): ServiceRef {
     return { id, serviceId, name };
@@ -149,15 +151,7 @@ export class ServiceAuthService {
     }
 
     // 冷启动：仅在缓存为空时，现查一次DB并写回缓存
-    // const services = await this.serviceRepo.find({ where: { isActive: true } });
-    const services = await this.serviceRepo.find({ where: { isActive: true } });
-    const snapshot: ServiceSnapshot = services.map(s => ({
-      key: s.serviceId,
-      aud: `${s.audPrefix}${s.serviceId}`, // e.g. api://booking
-      baseUrl: s.baseUrl,
-      requiredScopes: s.requiredScopes,
-      routes: s.routes,
-    }));
+    const snapshot = await this.serviceRepo.getSnapshots();
     return {
       status: 'success',
       message: 'Get service snapshot successful',
@@ -172,49 +166,33 @@ export class ServiceAuthService {
   async createService(data: ServiceCreateRequest, createdBy: string): Promise<SimpleResponse> {
     const log = logger.child({ method: 'createService', serviceId: data.serviceId, createdBy });
 
-    const existing = await this.serviceRepo.exists({ where: { serviceId: data.serviceId } });
-    if (existing) {
-      throw new BadRequestError(`Service "${data.serviceId}" already exists`);
-    }
-
-    const newService = this.serviceRepo.create({
-      ...data,
-      createdBy,
-      updatedBy: createdBy,
+    const newService = await AppDataSource.transaction(async manager => {
+      // 创建service
+      const newService = await this.serviceRepo.create(data, { createdBy, manager });
+      const resourceData: ResourceCreateRequest = {
+        namespace: newService.serviceId,
+        entity: '*',
+        isActive: true,
+        qualifier: '*',
+        fieldsMode: 'all',
+      };
+      // 创建resource
+      await this.resourceRepo.create(resourceData, { createdBy, manager });
+      return newService;
     });
-    const savedService = await this.serviceRepo.save(newService);
-    log.info(`Created service "${savedService.serviceId}" by ${createdBy}`);
+    log.info(`Created service "${newService.serviceId}" by ${createdBy}`);
     return {
       status: 'success',
-      message: `Created service "${savedService.serviceId}"`,
+      message: `Created service "${newService.serviceId}"`,
     };
   }
 
   // get list
   async getServiceList(pagination: ServiceListRequest): Promise<ServiceListResponse> {
-    const result = await paginateWithOffset({
-      repo: this.serviceRepo,
-      pagination,
-      modifyQueryBuilder: qb => {
-        const { search, filters } = pagination;
-        // 搜索条件
-        if (search) {
-          qb.where('t.serviceId ILIKE :search OR t.name ILIKE :search', {
-            search: `%${search.trim()}%`,
-          });
-        }
-        // 状态过滤
-        applyFilters(qb, filters, {
-          byKey: {
-            status: filterConditionMap,
-          },
-        });
-        return qb.withDeleted();
-      },
-    });
+    const result = await this.serviceRepo.getPaginatedList(pagination, { withDeleted: true });
     const pageData = {
       ...result,
-      data: result.data.map(srv => this.buildService(srv)),
+      data: result.data.map(srv => this.buildServiceSummary(srv)),
     };
     const response: ServiceListResponse = {
       status: 'success',
@@ -225,30 +203,18 @@ export class ServiceAuthService {
   }
 
   // update
-  async updateService(update: ServiceUpdateRequest, updatedBy: string): Promise<SimpleResponse> {
+  async updateService(
+    id: string,
+    update: ServiceUpdateRequest,
+    updatedBy: string
+  ): Promise<SimpleResponse> {
     const log = logger.child({ method: 'updateService', id: update.id, updatedBy });
 
-    const { id } = update;
-    const service = await this.serviceRepo.findOne({
-      where: { id },
-      withDeleted: true,
-    });
-    if (!service) {
-      throw new NotFoundError(`Service ${id} not found`);
-    }
-
-    for (const [key, value] of Object.entries(update)) {
-      if (key === 'id') continue;
-      if (value !== undefined) {
-        (service as any)[key] = value;
-      }
-    }
-    service.updatedBy = updatedBy;
-    const savedService = await this.serviceRepo.save(service);
-    log.info(`Updated service "${savedService.serviceId}" by ${updatedBy}`);
+    await this.serviceRepo.update(id, update, { updatedBy, withDeleted: true });
+    log.info(`Updated service "${id}" by ${updatedBy}`);
     return {
       status: 'success',
-      message: `Service: ${savedService.serviceId} updated by ${updatedBy}`,
+      message: `Service: ${id} updated by ${updatedBy}`,
     };
   }
 

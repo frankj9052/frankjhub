@@ -39,7 +39,9 @@ export async function paginateWithOffset<
     offset: number;
     order: 'ASC' | 'DESC';
     orderBy: keyof T | (string & {});
-  } & Record<string, any>
+    search?: string;
+    filters?: Record<string, any> | string[];
+  }
 >({
   repo,
   where,

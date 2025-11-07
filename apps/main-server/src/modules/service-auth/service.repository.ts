@@ -198,24 +198,25 @@ export class ServiceRepository {
     const repo = this.repo(manager);
     const services = await repo.find({
       where: { isActive: true, routes: { isActive: true } },
-      relations: { routes: true },
+      relations: {
+        routes: {
+          scopes: true,
+        },
+      },
     });
     const snapshot: ServiceSnapshot = services.map(s => ({
       key: s.serviceId,
       aud: `${s.audPrefix}${s.serviceId}`,
       baseUrl: s.baseUrl,
       requiredScopes: s.baselineRequiredScopes ?? [],
-      routes: s.routes.map(r => ({
-        id: r.id,
-        serviceId: r.serviceId,
+      routes: s?.routes?.map(r => ({
         path: r.path,
+        authMode: r.authMode,
         routeRuleType: r.routeRuleType,
         methods: r.methods as HttpMethod[],
+        scopeKeys: r.scopes ? r.scopes.flatMap(s => s.scopeKey) : [],
         rewrite: r.rewrite,
-        isActive: r.isActive,
-        createdAt: r.createdAt?.toISOString(),
-        updatedAt: r.updatedAt?.toISOString(),
-        deletedAt: r.deletedAt?.toISOString(),
+        rateLimit: r.rateLimit,
       })),
     }));
     return snapshot;

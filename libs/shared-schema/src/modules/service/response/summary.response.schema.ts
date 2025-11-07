@@ -1,6 +1,6 @@
-import { createSuccessResponseSchema } from '../../../factories';
-import { serviceSchema } from '../entities';
-import { zInfer } from '../../../libs';
+import { createSuccessResponseSchema } from '../../../factories/createSuccessResponse.schema';
+import { serviceSchema } from '../entities/service.schema';
+import { zInfer } from '../../../libs/z';
 
 export const serviceSummarySchema = serviceSchema.pick({
   id: true,
