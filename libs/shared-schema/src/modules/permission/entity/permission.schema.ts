@@ -1,7 +1,7 @@
 import { baseEntitySchema } from '../../../modules/common';
 import { z, zInfer } from '../../../libs/z';
 import { actionNameSchema } from '../../../modules/action';
-import { idSchema } from 'src/modules/common/entity/id.schema';
+import { idSchema } from '../../../modules/common/entity/id.schema';
 import {
   permissionConditionHashSchema,
   permissionConditionSchema,
@@ -11,8 +11,8 @@ import {
   permissionNameSchema,
 } from './fields';
 import { permissionEffectSchema } from '../constants/effect.enum';
-import { isActiveSchema } from 'src/modules/common/entity/isActive.schema';
-import { versionSchema } from 'src/modules/common/entity/version.schema';
+import { isActiveSchema } from '../../../modules/common/entity/isActive.schema';
+import { versionSchema } from '../../../modules/common/entity/version.schema';
 
 export const permissionSchema = z.object({
   ...baseEntitySchema.shape,

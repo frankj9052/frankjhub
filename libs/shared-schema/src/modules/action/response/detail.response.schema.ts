@@ -1,6 +1,6 @@
 import { zInfer } from 'src/libs';
 import { baseActionSchema } from '../entity';
-import { createSuccessResponseSchema } from 'src/factories';
+import { createSuccessResponseSchema } from '../../../factories';
 
 export const actionDetailSchema = baseActionSchema;
 export const actionDetailResponse = createSuccessResponseSchema(actionDetailSchema);

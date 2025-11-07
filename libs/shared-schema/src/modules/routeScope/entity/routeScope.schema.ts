@@ -1,4 +1,4 @@
-import { scopeKeySchema } from 'src/modules/scope/entity/fields/scopeKey.schema';
+import { scopeKeySchema } from '../../../modules/scope/entity/fields/scopeKey.schema';
 import { z, zInfer } from '../../../libs';
 import { baseEntitySchema } from '../../../modules/common';
 import { idSchema } from '../../../modules/common/entity/id.schema';

@@ -1,4 +1,4 @@
-import { createSuccessResponseSchema } from 'src/factories';
+import { createSuccessResponseSchema } from '../../../factories';
 import { serviceRouteSchema } from '../entity';
 import { zInfer } from '../../../libs/z';
 

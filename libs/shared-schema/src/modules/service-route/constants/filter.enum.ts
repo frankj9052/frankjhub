@@ -1,4 +1,4 @@
-import { createFiltersSchema } from 'src/factories';
+import { createFiltersSchema } from '../../../factories';
 
 export const SERVICE_ROUTE_STATUS_FILTER = {
   ACTIVE: 'active',

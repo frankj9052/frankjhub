@@ -1,4 +1,4 @@
-import { idSchema } from 'src/modules/common/entity/id.schema';
+import { idSchema } from '../../../modules/common/entity/id.schema';
 import { z, zInfer } from '../../../libs/z';
 import { baseEntitySchema } from '../../../modules/common';
 import {

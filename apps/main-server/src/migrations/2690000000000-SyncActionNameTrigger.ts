@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class SyncActionNameTrigger269000000000 implements MigrationInterface {
-  name = 'SyncActionNameTrigger269000000000';
+export class SyncActionNameTrigger implements MigrationInterface {
+  name = 'SyncActionNameTrigger2690000000000';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // 1) 触发器函数：当 action.name 变化，批量更新依赖表中的冗余 action_name
@@ -13,10 +13,6 @@ export class SyncActionNameTrigger269000000000 implements MigrationInterface {
       BEGIN
         IF NEW.name IS DISTINCT FROM OLD.name THEN
           -- 按需列出所有含有 action_id / action_name 的表
-          UPDATE route_resource_action
-             SET action_name = NEW.name
-           WHERE action_id = NEW.id;
-
           UPDATE permission
              SET action_name = NEW.name
            WHERE action_id = NEW.id;
@@ -40,9 +36,6 @@ export class SyncActionNameTrigger269000000000 implements MigrationInterface {
     `);
 
     // 3) 性能保障（一般外键会隐含/自带索引，但如果你没建，这里确保有）
-    await queryRunner.query(
-      `CREATE INDEX IF NOT EXISTS ix_rra_action_id ON route_resource_action (action_id);`
-    );
     await queryRunner.query(
       `CREATE INDEX IF NOT EXISTS ix_permission_action_id ON permission (action_id);`
     );

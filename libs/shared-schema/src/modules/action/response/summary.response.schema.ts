@@ -1,6 +1,6 @@
 import { baseActionSchema } from '../entity';
-import { zInfer } from 'src/libs';
-import { createSuccessResponseSchema } from 'src/factories';
+import { zInfer } from '../../../libs';
+import { createSuccessResponseSchema } from '../../../factories';
 
 export const actionSummarySchema = baseActionSchema.pick({
   id: true,
