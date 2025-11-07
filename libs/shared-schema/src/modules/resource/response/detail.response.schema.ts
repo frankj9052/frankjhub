@@ -1,7 +1,7 @@
-import { serviceSummarySchema } from '../../../modules/service';
-import { createSuccessResponseSchema } from '../../../factories';
-import { zInfer } from '../../../libs';
-import { baseResourceSchema } from '../entity';
+import { serviceSummarySchema } from '../../../modules/service/response/summary.response.schema';
+import { createSuccessResponseSchema } from '../../../factories/createSuccessResponse.schema';
+import { zInfer } from '../../../libs/z';
+import { baseResourceSchema } from '../entity/resource.schema';
 
 export const resourceDetailSchema = baseResourceSchema.extend({
   service: serviceSummarySchema,

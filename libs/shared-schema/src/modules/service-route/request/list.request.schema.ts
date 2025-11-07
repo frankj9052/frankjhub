@@ -1,7 +1,7 @@
 import { zInfer } from '../../../libs';
 import { createOffsetPaginationSchema } from '../../../factories/createOffsetPagination.schema';
 import {
-  dynamicFilterKeys,
+  serviceRouteDynamicFilterKeys,
   SERVICE_ROUTE_ORDER_BY_FIELD,
   SERVICE_ROUTE_STATUS_FILTER,
 } from '../constants';
@@ -11,7 +11,7 @@ export const serviceRouteListRequestSchema = createOffsetPaginationSchema(
   {
     status: SERVICE_ROUTE_STATUS_FILTER,
   },
-  dynamicFilterKeys
+  serviceRouteDynamicFilterKeys
 );
 
 export type ServiceRouteListRequest = zInfer<typeof serviceRouteListRequestSchema>;

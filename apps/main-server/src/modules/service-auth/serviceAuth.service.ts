@@ -1,14 +1,16 @@
 import {
+  HttpMethod,
   ServiceCreateRequest,
-  ServiceDto,
+  ServiceDetail,
   ServiceJwtPayload,
   ServiceListRequest,
   ServiceListResponse,
   ServiceLogin,
   ServiceLoginResponse,
-  ServiceSingleResponse,
+  ServiceRef,
   ServiceSnapshot,
   ServiceSnapshotResponse,
+  ServiceSummary,
   ServiceUpdateRequest,
   SimpleResponse,
 } from '@frankjhub/shared-schema';
@@ -24,6 +26,7 @@ import { applyFilters } from '../common/utils/applyFilters';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { getSnapshotFromCache } from '../api-gateway/snapshotCache';
 import { redisClient } from '../../infrastructure/redis';
+import { ServiceRepository } from './service.repository';
 
 const logger = createLoggerWithContext('ServiceAuthService');
 const filterConditionMap: Record<string, string> = {
@@ -33,24 +36,82 @@ const filterConditionMap: Record<string, string> = {
 };
 
 export class ServiceAuthService {
-  private serviceRepo = AppDataSource.getRepository(Service);
+  private serviceRepo = new ServiceRepository(AppDataSource);
 
-  buildService(service: Service): ServiceDto {
+  buildServiceRef({ id, serviceId, name }: Service): ServiceRef {
+    return { id, serviceId, name };
+  }
+  buildServiceSummary({
+    id,
+    serviceId,
+    name,
+    baseUrl,
+    ownerTeam,
+    isActive,
+    lastRotatedAt,
+    updatedAt,
+    createdAt,
+    deletedAt,
+  }: Service): ServiceSummary {
+    return {
+      id,
+      serviceId,
+      name,
+      baseUrl,
+      ownerTeam,
+      isActive: !!isActive,
+      lastRotatedAt: lastRotatedAt?.toISOString() ?? null,
+      updatedAt: updatedAt?.toISOString(),
+      createdAt: createdAt?.toISOString(),
+      deletedAt: deletedAt?.toISOString(),
+    };
+  }
+  buildServiceDetail(service: Service): ServiceDetail {
     return {
       ...service,
+      secretVersion: String(service.secretVersion),
+      baselineRequiredScopes: service.baselineRequiredScopes ?? [],
+      audPrefix: service.audPrefix ?? '',
+      isActive: !!service.isActive,
+      lastRotatedAt: service.lastRotatedAt?.toISOString() ?? null,
       createdAt: service.createdAt.toISOString(),
       updatedAt: service.updatedAt.toISOString(),
       deletedAt: service.deletedAt?.toISOString() ?? undefined,
       createdBy: service.createdBy ?? undefined,
       updatedBy: service.updatedBy ?? undefined,
       deletedBy: service.deletedBy ?? undefined,
+      routes: service.routes.map(r => ({
+        id: r.id,
+        serviceId: r.serviceId,
+        path: r.path,
+        routeRuleType: r.routeRuleType,
+        methods: r.methods as HttpMethod[],
+        rewrite: r.rewrite,
+        isActive: r.isActive,
+        createdAt: r.createdAt?.toISOString(),
+        updatedAt: r.updatedAt?.toISOString(),
+        deletedAt: r.deletedAt?.toISOString(),
+      })),
+      resources: service.resources.map(r => ({
+        id: r.id,
+        resource_key: r.resource_key,
+        namespace: r.namespace,
+        entity: r.entity,
+        qualifier: r.qualifier,
+        fieldsMode: r.fieldsMode,
+        fields: r.fields,
+        isActive: r.isActive,
+        createdAt: r.createdAt?.toISOString(),
+        updatedAt: r.updatedAt?.toISOString(),
+        deletedAt: r.deletedAt?.toISOString(),
+      })),
     };
   }
 
   // service login
   async serviceLogin(data: ServiceLogin): Promise<ServiceLoginResponse> {
     const { serviceId, serviceSecret } = data;
-    const service = await this.serviceRepo.findOne({ where: { serviceId } });
+    const service = await this.serviceRepo.getByServiceId(serviceId);
 
     const permissions = service?.grantedScopes ?? [];
 
@@ -88,6 +149,7 @@ export class ServiceAuthService {
     }
 
     // 冷启动：仅在缓存为空时，现查一次DB并写回缓存
+    // const services = await this.serviceRepo.find({ where: { isActive: true } });
     const services = await this.serviceRepo.find({ where: { isActive: true } });
     const snapshot: ServiceSnapshot = services.map(s => ({
       key: s.serviceId,

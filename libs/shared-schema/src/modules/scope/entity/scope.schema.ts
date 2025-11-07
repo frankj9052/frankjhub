@@ -2,7 +2,7 @@ import { baseEntitySchema } from '../../../modules/common';
 import { z, zInfer } from '../../../libs';
 import { idSchema } from '../../../modules/common/entity/id.schema';
 import { actionNameSchema } from '../../../modules/action';
-import { scopeKeySchema } from './fields/key.schema';
+import { scopeKeySchema } from './fields/scopeKey.schema';
 
 export const scopeSchema = z.object({
   ...baseEntitySchema.shape,

@@ -7,6 +7,7 @@ export const serviceRouteCreateRequestSchema = serviceRouteSchema
     rewrite: true,
     rateLimit: true,
     isActive: true,
+    authMode: true,
   })
   .partial()
   .extend(

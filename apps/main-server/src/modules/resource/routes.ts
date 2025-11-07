@@ -1,19 +1,17 @@
 import './docs/openapi';
 import { Router } from 'express';
 import {
-  createResourceController,
   getResourceListController,
   getResourceByIdController,
   updateResourceController,
-  softDeleteResourceController,
-  restoreResourceController,
-  hardDeleteResourceController,
+  // softDeleteResourceController,
+  // restoreResourceController,
+  // hardDeleteResourceController,
   getResourceOptionListController,
 } from './resource.controller';
 
 import {
   idParamsSchema,
-  resourceCreateRequestSchema,
   resourceListRequestSchema,
   resourceUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
@@ -25,12 +23,12 @@ import { validateRequest } from '../common/middlewares/validateRequest';
 const router = Router();
 
 // Resource routes
-router.post(
-  '/resource',
-  requirePermission(buildPermissionName('resource', ['create'])),
-  validateRequest({ body: resourceCreateRequestSchema }),
-  createResourceController
-);
+// router.post(
+//   '/resource',
+//   requirePermission(buildPermissionName('resource', ['create'])),
+//   validateRequest({ body: resourceCreateRequestSchema }),
+//   createResourceController
+// );
 
 router.get(
   '/resource/list',
@@ -59,26 +57,26 @@ router.patch(
   updateResourceController
 );
 
-router.patch(
-  '/resource/soft-delete',
-  requirePermission(buildPermissionName('resource', ['delete'])),
-  validateRequest({ body: idParamsSchema }),
-  softDeleteResourceController
-);
+// router.patch(
+//   '/resource/soft-delete',
+//   requirePermission(buildPermissionName('resource', ['delete'])),
+//   validateRequest({ body: idParamsSchema }),
+//   softDeleteResourceController
+// );
 
-router.patch(
-  '/resource/restore',
-  requirePermission(buildPermissionName('resource', ['delete'])),
-  validateRequest({ body: idParamsSchema }),
-  restoreResourceController
-);
+// router.patch(
+//   '/resource/restore',
+//   requirePermission(buildPermissionName('resource', ['delete'])),
+//   validateRequest({ body: idParamsSchema }),
+//   restoreResourceController
+// );
 
-router.delete(
-  '/resource/hard-delete',
-  requirePermission(buildPermissionName('resource', ['delete'])),
-  validateRequest({ query: idParamsSchema }),
-  hardDeleteResourceController
-);
+// router.delete(
+//   '/resource/hard-delete',
+//   requirePermission(buildPermissionName('resource', ['delete'])),
+//   validateRequest({ query: idParamsSchema }),
+//   hardDeleteResourceController
+// );
 
 // Exported register function
 export function register(parent: Router) {

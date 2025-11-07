@@ -4,7 +4,6 @@ import { Resource } from './entities/Resource';
 import {
   Qualifier,
   ResourceCreateRequest,
-  ResourceListPageData,
   ResourceListRequest,
   ResourceUpdateRequest,
 } from '@frankjhub/shared-schema';

@@ -1,1 +1,1 @@
-export * from './key.schema';
+export * from './scopeKey.schema';

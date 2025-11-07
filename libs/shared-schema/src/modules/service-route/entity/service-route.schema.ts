@@ -7,7 +7,7 @@ import { methodsSchema } from './fields/methods.schema';
 import { rewriteSchema } from './fields/rewrite.schema';
 import { rateLimitSchema } from './fields/rateLimit.schema';
 import { isActiveSchema } from '../../../modules/common/entity/isActive.schema';
-import { routeRuleTypeSchema } from '../constants';
+import { AuthModeSchema, routeRuleTypeSchema } from '../constants';
 
 /** Core entity DTO (internal usage). */
 export const serviceRouteSchema = z.object({
@@ -20,6 +20,7 @@ export const serviceRouteSchema = z.object({
   rewrite: rewriteSchema,
   rateLimit: rateLimitSchema,
   isActive: isActiveSchema,
+  authMode: AuthModeSchema,
 });
 
 export type ServiceRoute = zInfer<typeof serviceRouteSchema>;

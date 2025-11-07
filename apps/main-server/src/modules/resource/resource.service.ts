@@ -1,8 +1,6 @@
 import {
-  ResourceCreateRequest,
   ResourceDetail,
   ResourceDetailResponse,
-  ResourceDto,
   ResourceListRequest,
   ResourceListResponse,
   ResourceOptionListResponse,
@@ -14,21 +12,10 @@ import {
 import AppDataSource from '../../config/data-source';
 import { createLoggerWithContext } from '../common/libs/logger';
 import { Resource } from './entities/Resource';
-import { BadRequestError } from '../common/errors/BadRequestError';
-import { paginateWithOffset } from '../common/utils/paginateWithOffset';
 import { NotFoundError } from '../common/errors/NotFoundError';
-import { Permission } from '../permission/entities/Permission';
-import { updateEntityFields } from '@frankjhub/shared-utils';
-import { applyFilters } from '../common/utils/applyFilters';
 import { ResourceRepository } from './resource.repository';
 
 const logger = createLoggerWithContext('ActionService');
-
-// const filterConditionMap: Record<string, string> = {
-//   active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
-//   inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
-//   deleted: `(t."deleted_at" IS NOT NULL)`,
-// };
 
 export class ResourceService {
   private resourceRepo = new ResourceRepository(AppDataSource);
@@ -176,56 +163,37 @@ export class ResourceService {
     };
   }
 
-  async restoreResource(id: string, performedBy: string): Promise<ResourceSingleResponse> {
-    const log = logger.child({ method: 'restoreResource', id, performedBy });
-    const resource = await this.resourceRepo.findOne({ where: { id }, withDeleted: true });
-    if (!resource) {
-      throw new NotFoundError(`Resource ${id} not found`);
-    }
+  async restoreResource(id: string, restoredBy: string): Promise<SimpleResponse> {
+    const log = logger.child({ method: 'restoreResource', id, restoredBy });
 
-    resource.deletedAt = null;
-    resource.deletedBy = null;
-    resource.updatedBy = performedBy;
-
-    const savedResource = await this.resourceRepo.save(resource);
-    log.info(`Resource ${savedResource.name} restored by ${performedBy}`);
+    await this.resourceRepo.restore(id, { restoredBy });
+    log.info(`Resource ${id} restored by ${restoredBy}`);
 
     return {
       status: 'success',
-      message: `Resource ${savedResource.name} restored By ${performedBy}`,
-      data: this.buildResource(savedResource),
+      message: `Resource ${id} restored By ${restoredBy}`,
     };
   }
 
-  async hardDeleteResource(id: string, performedBy: string): Promise<ResourceSingleResponse> {
-    const log = logger.child({ method: 'hardDeleteResource', id, performedBy });
-    const resource = await this.resourceRepo.findOne({ where: { id }, withDeleted: true });
-    if (!resource) {
-      throw new NotFoundError(`Resource ${id} not found`);
-    }
+  async hardDeleteResource(id: string, deletedBy: string): Promise<SimpleResponse> {
+    const log = logger.child({ method: 'hardDeleteResource', id, deletedBy });
 
-    await this.resourceRepo.remove(resource);
-    log.info(`Resource ${resource.name} permantly deleted by ${performedBy}`);
+    await this.resourceRepo.hardDelete(id, { deletedBy });
+    log.info(`Resource ${id} permantly deleted by ${deletedBy}`);
     return {
       status: 'success',
-      message: `Resource ${resource.name} permantly deleted by ${performedBy}`,
-      data: this.buildResource(resource),
+      message: `Resource ${id} permantly deleted by ${deletedBy}`,
     };
   }
 
   async getResourceOptionList(): Promise<ResourceOptionListResponse> {
-    const resources = await this.resourceRepo.find({
-      where: { isActive: true },
-      select: ['id', 'name'],
-      order: { name: 'ASC' },
-    });
-
+    const resources = await this.resourceRepo.getOptionList();
     return {
       status: 'success',
       message: 'Fetched resource option list successful',
       data: resources.map(resource => ({
         id: resource.id,
-        name: resource.name,
+        resource_key: resource.resource_key,
       })),
     };
   }

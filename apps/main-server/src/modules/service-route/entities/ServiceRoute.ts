@@ -5,15 +5,22 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
 import { BaseEntity } from '../../common/entities/BaseEntity';
 import { Service } from '../../service-auth/entities/Service';
-import { ROUTE_RULE_TYPE, RouteRuleType } from '@frankjhub/shared-schema';
+import { AUTH_MODE, AuthMode, ROUTE_RULE_TYPE, RouteRuleType } from '@frankjhub/shared-schema';
+import { RouteScope } from '../../routeScope/entities/RouteScope';
 /** 路由清单 */
 @Entity()
-@Unique('ux_route_service_path_rewrite_not_deleted', ['service', 'path', 'rewrite'])
+@Unique('ux_route_service_path_rule_rewrite_not_deleted', [
+  'service',
+  'path',
+  'routeRuleType',
+  'rewrite',
+]) // ⬅️ 将 routeRuleType 纳入唯一键
 @Index('ix_route_service', ['service'])
 export class ServiceRoute extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -51,4 +58,15 @@ export class ServiceRoute extends BaseEntity {
   /** 是否启用 */
   @Column({ type: 'boolean', default: true })
   isActive!: boolean;
+
+  /** 授权组合模式（路由层面的 ANY/ALL），配合 RouteScope 多行记录 */
+  @Column({ type: 'enum', enum: AUTH_MODE, default: AUTH_MODE.ANY })
+  authMode!: AuthMode;
+
+  @OneToMany(() => RouteScope, rs => rs.route, {
+    cascade: false, // 不级联创建/更新
+    eager: false, // 需要时再手动加载
+    orphanedRowAction: 'delete', // 可选：仅当通过关系移除时，删除孤儿（谨慎使用）
+  })
+  scopes?: RouteScope[];
 }

@@ -137,11 +137,11 @@ export class ActionService {
   }
 
   async restoreAction(id: string, restoredBy: string): Promise<SimpleResponse> {
-    const action = await this.actionRepo.restore(id, { restoredBy });
+    await this.actionRepo.restore(id, { restoredBy });
 
     return {
       status: 'success',
-      message: `Action ${action.name} restored by ${restoredBy}`,
+      message: `Action ${id} restored by ${restoredBy}`,
     };
   }
 
