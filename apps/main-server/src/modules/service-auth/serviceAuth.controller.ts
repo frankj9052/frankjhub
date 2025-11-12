@@ -76,9 +76,10 @@ export const getServiceListController = async (req: Request, res: Response, next
 
 export const updateServiceController = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    const { id } = idParamsSchema.parse(req.params);
     const parsed = serviceUpdateRequestSchema.parse(req.body);
     const updatedBy = req?.currentUser?.userName ?? 'anonymous';
-    const result = await serviceAuthService.updateService(parsed, updatedBy);
+    const result = await serviceAuthService.updateService(id, parsed, updatedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);

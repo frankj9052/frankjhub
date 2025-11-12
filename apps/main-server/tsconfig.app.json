@@ -36,6 +36,9 @@
       "path": "../../libs/shared-schema/tsconfig.lib.json"
     },
     {
+      "path": "../../libs/shared-error-utils/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/shared-auth/tsconfig.lib.json"
     },
     {

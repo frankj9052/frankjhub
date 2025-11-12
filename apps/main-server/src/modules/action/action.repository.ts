@@ -218,7 +218,7 @@ export class ActionRepository {
       throw new NotFoundError(`Action ${id} not found`);
     }
     if (action.deletedAt) {
-      return new ForbiddenError(`Action ${id} has been deleted`);
+      throw new ForbiddenError(`Action ${id} has been deleted`);
     }
 
     action.deletedAt = new Date();

@@ -5,7 +5,11 @@ import { InternalServerError } from '../modules/common/errors/InternalServerErro
 import { env } from '../config/env';
 import { logger } from '../modules/common/libs/logger';
 import { UnauthorizedError } from '../modules/common/errors/UnauthorizedError';
-import { findAggregateError, flattenAggregateErrors, isNetLike } from '@frankjhub/shared-utils';
+import {
+  findAggregateError,
+  flattenAggregateErrors,
+  isNetLike,
+} from '@frankjhub/shared-error-utils';
 
 // 类型辅助接口：用于安全访问动态扩展属性
 interface WithRequestId {

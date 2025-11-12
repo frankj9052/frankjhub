@@ -3,19 +3,18 @@ import { registry } from '../../../config/openapiRegistry';
 import {
   buildErrorResponses,
   idParamsSchema,
-  serviceCreateRequestExample,
+  serviceCreateRequestData,
   serviceCreateRequestSchema,
-  serviceListRequestExample,
+  serviceDetailData,
+  serviceDetailResponseSchema,
+  serviceListRequestData,
   serviceListRequestSchema,
-  serviceListResponseExample,
+  serviceListResponseData,
   serviceListResponseSchema,
   serviceLoginResponseSchema,
   serviceLoginSchema,
-  serviceSingleResponseExample,
-  serviceSingleResponseSchema,
-  serviceUpdateRequestExample,
+  serviceUpdateRequestData,
   serviceUpdateRequestSchema,
-  serviceUpdateResponseExample,
   simpleResponseSchema,
 } from '@frankjhub/shared-schema';
 
@@ -250,7 +249,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: serviceCreateRequestSchema.openapi({
-            example: serviceCreateRequestExample,
+            example: serviceCreateRequestData,
           }),
         },
       },
@@ -289,7 +288,7 @@ registry.registerPath({
     'Query services with pagination, optional search, and status filters. Requires permission.',
   request: {
     query: serviceListRequestSchema.openapi({
-      example: serviceListRequestExample,
+      example: serviceListRequestData,
     }),
   },
   responses: {
@@ -298,7 +297,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: serviceListResponseSchema.openapi({
-            example: serviceListResponseExample,
+            example: serviceListResponseData,
           }),
         },
       },
@@ -320,12 +319,17 @@ registry.registerPath({
   description:
     'Partial update of a service (by id). Only provided fields are updated. Requires permission.',
   request: {
+    params: idParamsSchema.openapi({
+      example: {
+        id: 'd9f1c3a2-4b7e-4f8b-8a2d-6c1b9e2f7f45',
+      },
+    }),
     body: {
       required: true,
       content: {
         'application/json': {
           schema: serviceUpdateRequestSchema.openapi({
-            example: serviceUpdateRequestExample,
+            example: serviceUpdateRequestData,
           }),
         },
       },
@@ -337,7 +341,10 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: simpleResponseSchema.openapi({
-            example: serviceUpdateResponseExample,
+            example: {
+              status: 'success',
+              message: 'Service update successful',
+            },
           }),
         },
       },
@@ -512,8 +519,12 @@ registry.registerPath({
       description: 'Service fetched successfully',
       content: {
         'application/json': {
-          schema: serviceSingleResponseSchema.openapi({
-            example: serviceSingleResponseExample,
+          schema: serviceDetailResponseSchema.openapi({
+            example: {
+              status: 'success',
+              message: 'Service detail get successful',
+              data: serviceDetailData,
+            },
           }),
         },
       },

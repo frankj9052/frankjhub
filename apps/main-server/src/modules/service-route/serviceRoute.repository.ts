@@ -20,17 +20,6 @@ export class ServiceRouteRepository {
     return (manager ?? this.dataSource.manager).getRepository(ServiceRoute);
   }
 
-  /** helpers */
-  //     // 检查唯一用
-  //   private normalizeComposite(input: ServiceRouteKey) {
-  //     return {
-  //       serviceId: input.serviceId,
-  //       path: input.path,
-  //       routeRuleType: input.routeRuleType ?? ROUTE_RULE_TYPE.EXACT,
-  //       rewrite: input.rewrite ?? null,
-  //     } as Required<Omit<CompositeUnique, 'rewrite'>> & { rewrite: string | null };
-  //   }
-
   private mergeFindOptionsWithRelations(
     findOptions: FindOneOptions<ServiceRoute>,
     withRelations?: boolean | ServiceRouteRelationKeys[]
@@ -308,7 +297,7 @@ export class ServiceRouteRepository {
       throw new NotFoundError(`ServiceRoute ${id} not found`);
     }
     if (route.deletedAt) {
-      return new ForbiddenError(`ServiceRoute ${id} has been deleted`);
+      throw new ForbiddenError(`ServiceRoute ${id} has been deleted`);
     }
 
     route.deletedAt = new Date();

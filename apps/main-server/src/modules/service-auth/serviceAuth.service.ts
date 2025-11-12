@@ -3,13 +3,13 @@ import {
   ResourceCreateRequest,
   ServiceCreateRequest,
   ServiceDetail,
+  ServiceDetailResponse,
   ServiceJwtPayload,
   ServiceListRequest,
   ServiceListResponse,
   ServiceLogin,
   ServiceLoginResponse,
   ServiceRef,
-  ServiceSnapshot,
   ServiceSnapshotResponse,
   ServiceSummary,
   ServiceUpdateRequest,
@@ -21,20 +21,14 @@ import * as argon2 from 'argon2';
 import { UnauthorizedError } from '../common/errors/UnauthorizedError';
 import { ServiceTokenService } from './serviceToken.service';
 import { createLoggerWithContext } from '../common/libs/logger';
-import { paginateWithOffset } from '../common/utils/paginateWithOffset';
-import { applyFilters } from '../common/utils/applyFilters';
 import { NotFoundError } from '../common/errors/NotFoundError';
 import { getSnapshotFromCache } from '../api-gateway/snapshotCache';
 import { redisClient } from '../../infrastructure/redis';
 import { ServiceRepository } from './service.repository';
 import { ResourceRepository } from '../resource/resource.repository';
+import { BaseError } from '@frankjhub/shared-errors';
 
 const logger = createLoggerWithContext('ServiceAuthService');
-const filterConditionMap: Record<string, string> = {
-  active: `(t."is_active" = true AND t."deleted_at" IS NULL)`,
-  inactive: `(t."is_active" = false AND t."deleted_at" IS NULL)`,
-  deleted: `(t."deleted_at" IS NOT NULL)`,
-};
 
 export class ServiceAuthService {
   private serviceRepo = new ServiceRepository(AppDataSource);
@@ -208,7 +202,7 @@ export class ServiceAuthService {
     update: ServiceUpdateRequest,
     updatedBy: string
   ): Promise<SimpleResponse> {
-    const log = logger.child({ method: 'updateService', id: update.id, updatedBy });
+    const log = logger.child({ method: 'updateService', id, updatedBy });
 
     await this.serviceRepo.update(id, update, { updatedBy, withDeleted: true });
     log.info(`Updated service "${id}" by ${updatedBy}`);
@@ -221,88 +215,58 @@ export class ServiceAuthService {
   // soft-delete
   async softDeleteService(id: string, deletedBy: string): Promise<SimpleResponse> {
     const log = logger.child({ method: 'softDeleteService', id, deletedBy });
-    const service = await this.serviceRepo.findOne({ where: { id } });
-    if (!service) {
-      throw new NotFoundError(`Service ${id} not found`);
+    const result = await this.serviceRepo.softDelete(id, { deletedBy });
+    if (result instanceof BaseError) {
+      throw result;
     }
-
-    service.deletedAt = new Date();
-    service.deletedBy = deletedBy;
-    service.updatedBy = deletedBy;
-    const savedService = await this.serviceRepo.save(service);
-    log.info(`Soft-deleted service "${savedService.serviceId}" by ${deletedBy}`);
+    log.info(`Soft-deleted service "${result.serviceId}" by ${deletedBy}`);
     return {
       status: 'success',
-      message: `Service ${savedService.serviceId} soft deleted by ${deletedBy}`,
+      message: `Service ${result.serviceId} soft deleted by ${deletedBy}`,
     };
   }
 
   // restore
   async restoreService(id: string, restoredBy: string): Promise<SimpleResponse> {
     const log = logger.child({ method: 'restoreService', id, restoredBy });
-    const service = await this.serviceRepo.findOne({
-      where: { id },
-      withDeleted: true,
-    });
-    if (!service) {
-      throw new NotFoundError(`Service ${id} not found`);
+    const result = await this.serviceRepo.restore(id, { restoredBy });
+    if (result instanceof BaseError) {
+      throw result;
     }
-
-    if (!service.deletedAt) {
-      return {
-        status: 'success',
-        message: `Service ${service.serviceId} is not deleted`,
-      };
-    }
-
-    service.deletedAt = null;
-    service.deletedBy = null;
-    service.updatedAt = new Date();
-    service.updatedBy = restoredBy;
-
-    const savedService = await this.serviceRepo.save(service);
-    log.info(`Restored service ${savedService.serviceId} by ${restoredBy}`);
+    log.info(`Restored service ${result.serviceId} by ${restoredBy}`);
     return {
       status: 'success',
-      message: `Service ${savedService.serviceId} restored by ${restoredBy}`,
+      message: `Service ${result.serviceId} restored by ${restoredBy}`,
     };
   }
 
   // hard-delete
   async hardDeleteService(id: string, deletedBy: string): Promise<SimpleResponse> {
     const log = logger.child({ method: 'hardDeleteService', id, deletedBy });
-    const service = await this.serviceRepo.findOne({
-      where: { id },
-      withDeleted: true,
-    });
-    if (!service) {
-      throw new NotFoundError(`Service ${id} not found`);
+    const result = await this.serviceRepo.hardDelete(id, { deletedBy });
+    if (result instanceof BaseError) {
+      throw result;
     }
-
-    await this.serviceRepo.remove(service);
-    log.info(`Service ${service.serviceId} deleted by ${deletedBy} permanently`);
+    log.info(`Service ${result.serviceId} deleted by ${deletedBy} permanently`);
 
     return {
       status: 'success',
-      message: `Service ${service.serviceId} deleted permanently`,
+      message: `Service ${result.serviceId} deleted permanently`,
     };
   }
 
   // get service by id
-  async getServiceById(id: string): Promise<ServiceSingleResponse> {
-    const service = await this.serviceRepo.findOne({
-      where: { id },
-      withDeleted: true, // 支持查询软删除的数据，便于编辑/恢复
-    });
+  async getServiceById(id: string): Promise<ServiceDetailResponse> {
+    const data = await this.serviceRepo.getById(id, { withDeleted: true, withRelations: true });
 
-    if (!service) {
-      throw new NotFoundError(`Service ${id} not found`);
+    if (!data) {
+      throw new NotFoundError('Cannot find service id');
     }
 
     return {
       status: 'success',
-      message: `Get service:"${service.serviceId}" successful`,
-      data: this.buildService(service),
+      message: `Get service:"${data.serviceId}" successful`,
+      data: this.buildServiceDetail(data),
     };
   }
 }

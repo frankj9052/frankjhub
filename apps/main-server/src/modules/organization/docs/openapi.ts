@@ -4,6 +4,7 @@ import {
   idParamsSchema,
   organizationCreateRequestSchema,
   organizationDataExample,
+  organizationListRequestData,
   organizationListRequestSchema,
   organizationListResponseExample,
   organizationListResponseSchema,
@@ -68,12 +69,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: organizationListRequestSchema.openapi({
-      example: {
-        limit: 10,
-        offset: 0,
-        search: 'North',
-        filters: ['active'],
-      },
+      example: organizationListRequestData,
     }),
   },
   responses: {

@@ -4,12 +4,16 @@ import {
   permissionCreateRequestSchema,
   permissionUpdateRequestSchema,
   permissionListRequestSchema,
-  permissionSingleResponseSchema,
   permissionListResponseSchema,
   permissionOptionListResponseSchema,
-  permissionListResponseExample,
-  permissionDataExample,
   buildErrorResponses,
+  permissionCreateRequestData,
+  simpleResponseSchema,
+  permissionListRequestData,
+  permissionListResponseData,
+  permissionDetailResponseSchema,
+  permissionDetailData,
+  permissionUpdateRequestData,
 } from '@frankjhub/shared-schema';
 
 // ----------------- PATH REGISTRATIONS -----------------
@@ -26,13 +30,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: permissionCreateRequestSchema.openapi({
-            example: {
-              resourceId: 'resource-uuid-123',
-              actionIds: ['action-uuid-1', 'action-uuid-2'],
-              fields: ['name', 'email'],
-              condition: { orgId: 'org-123' },
-              description: 'Read name/email for own org',
-            },
+            example: permissionCreateRequestData,
           }),
         },
       },
@@ -43,11 +41,10 @@ registry.registerPath({
       description: 'Permission created successfully',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission create successful',
-              data: permissionDataExample,
             },
           }),
         },
@@ -70,12 +67,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: permissionListRequestSchema.openapi({
-      example: {
-        limit: 10,
-        offset: 0,
-        search: 'read',
-        filters: ['active'],
-      },
+      example: permissionListRequestData,
     }),
   },
   responses: {
@@ -84,7 +76,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: permissionListResponseSchema.openapi({
-            example: permissionListResponseExample,
+            example: permissionListResponseData,
           }),
         },
       },
@@ -119,11 +111,11 @@ registry.registerPath({
       description: 'Permission found',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: permissionDetailResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission get successful',
-              data: permissionDataExample,
+              data: permissionDetailData,
             },
           }),
         },
@@ -148,15 +140,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: permissionUpdateRequestSchema.openapi({
-            example: {
-              id: 'permission-uuid-abc',
-              resourceId: 'resource-uuid-123',
-              actionIds: ['action-uuid-1', 'action-uuid-2'],
-              fields: ['name', 'email'],
-              condition: { orgId: 'org-456' },
-              description: 'Updated description',
-              isActive: true,
-            },
+            example: permissionUpdateRequestData,
           }),
         },
       },
@@ -167,11 +151,10 @@ registry.registerPath({
       description: 'Permission updated successfully',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission update successful',
-              data: permissionDataExample,
             },
           }),
         },
@@ -207,11 +190,10 @@ registry.registerPath({
       description: 'Soft deleted successfully',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission delete successful',
-              data: permissionDataExample,
             },
           }),
         },
@@ -247,11 +229,10 @@ registry.registerPath({
       description: 'Restored successfully',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission restore successful',
-              data: permissionDataExample,
             },
           }),
         },
@@ -281,11 +262,10 @@ registry.registerPath({
       description: 'Deleted permanently',
       content: {
         'application/json': {
-          schema: permissionSingleResponseSchema.openapi({
+          schema: simpleResponseSchema.openapi({
             example: {
               status: 'success',
               message: 'Permission permanent delete successful',
-              data: permissionDataExample,
             },
           }),
         },

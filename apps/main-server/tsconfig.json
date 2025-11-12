@@ -16,6 +16,9 @@
       "path": "../../libs/shared-schema"
     },
     {
+      "path": "../../libs/shared-error-utils"
+    },
+    {
       "path": "../../libs/shared-auth"
     },
     {

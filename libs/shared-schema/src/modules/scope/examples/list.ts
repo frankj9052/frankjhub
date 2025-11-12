@@ -13,7 +13,7 @@ export const scopeListRequestData: ScopeListRequest = {
     any: [
       {
         key: 'status',
-        values: ['active', 'inactive'],
+        values: ['deleted'],
       },
     ],
     all: [],
@@ -50,15 +50,10 @@ export const scopeListResponseData: ScopeListResponse = {
       any: [
         {
           key: 'status',
-          values: ['ACTIVE', 'INACTIVE'],
+          values: ['DELETED'],
         },
       ],
-      all: [
-        {
-          key: 'status',
-          values: ['ACTIVE'],
-        },
-      ],
+      all: [],
     },
     resourceId: 'a3f1c2e4-5b6d-47f2-8c1d-123456789abc',
   },

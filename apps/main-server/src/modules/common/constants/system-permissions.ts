@@ -1,10 +1,10 @@
-import { buildPermissionName } from '../../codecs/permissionCodec';
+import { buildPermissionName } from '@frankjhub/shared-perm';
 import { SYSTEM_ACTIONS } from './system-actions';
 import { SYSTEM_RESOURCES } from './system-resources';
 
 export const SYSTEM_PERMISSIONS = {
   ALL: {
-    name: buildPermissionName(SYSTEM_RESOURCES.ALL.name, SYSTEM_ACTIONS.ALL.name),
+    name: buildPermissionName(SYSTEM_RESOURCES.ALL.name, [SYSTEM_ACTIONS.ALL.name]),
     description: 'Grant all permissions',
   },
 } as const;

@@ -4,11 +4,11 @@ import {
   createSuccessResponseSchema,
 } from '../../../factories';
 import { organizationTypeSchema } from '../entity';
-import { organizationTypeFilterListSchema } from '../constants';
+import { organizationTypeFiltersSchema } from '../constants/filter.enum';
 
 export const organizationTypeListPageDataSchema = createOffsetPaginatedResponseSchema(
   organizationTypeSchema,
-  organizationTypeFilterListSchema
+  organizationTypeFiltersSchema
 );
 
 export const organizationTypeListResponseSchema = createSuccessResponseSchema(

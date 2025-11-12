@@ -5,15 +5,15 @@ import {
   buildErrorResponses,
   idParamsSchema,
   invitationListRequestSchema,
-  invitationListResponseExample,
   invitationListResponseSchema,
   issueInvitationRequestSchema,
   issueInvitationResponseExample,
   issueInvitationResponseSchema,
-  OrderEnum,
   invitationSingleResponseSchema,
   invitationDataExample,
   simpleResponseSchema,
+  invitationListRequestData,
+  invitationListResponseData,
 } from '@frankjhub/shared-schema';
 import { registry } from '../../../config/openapiRegistry';
 
@@ -123,14 +123,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: invitationListRequestSchema.openapi({
-      example: {
-        limit: 10,
-        offset: 0,
-        order: OrderEnum.ASC,
-        orderBy: 'createdAt',
-        search: 'admin@ny-eye.ca',
-        filters: ['pending'],
-      },
+      example: invitationListRequestData,
     }),
   },
   responses: {
@@ -139,7 +132,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: invitationListResponseSchema.openapi({
-            example: invitationListResponseExample,
+            example: invitationListResponseData,
           }),
         },
       },
@@ -164,14 +157,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: invitationListRequestSchema.openapi({
-            example: {
-              limit: 10,
-              offset: 0,
-              order: OrderEnum.ASC,
-              orderBy: 'createdAt',
-              search: 'admin@ny-eye.ca',
-              filters: ['pending'],
-            },
+            example: invitationListRequestData,
           }),
         },
       },
@@ -183,7 +169,7 @@ registry.registerPath({
       content: {
         'application/json': {
           schema: invitationListResponseSchema.openapi({
-            example: invitationListResponseExample,
+            example: invitationListResponseData,
           }),
         },
       },

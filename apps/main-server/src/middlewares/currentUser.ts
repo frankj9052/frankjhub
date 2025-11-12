@@ -51,13 +51,19 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
 
     // 验证 JWT 签名
     const payload = await verifyJwt(token, 'main', env);
-
     if (payload.type === 'user') {
-      req.currentUser = {
-        id: payload.id,
-        userName: payload.userName,
-        sessionVersion: payload.sessionVersion,
-      };
+      if (payload.type === 'user') {
+        req.currentUser = {
+          id: payload.id,
+          userName: payload.userName,
+          email: payload.userName,
+          emailVerified: payload.emailVerified,
+          profileCompleted: payload.profileCompleted,
+          isActive: payload.isActive,
+          sessionVersion: payload.sessionVersion,
+          orgRoles: payload.orgRoles,
+        };
+      }
     }
 
     // req.currentUser = fullUser;

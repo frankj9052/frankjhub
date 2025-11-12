@@ -5,7 +5,6 @@ import {
   InvitationListResponse,
   IssueInvitationResponse,
 } from '../response';
-import { INVITATION_STATUS } from '../constants';
 
 export const invitationDataExample: InvitationDto = {
   id: 'inv-uuid-123',
@@ -53,21 +52,5 @@ export const acceptInvitationResponseExample: AcceptInvitationResponse = {
     organizationId: 'org-uuid-001',
     targetRoleId: 'role-uuid-admin',
     invitationId: 'inv-uuid-123',
-  },
-};
-
-export const invitationListResponseExample: InvitationListResponse = {
-  status: 'success',
-  message: 'Get invitation list successful',
-  data: {
-    total: 3,
-    pageCount: 1,
-    currentPage: 1,
-    pageSize: 10,
-    search: undefined,
-    filters: {
-      status: INVITATION_STATUS.PENDING,
-    },
-    data: [invitationDataExample],
   },
 };

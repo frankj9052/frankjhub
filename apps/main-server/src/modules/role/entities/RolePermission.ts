@@ -15,6 +15,7 @@ import { BaseEntity } from '../../common/entities/BaseEntity';
 
 @Entity()
 @Index(['name'], { unique: true })
+@Index('ux_role_permission_pair', ['roleId', 'permissionId'], { unique: true })
 export class RolePermission extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -29,14 +30,14 @@ export class RolePermission extends BaseEntity {
   permissionId!: string;
 
   /* 外键 */
-  @ManyToOne(() => Permission, { nullable: false })
+  @ManyToOne(() => Permission, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'permissionId' })
   permission!: Permission;
 
   @Column({ type: 'uuid' })
   roleId!: string;
 
-  @ManyToOne(() => Role, { nullable: false })
+  @ManyToOne(() => Role, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'roleId' })
   role!: Role;
 

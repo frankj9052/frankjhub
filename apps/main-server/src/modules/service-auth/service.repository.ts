@@ -293,7 +293,7 @@ export class ServiceRepository {
       throw new NotFoundError(`Service ${id} not found`);
     }
     if (svc.deletedAt) {
-      return new ForbiddenError(`Service ${id} has been deleted`);
+      throw new ForbiddenError(`Service ${id} has been deleted`);
     }
 
     svc.deletedAt = new Date();

@@ -7,6 +7,7 @@ export * from './action';
 export * from './resource';
 export * from './permission';
 export * from './role';
+export * from './rolePermission';
 export * from './contact';
 export * from './userOrganizationRole';
 export * from './clinic';

@@ -12,6 +12,7 @@ import {
   resourceUpdateRequestData,
   simpleResponseSchema,
   resourceOptionListResponseData,
+  idParamsSchema,
 } from '@frankjhub/shared-schema';
 
 // ----------------- PATH REGISTRATIONS -----------------
@@ -138,6 +139,11 @@ registry.registerPath({
   summary: 'Update resource',
   security: [{ bearerAuth: [] }],
   request: {
+    params: idParamsSchema.openapi({
+      example: {
+        id: 'd9f1c3a2-4b7e-4f8b-8a2d-6c1b9e2f7f45',
+      },
+    }),
     body: {
       content: {
         'application/json': {

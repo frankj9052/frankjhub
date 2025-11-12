@@ -4,6 +4,7 @@ import {
   idParamsSchema,
   userDataExample,
   userListPageDataExample,
+  userListRequestData,
   userListRequestSchema,
   userListResponseSchema,
   userOptionListRequestSchema,
@@ -63,14 +64,7 @@ registry.registerPath({
   request: {
     query: userListRequestSchema.openapi({
       description: 'Pagination query parameters for listing all user profiles (limit/offset based)',
-      example: {
-        limit: 20,
-        offset: 0,
-        order: 'DESC',
-        orderBy: 'createdAt',
-        search: 'jurong',
-        filters: ['active'],
-      },
+      example: userListRequestData,
     }),
   },
   responses: {

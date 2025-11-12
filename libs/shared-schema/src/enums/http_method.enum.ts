@@ -8,6 +8,7 @@ export const HTTP_METHOD = {
   DELETE: 'DELETE',
   HEAD: 'HEAD',
   OPTIONS: 'OPTIONS',
+  ALL: '*',
 } as const;
 
 export type HttpMethod = (typeof HTTP_METHOD)[keyof typeof HTTP_METHOD];

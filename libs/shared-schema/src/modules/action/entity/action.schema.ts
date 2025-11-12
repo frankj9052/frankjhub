@@ -1,7 +1,7 @@
 import { idSchema } from '../../../modules/common/entity/id.schema';
 import { baseEntitySchema } from '../../../modules/common';
 import { isActiveSchema } from '../../../modules/common/entity/isActive.schema';
-import { zInfer } from 'src/libs';
+import { zInfer } from '../../../libs';
 import { actionNameSchema } from './fields/name.schema';
 import { actionDisplayNameSchema } from './fields/displayName.schema';
 import { actionDescriptionSchema } from './fields/description.schema';

@@ -10,6 +10,7 @@ export const permissionUpdateRequestSchema = permissionSchema
     isActive: true,
     version: true,
   })
-  .partial();
+  .partial()
+  .strict();
 
 export type PermissionUpdateRequest = zInfer<typeof permissionUpdateRequestSchema>;

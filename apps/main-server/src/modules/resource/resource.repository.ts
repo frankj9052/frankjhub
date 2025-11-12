@@ -284,7 +284,7 @@ export class ResourceRepository {
       throw new NotFoundError(`Resource ${id} not found`);
     }
     if (resource.deletedAt) {
-      return new ForbiddenError(`Resource ${id} has been deleted`);
+      throw new ForbiddenError(`Resource ${id} has been deleted`);
     }
 
     resource.deletedAt = new Date();

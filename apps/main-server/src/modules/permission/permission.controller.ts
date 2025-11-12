@@ -61,11 +61,12 @@ export const updatePermissionController: RequestHandler = async (
   next: NextFunction
 ) => {
   try {
+    const { id } = idParamsSchema.parse(req.params);
     const parsed = permissionUpdateRequestSchema.parse(req.body);
     const updatedBy = req.currentUser?.userName;
     if (!updatedBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await permissionService.updatePermission(parsed, updatedBy);
+    const result = await permissionService.updatePermission(id, parsed, updatedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);
@@ -113,10 +114,10 @@ export const hardDeletePermissionController: RequestHandler = async (
 ) => {
   try {
     const parsed = idParamsSchema.parse(req.query);
-    const performedBy = req.currentUser?.userName;
-    if (!performedBy) throw new UnauthorizedError('User identity not found in request');
+    const deletedBy = req.currentUser?.userName;
+    if (!deletedBy) throw new UnauthorizedError('User identity not found in request');
 
-    const result = await permissionService.hardDeletePermission(parsed.id);
+    const result = await permissionService.hardDeletePermission(parsed.id, deletedBy);
     res.status(200).json(result);
   } catch (error) {
     next(error);
