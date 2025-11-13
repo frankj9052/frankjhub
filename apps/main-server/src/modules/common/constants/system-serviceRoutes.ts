@@ -1,0 +1,88 @@
+import { ServiceRouteCreateRequest } from '@frankjhub/shared-schema';
+import { SYSTEM_SERVICES } from '../../common/constants/system-services';
+
+export const SYSTEM_SERVICE_ROUTE_KEY_LIST = [''] as const;
+
+export const SYSTEM_SERVICE_ROUTES: Record<string, ServiceRouteCreateRequest> = {
+  AUTH: {
+    path: '/auth',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['POST', 'GET'],
+    routeRuleType: 'prefix',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  JWKS: {
+    path: '/.well-known/jwks.json',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['GET'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_LIST: {
+    path: '/user/list',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['GET'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_DETAIL: {
+    path: '/user/:id',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['GET'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_SOFT_DELETE: {
+    path: '/user/soft-delete',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['PATCH'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_HARD_DELETE: {
+    path: '/user/hard-delete',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['DELETE'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_RESTORE: {
+    path: '/user/restore',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['PATCH'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_UPDATE: {
+    path: '/user/update',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['PATCH'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+  USER_CURRENT: {
+    path: '/user/current-user',
+    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
+    methods: ['GET'],
+    routeRuleType: 'exact',
+    rewrite: null,
+    isActive: true,
+    authMode: 'all',
+  },
+};

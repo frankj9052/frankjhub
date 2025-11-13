@@ -1,10 +1,6 @@
 import { RoleSource } from '../../../enums';
 import { InvitationDto } from '../entity';
-import {
-  AcceptInvitationResponse,
-  InvitationListResponse,
-  IssueInvitationResponse,
-} from '../response';
+import { AcceptInvitationResponse, IssueInvitationResponse } from '../response';
 
 export const invitationDataExample: InvitationDto = {
   id: 'inv-uuid-123',

@@ -13,8 +13,8 @@ export const permissionCreateRequestSchema = permissionSchema
   .extend(
     permissionSchema
       .pick({
-        resourceId: true,
-        actionId: true,
+        resource_key: true,
+        actionName: true,
       })
       .required().shape
   )

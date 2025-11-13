@@ -6,6 +6,7 @@ import { SYSTEM_PERMISSIONS } from '../../common/constants/system-permissions';
 import { SYSTEM_ROLES } from '../../common/constants/system-role';
 import { waitForEntity } from '../../common/utils/waitForEntity';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
+import { buildSingleActionPermissionName } from '@frankjhub/shared-perm';
 
 /**
  * Seeder: RolePermissionProdSeed
@@ -14,7 +15,12 @@ import { BaseSeeder } from '../../common/libs/BaseSeeder';
  */
 export default class RolePermissionProdSeed extends BaseSeeder {
   private readonly roleName = SYSTEM_ROLES.ADMIN.name;
-  private readonly permissionName = SYSTEM_PERMISSIONS.ALL.name;
+  private readonly permissionName = buildSingleActionPermissionName(
+    SYSTEM_PERMISSIONS.ALL.resource_key,
+    SYSTEM_PERMISSIONS.ALL.actionName,
+    SYSTEM_PERMISSIONS.ALL.fields,
+    SYSTEM_PERMISSIONS.ALL.condition ?? undefined
+  );
 
   private role: Role | null = null;
   private permission: Permission | null = null;

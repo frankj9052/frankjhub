@@ -3,11 +3,13 @@ import { z, zInfer } from '../../../libs';
 import { idSchema } from '../../../modules/common/entity/id.schema';
 import { actionNameSchema } from '../../../modules/action';
 import { scopeKeySchema } from './fields/scopeKey.schema';
+import { resourceKeySchema } from '../../../modules/resource';
 
 export const scopeSchema = z.object({
   ...baseEntitySchema.shape,
   id: idSchema,
   resourceId: idSchema,
+  resource_key: resourceKeySchema,
   actionId: idSchema,
   actionName: actionNameSchema,
   key: scopeKeySchema,

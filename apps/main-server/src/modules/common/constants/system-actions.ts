@@ -1,6 +1,17 @@
 import { ActionCreateRequest } from '@frankjhub/shared-schema';
 
-export const SYSTEM_ACTIONS: Record<string, ActionCreateRequest> = {
+export const SYSTEM_ACTION_KEY_LIST = [
+  'ALL',
+  'CREATE',
+  'READ',
+  'UPDATE',
+  'SOFT_DELETE',
+  'HARD_DELETE',
+  'RESTORE',
+] as const;
+export type SystemActionKey = (typeof SYSTEM_ACTION_KEY_LIST)[number];
+
+export const SYSTEM_ACTIONS: Record<SystemActionKey, ActionCreateRequest> = {
   ALL: {
     name: '*',
     displayName: 'All',
@@ -21,11 +32,6 @@ export const SYSTEM_ACTIONS: Record<string, ActionCreateRequest> = {
     displayName: 'Update',
     description: 'Update existing resource',
   },
-  DELETE: {
-    name: 'delete',
-    displayName: 'Delete',
-    description: 'Delete resource',
-  },
   SOFT_DELETE: {
     name: 'soft-delete',
     displayName: 'Soft Delete',
@@ -42,5 +48,3 @@ export const SYSTEM_ACTIONS: Record<string, ActionCreateRequest> = {
     description: 'Restore data from soft delete',
   },
 } as const;
-
-export type SystemActionName = (typeof SYSTEM_ACTIONS)[keyof typeof SYSTEM_ACTIONS]['name'];

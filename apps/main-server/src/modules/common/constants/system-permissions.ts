@@ -1,13 +1,21 @@
-import { buildPermissionName } from '@frankjhub/shared-perm';
+import { buildResourceKey } from '@frankjhub/shared-perm';
 import { SYSTEM_ACTIONS } from './system-actions';
 import { SYSTEM_RESOURCES } from './system-resources';
+import { PermissionCreateRequest } from '@frankjhub/shared-schema';
 
-export const SYSTEM_PERMISSIONS = {
+export const SYSTEM_PERMISSION_KEY_LIST = ['ALL'] as const;
+export type SystemPermissionKey = (typeof SYSTEM_PERMISSION_KEY_LIST)[number];
+
+export const SYSTEM_PERMISSIONS: Record<SystemPermissionKey, PermissionCreateRequest> = {
   ALL: {
-    name: buildPermissionName(SYSTEM_RESOURCES.ALL.name, [SYSTEM_ACTIONS.ALL.name]),
+    resource_key: buildResourceKey({
+      namespace: SYSTEM_RESOURCES.ALL.namespace,
+      entity: SYSTEM_RESOURCES.ALL.entity,
+      qualifier: SYSTEM_RESOURCES.ALL.qualifier ?? undefined,
+    }),
+    actionName: SYSTEM_ACTIONS.ALL.name,
     description: 'Grant all permissions',
+    isActive: true,
+    effect: 'allow',
   },
 } as const;
-
-export type SystemPermissionName =
-  (typeof SYSTEM_PERMISSIONS)[keyof typeof SYSTEM_PERMISSIONS]['name'];

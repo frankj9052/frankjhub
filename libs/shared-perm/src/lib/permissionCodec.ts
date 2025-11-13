@@ -93,15 +93,18 @@ export interface ResourceKeyParts {
 /** 简单的 camel/标识符约束：首字母小写，字母数字 identifier regular expression */
 const IDENT_RE = /^[a-z][a-zA-Z0-9]*$/;
 
-export const buildResourceKey = (parts: ResourceKeyParts): string => {
+export const buildResourceKey = (parts: ResourceKeyParts) => {
   const namespace = (parts.namespace || '').trim();
   const entity = (parts.entity || '').trim();
   const qualifier = (parts.qualifier || '').trim();
 
-  if (!IDENT_RE.test(namespace)) {
+  // 允许全通配 *
+  const allowStar = (v: string) => v === '*' || IDENT_RE.test(v);
+
+  if (!allowStar(namespace)) {
     throw new Error(`Invalid namespace for resourceKey: "${parts.namespace}"`);
   }
-  if (!IDENT_RE.test(entity)) {
+  if (!allowStar(entity)) {
     throw new Error(`Invalid entity for resourceKey: "${parts.entity}"`);
   }
   if (qualifier && qualifier !== '*' && qualifier !== ':id') {
@@ -110,7 +113,19 @@ export const buildResourceKey = (parts: ResourceKeyParts): string => {
     );
   }
 
-  return qualifier ? `${namespace}.${entity}.${qualifier}` : `${namespace}.${entity}`;
+  // 🌟 智能压缩规则：
+  // 1. 全部为 * 时，简写为 "*"
+  if (namespace === '*' && entity === '*' && (!qualifier || qualifier === '*')) {
+    return '*' as any;
+  }
+
+  // 2. qualifier 为 "*" 时省略它（因为 entity 已经是通配）
+  if (qualifier === '*' || !qualifier) {
+    return `${namespace}.${entity}` as any;
+  }
+
+  // 3. 其它情况，完整拼接
+  return `${namespace}.${entity}.${qualifier}` as any;
 };
 
 export const parseResourceKey = (resourceKey: string): ResourceKeyParts => {
@@ -204,7 +219,7 @@ export const parseSingleActionPermissionName = (permissionName: string): ParsedS
 };
 
 /**
- * 构建权限字符串
+ * 构建权限字符串(弃用)
  * @param resourceKey - 资源键（namespace.entity[.qualifier]）
  * @param actions     - 动作数组或 '*'（数组必须非空）
  * @param fields      - 可选字段数组或 '*'（空数组等价未指定）

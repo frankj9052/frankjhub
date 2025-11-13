@@ -12,6 +12,7 @@ import {
   buildErrorResponses,
   RoleSource,
   roleOptionListResponseExample,
+  roleListRequestData,
 } from '@frankjhub/shared-schema';
 
 /* ----------------- PATH REGISTRATIONS ----------------- */
@@ -72,12 +73,7 @@ registry.registerPath({
   security: [{ bearerAuth: [] }],
   request: {
     query: roleListRequestSchema.openapi({
-      example: {
-        limit: 10,
-        offset: 0,
-        search: 'admin',
-        filters: ['active', 'source_organization'],
-      },
+      example: roleListRequestData,
     }),
   },
   responses: {

@@ -1,56 +1,31 @@
-export const SYSTEM_RESOURCES = {
-  ALL: {
-    name: '*',
-    description: 'All resources',
-  },
-  ORGANIZATION: {
-    name: 'organization',
-    description: 'Manage platform-level organizations or tenants',
-  },
-  USER_ORG_ROLE: {
-    name: 'userOrganizationRole',
-    description: 'Assign users to organizations and roles',
-  },
-  ACTION: {
-    name: 'action',
-    description: 'Define available system actions (e.g., CREATE, READ)',
-  },
-  PERMISSION: {
-    name: 'permission',
-    description: 'Grant or restrict access to resource-action pairs',
-  },
-  PERMISSION_ACTION: {
-    name: 'permissionAction',
-    description: 'Link permissions to their allowed actions',
-  },
-  RESOURCE: {
-    name: 'resource',
-    description: 'Define system-level entities that can be protected',
-  },
-  ROLE: {
-    name: 'role',
-    description: 'User role definitions and metadata',
-  },
-  ROLE_PERMISSION: {
-    name: 'rolePermission',
-    description: 'Link roles to their allowed permissions',
-  },
-  CLINIC: {
-    name: 'clinic',
-    description: 'Manage clinics, their details, and settings',
-  },
-  SERVICE: {
-    name: 'service',
-    description: 'Define and manage services offered by clinics or organizations',
-  },
-  INVITATION: {
-    name: 'invitation',
-    description: 'Handle user invitations to organizations, clinics, or services',
-  },
-  BOOKING: {
-    name: 'booking',
-    description: 'Booking services',
-  },
-} as const;
+import { ResourceCreateRequest } from '@frankjhub/shared-schema';
+import { SYSTEM_SERVICE_KEY_LIST, SYSTEM_SERVICES, SystemServiceKey } from './system-services';
 
-export type SystemResourceName = (typeof SYSTEM_RESOURCES)[keyof typeof SYSTEM_RESOURCES]['name'];
+export const SYSTEM_RESOURCE_KEY_LIST = [...SYSTEM_SERVICE_KEY_LIST, 'ALL'] as const;
+export type SystemResourceKey = (typeof SYSTEM_RESOURCE_KEY_LIST)[number];
+
+export const SYSTEM_RESOURCES: Record<SystemResourceKey, ResourceCreateRequest> = {
+  ALL: {
+    namespace: '*',
+    entity: '*',
+    qualifier: '*',
+    fieldsMode: 'all',
+    fields: [],
+    isActive: true,
+  },
+  // 其余服务通配资源
+  ...(Object.fromEntries(
+    Object.keys(SYSTEM_SERVICES).map(key => {
+      const service = SYSTEM_SERVICES[key as SystemServiceKey];
+      const resource: ResourceCreateRequest = {
+        namespace: service.serviceId,
+        entity: '*',
+        qualifier: '*',
+        fieldsMode: 'all',
+        fields: [],
+        isActive: true,
+      };
+      return [key, resource];
+    })
+  ) as Record<SystemServiceKey, ResourceCreateRequest>),
+} as const;

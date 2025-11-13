@@ -1,7 +1,7 @@
-import { RoleSource } from 'src/enums/roleSource.enum';
+import { RoleSource } from '../../../enums/roleSource.enum';
 import { InvitationListRequest } from '../request/list.request.schema';
-import { InvitationListResponse } from '../response';
-import { OrderEnum } from 'src/enums';
+import { InvitationListResponse } from '../response/list.response.schema';
+import { OrderEnum } from '../../../enums/order.enum';
 
 export const invitationListRequestData: InvitationListRequest = {
   limit: 20,

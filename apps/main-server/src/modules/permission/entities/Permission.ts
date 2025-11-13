@@ -70,6 +70,9 @@ export class Permission extends BaseEntity {
   @Column({ type: 'uuid' })
   resourceId!: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  resource_key!: string;
+
   /** 动作（统一指向全局 Action 字典；建议 onDelete: RESTRICT 防止误删动作） */
   @ManyToOne(() => Action, { nullable: false, onDelete: 'RESTRICT', eager: true })
   @JoinColumn({ name: 'actionId' })
@@ -99,6 +102,8 @@ export class Permission extends BaseEntity {
     // 1) 同步 actionName
     const an = this.action?.name || '';
     if (an) this.actionName = an;
+    const rk = this.resource.resource_key || '';
+    if (rk) this.resource_key = rk;
 
     this.fieldsHash = arrayToString(this.fields); // 需要更强一致性可换 sha1
 

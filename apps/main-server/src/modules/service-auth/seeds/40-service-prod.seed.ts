@@ -45,11 +45,6 @@ export default class ServiceProdSeed extends BaseSeeder {
     this.logger.info('🚀 Inserting services...');
     const savedServices = await serviceRepo.save(this.servicesToInsert);
 
-    const serviceMap = new Map<string, Service>();
-    for (const service of savedServices) {
-      serviceMap.set(service.serviceId, service);
-    }
-
     for (const service of savedServices) {
       this.logger.info(`✅ Inserted service: "${service.serviceId}"`);
     }

@@ -1,7 +1,10 @@
 import { ServiceCreateRequest } from '@frankjhub/shared-schema';
 import { env } from '../../../config/env';
 
-export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
+export const SYSTEM_SERVICE_KEY_LIST = ['BOOKING', 'MAIN'] as const;
+export type SystemServiceKey = (typeof SYSTEM_SERVICE_KEY_LIST)[number];
+
+export const SYSTEM_SERVICES = {
   BOOKING: {
     serviceId: 'booking',
     name: 'Booking Service',
@@ -29,6 +32,4 @@ export const SYSTEM_SERVICES: Record<string, ServiceCreateRequest> = {
     serviceSecret: 'main-server-secret',
     description: 'Main Service',
   },
-};
-
-export type SystemServiceId = (typeof SYSTEM_SERVICES)[keyof typeof SYSTEM_SERVICES]['serviceId'];
+} as const satisfies Record<SystemServiceKey, ServiceCreateRequest>;

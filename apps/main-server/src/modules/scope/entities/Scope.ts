@@ -31,6 +31,9 @@ export class Scope extends BaseEntity {
   @Column({ type: 'uuid' })
   resourceId!: string;
 
+  @Column({ type: 'varchar', length: 100 })
+  resource_key!: string;
+
   /** 动作字典 */
   @ManyToOne(() => Action, { nullable: false, onDelete: 'RESTRICT', eager: true })
   @JoinColumn({ name: 'actionId' })
@@ -55,6 +58,8 @@ export class Scope extends BaseEntity {
     // 1) 同步 actionName
     const an = this.action?.name || '';
     if (an) this.actionName = an;
+    const rk = this.resource.resource_key || '';
+    if (rk) this.resource_key = rk;
 
     // 2) 拼装 key
     const ns = this.resource?.namespace || ''; // = serviceId

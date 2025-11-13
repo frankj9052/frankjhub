@@ -13,6 +13,7 @@ import {
 import { permissionEffectSchema } from '../constants/effect.enum';
 import { isActiveSchema } from '../../../modules/common/entity/isActive.schema';
 import { versionSchema } from '../../../modules/common/entity/version.schema';
+import { resourceKeySchema } from '../../../modules/resource';
 
 export const permissionSchema = z.object({
   ...baseEntitySchema.shape,
@@ -24,6 +25,7 @@ export const permissionSchema = z.object({
   condition: permissionConditionSchema.optional(),
   conditionHash: permissionConditionHashSchema,
   resourceId: idSchema,
+  resource_key: resourceKeySchema,
   actionId: idSchema,
   actionName: actionNameSchema,
   effect: permissionEffectSchema,
