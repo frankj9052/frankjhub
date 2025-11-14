@@ -49,9 +49,17 @@ export const parseScopeKey = (scopeKey: string): ScopeKeyParts => {
   const resourceRaw = s.slice(0, idx);
   const action = s.slice(idx + 1).trim();
 
+  let resource = undefined;
   // 校验 resourceKey 与 action
-  const resource = parseResourceKey(resourceRaw);
-  if (!ACTION_RE.test(action)) {
+  if (resourceRaw.trim() === '*') {
+    resource = {
+      namespace: '*',
+      entity: '*',
+    };
+  } else {
+    resource = parseResourceKey(resourceRaw);
+  }
+  if (!ACTION_RE.test(action) && action !== '*') {
     throw new Error(`Invalid action for scopeKey: "${action}"`);
   }
 
@@ -130,6 +138,12 @@ export const buildResourceKey = (parts: ResourceKeyParts) => {
 
 export const parseResourceKey = (resourceKey: string): ResourceKeyParts => {
   const key = (resourceKey || '').trim();
+
+  // 额外支持 "*"
+  if (key === '*') {
+    return { namespace: '*', entity: '*' };
+  }
+
   // 允许：ns.entity 或 ns.entity.* 或 ns.entity.:id
   const m = key.match(/^([a-z][a-zA-Z0-9]*)\.([a-z][a-zA-Z0-9]*)(?:\.(\*|:id))?$/);
   if (!m) throw new Error(`Invalid resourceKey format: "${resourceKey}"`);
@@ -287,7 +301,7 @@ export const parsePermissionName = (permissionName: string): ParsedPermission =>
     throw new Error(`Invalid permission string format: ${permissionName}`);
   }
 
-  const [resourceRaw, actionStr, fieldStr, conditionStr] = m;
+  const [, resourceRaw, actionStr, fieldStr, conditionStr] = m;
 
   // 校验 + 规范化 resourceKey
   const resourceKey = resourceRaw.trim() === '*' ? '*' : normalizeResourceKey(resourceRaw);

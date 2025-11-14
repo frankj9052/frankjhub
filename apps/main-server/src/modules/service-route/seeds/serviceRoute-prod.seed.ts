@@ -1,14 +1,18 @@
-import { ServiceRouteCreateRequest } from '@frankjhub/shared-schema';
-import { SYSTEM_SERVICES } from '../../common/constants/system-services';
+import { BaseSeeder } from '../../common/libs/BaseSeeder';
+import { ServiceRoute } from '../entities/ServiceRoute';
+import { DataSource } from 'typeorm';
+import { SeederFactoryManager } from 'typeorm-extension';
 
-export const SYSTEM_SERVICE_ROUTE_KEY_LIST = [] as const;
+export default class ServiceRouteProdSeed extends BaseSeeder {
+  private serviceRouteToInsert: ServiceRoute[] = [];
 
-export const SYSTEM_SERVICE_ROUTES: Record<string, ServiceRouteCreateRequest> = {
-  LOGIN: {
-    path: '/login',
-    serviceId: SYSTEM_SERVICES.MAIN.serviceId,
-    methods: ['POST'],
-    routeRuleType: 'exact',
-    rewrite: '',
-  },
-};
+  override async shouldRun(dataSource: DataSource): Promise<boolean> {
+    this.logger.info('🔍 Checking for system service routes...');
+    // test
+    return false;
+  }
+
+  override async run(dataSource: DataSource, factoryManager: SeederFactoryManager): Promise<void> {
+    console.log('run');
+  }
+}

@@ -8,6 +8,7 @@ export const SYSTEM_ACTION_KEY_LIST = [
   'SOFT_DELETE',
   'HARD_DELETE',
   'RESTORE',
+  'LIST',
 ] as const;
 export type SystemActionKey = (typeof SYSTEM_ACTION_KEY_LIST)[number];
 
@@ -33,12 +34,12 @@ export const SYSTEM_ACTIONS: Record<SystemActionKey, ActionCreateRequest> = {
     description: 'Update existing resource',
   },
   SOFT_DELETE: {
-    name: 'soft-delete',
+    name: 'soft_delete',
     displayName: 'Soft Delete',
     description: 'Soft delete data',
   },
   HARD_DELETE: {
-    name: 'hard-delete',
+    name: 'hard_delete',
     displayName: 'Hard Delete',
     description: 'Delete data permanently',
   },
@@ -46,5 +47,10 @@ export const SYSTEM_ACTIONS: Record<SystemActionKey, ActionCreateRequest> = {
     name: 'restore',
     displayName: 'Restore',
     description: 'Restore data from soft delete',
+  },
+  LIST: {
+    name: 'list',
+    displayName: 'List',
+    description: 'List resources (lightweight, e.g. for options/autocomplete)',
   },
 } as const;
