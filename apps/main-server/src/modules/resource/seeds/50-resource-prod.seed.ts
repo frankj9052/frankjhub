@@ -57,7 +57,7 @@ export default class ResourceProdSeed extends BaseSeeder {
       this.resourcesToInsert.push(resource);
     }
 
-    // 处理SERVICE_ROUTE
+    // 处理SERVICE_ROUTE的resource
     for (const key of Object.keys(SYSTEM_SERVICE_ROUTES)) {
       const scopes = SYSTEM_SERVICE_ROUTES[key as SystemServiceRouteKey].scopes;
       if (scopes.length === 0) {
