@@ -13,11 +13,16 @@
   },
   "nx": {
     "targets": {
+      "storybook": {
+        "options": {
+          "port": 9019
+        }
+      },
       "storybook-static": {
         "executor": "@nx/web:file-server",
         "options": {
           "staticFilePath": "libs/storybook-host/storybook-static",
-          "port": 6006,
+          "port": 9009,
           "fallback": "index.html",
           "spa": true,
           "watch": false
