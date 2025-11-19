@@ -22,6 +22,7 @@ export const permissionDetailData: PermissionDetail = {
   fieldsHash: 'abc123def456',
   conditionHash: 'xyz789ghi012',
   resourceId: 'a1e7c3b9-8f2d-41b5-9a6d-3f2c7b8e4d13',
+  resource_key: 'main.invitation',
   actionId: 'e7b6a2c1-3f8d-4a9e-9b7f-1d2c5a8b9e34',
   actionName: 'READ',
   effect: 'allow',

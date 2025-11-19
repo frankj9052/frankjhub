@@ -70,7 +70,7 @@ export class PermissionService {
   ): Promise<SimpleResponse> {
     const log = logger.child({
       method: 'createPermission',
-      resourceId: data.resourceId,
+      resource_key: data.resource_key,
       createdBy,
     });
 

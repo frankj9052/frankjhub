@@ -1,6 +1,6 @@
 import { DataSource, Repository } from 'typeorm';
 import { Action } from '../entities/Action';
-import { SYSTEM_ACTIONS } from '../../common/constants/system-actions';
+import { SYSTEM_ACTIONS, SystemActionKey } from '../../common/constants/system-actions';
 import { BaseSeeder } from '../../common/libs/BaseSeeder';
 
 /**
@@ -22,7 +22,7 @@ export default class ActionProdSeed extends BaseSeeder {
     this.logger.info('🔍 Checking for required actions...');
     const repo = this.getRepository(dataSource);
     this.missingActions = [];
-    const actionKeys: (keyof typeof SYSTEM_ACTIONS)[] = Object.keys(this.actions);
+    const actionKeys = Object.keys(this.actions) as SystemActionKey[];
     for (const key of actionKeys) {
       const exists = await repo.exists({ where: { name: this.actions[key].name } });
       if (!exists) {

@@ -14,7 +14,6 @@ import {
   updateServiceController,
 } from './serviceAuth.controller';
 import { requirePermission } from '../common/middlewares/requirePermission';
-import { buildPermissionName } from '../codecs/permissionCodec';
 import { SYSTEM_RESOURCES } from '../common/constants/system-resources';
 import { SYSTEM_ACTIONS } from '../common/constants/system-actions';
 import { validateRequest } from '../common/middlewares/validateRequest';
@@ -24,8 +23,19 @@ import {
   serviceListRequestSchema,
   serviceUpdateRequestSchema,
 } from '@frankjhub/shared-schema';
+import { buildResourceKey, buildSingleActionPermissionName } from '@frankjhub/shared-perm';
 
 const router = Router();
+const resource_key_collection = buildResourceKey({
+  namespace: SYSTEM_RESOURCES.MAIN.namespace,
+  entity: 'service',
+  qualifier: '*',
+});
+const resource_key_item = buildResourceKey({
+  namespace: SYSTEM_RESOURCES.MAIN.namespace,
+  entity: 'service',
+  qualifier: ':id',
+});
 
 router.post('/auth/service-login', serviceLoginController);
 router.get('/.well-known/jwks.json', getJwksController); // ✅ 业界标准路径
@@ -39,7 +49,7 @@ router.get('/registry/snapshot', getSnapshotController);
 router.post(
   '/service',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.CREATE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.CREATE.name)
   ),
   validateRequest({ body: serviceCreateRequestSchema }),
   createServiceController
@@ -48,7 +58,9 @@ router.post(
 /** 管理端：服务列表（Query 方式） */
 router.get(
   '/service/list',
-  requirePermission(buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.READ.name])),
+  requirePermission(
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.READ.name)
+  ),
   validateRequest({ query: serviceListRequestSchema }),
   getServiceListController
 );
@@ -57,7 +69,7 @@ router.get(
 router.patch(
   '/service/update',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.UPDATE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.UPDATE.name)
   ),
   validateRequest({ body: serviceUpdateRequestSchema }),
   updateServiceController
@@ -67,7 +79,7 @@ router.patch(
 router.patch(
   '/service/soft-delete',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.SOFT_DELETE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.SOFT_DELETE.name)
   ),
   validateRequest({ body: idParamsSchema }),
   softDeleteServiceController
@@ -77,7 +89,7 @@ router.patch(
 router.patch(
   '/service/restore',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.RESTORE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.RESTORE.name)
   ),
   validateRequest({ body: idParamsSchema }),
   restoreServiceController
@@ -87,7 +99,7 @@ router.patch(
 router.delete(
   '/service/hard-delete',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.HARD_DELETE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.HARD_DELETE.name)
   ),
   validateRequest({ query: idParamsSchema }),
   hardDeleteServiceController
@@ -95,7 +107,7 @@ router.delete(
 
 router.get(
   '/service/:id',
-  requirePermission(buildPermissionName(SYSTEM_RESOURCES.SERVICE.name, [SYSTEM_ACTIONS.READ.name])),
+  requirePermission(buildSingleActionPermissionName(resource_key_item, SYSTEM_ACTIONS.READ.name)),
   getServiceByIdController
 );
 

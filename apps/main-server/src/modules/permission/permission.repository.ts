@@ -19,8 +19,8 @@ type PermissionRelationKeys = 'resource' | 'action';
 
 /** 与数据库复合唯一键一致的组合键 */
 export type PermissionComposite = {
-  resourceId: string;
-  actionId: string;
+  resource_key: string;
+  actionName: string;
   fieldsHash: string;
   conditionHash: string;
   effect: PermissionEffect;
@@ -67,8 +67,8 @@ export class PermissionRepository {
 
   /** 以实体钩子相同规则预计算 hashes，用于唯一性检查 */
   private computeCompositeFromInput(input: {
-    resourceId: string;
-    actionId: string;
+    resource_key: string;
+    actionName: string;
     fields?: string[];
     condition?: Record<string, unknown> | null;
     effect?: PermissionEffect;
@@ -76,8 +76,8 @@ export class PermissionRepository {
     const fieldsHash = arrayToString(input.fields);
     const conditionHash = safeJsonStringify(input.condition ?? undefined);
     return {
-      resourceId: input.resourceId,
-      actionId: input.actionId,
+      resource_key: input.resource_key,
+      actionName: input.actionName,
       fieldsHash,
       conditionHash,
       effect: input.effect ?? PERMISSION_EFFECT.ALLOW,
@@ -96,21 +96,21 @@ export class PermissionRepository {
     const repo = this.repo(manager);
 
     // 基础校验
-    if (!dto.resourceId) throw new BadRequestError('"resourceId" is required');
-    if (!dto.actionId) throw new BadRequestError('"actionId" is required');
+    if (!dto.resource_key) throw new BadRequestError('"resource_key" is required');
+    if (!dto.actionName) throw new BadRequestError('"actionName" is required');
 
     // 加载 Resource / Action（确保实体钩子能生成 name / actionName）
     const [resource, action] = await Promise.all([
-      this.resourceRepo(manager).findOne({ where: { id: dto.resourceId } }),
-      this.actionRepo(manager).findOne({ where: { id: dto.actionId } }),
+      this.resourceRepo(manager).findOne({ where: { resource_key: dto.resource_key } }),
+      this.actionRepo(manager).findOne({ where: { name: dto.actionName } }),
     ]);
-    if (!resource) throw new NotFoundError(`Resource ${dto.resourceId} not found`);
-    if (!action) throw new NotFoundError(`Action ${dto.actionId} not found`);
+    if (!resource) throw new NotFoundError(`Resource Key ${dto.resource_key} not found`);
+    if (!action) throw new NotFoundError(`Action Name ${dto.actionName} not found`);
 
     // 预计算复合唯一键（与实体钩子一致）
     const key = this.computeCompositeFromInput({
-      resourceId: dto.resourceId,
-      actionId: dto.actionId,
+      resource_key: dto.resource_key,
+      actionName: dto.actionName,
       fields: dto.fields,
       condition: (dto as any).condition ?? undefined,
       effect: dto.effect ?? PERMISSION_EFFECT.ALLOW,
@@ -120,7 +120,7 @@ export class PermissionRepository {
     const exists = await this.existsByComposite(key, { withDeleted: true, manager });
     if (exists) {
       throw new BadRequestError(
-        `Permission already exists (resourceId="${key.resourceId}", actionId="${key.actionId}", fieldsHash="${key.fieldsHash}", conditionHash="${key.conditionHash}", effect="${key.effect}")`
+        `Permission already exists (resource_key="${key.resource_key}", actionName="${key.actionName}", fieldsHash="${key.fieldsHash}", conditionHash="${key.conditionHash}", effect="${key.effect}")`
       );
     }
 
@@ -181,8 +181,8 @@ export class PermissionRepository {
 
     let findOptions: FindOneOptions<Permission> = {
       where: {
-        resourceId: composite.resourceId,
-        actionId: composite.actionId,
+        resource_key: composite.resource_key,
+        actionName: composite.actionName,
         fieldsHash: composite.fieldsHash,
         conditionHash: composite.conditionHash,
         effect: composite.effect,
@@ -213,8 +213,8 @@ export class PermissionRepository {
     const repo = this.repo(options?.manager);
     return repo.exists({
       where: {
-        resourceId: composite.resourceId,
-        actionId: composite.actionId,
+        resource_key: composite.resource_key,
+        actionName: composite.actionName,
         fieldsHash: composite.fieldsHash,
         conditionHash: composite.conditionHash,
         effect: composite.effect,
@@ -311,8 +311,8 @@ export class PermissionRepository {
 
     // 预计算潜在的复合唯一键冲突
     const composite = this.computeCompositeFromInput({
-      resourceId: current.resourceId,
-      actionId: current.actionId,
+      resource_key: current.resource_key,
+      actionName: current.actionName,
       fields: current.fields,
       condition: current.condition as any,
       effect: current.effect,
@@ -321,8 +321,8 @@ export class PermissionRepository {
     const conflict = await repo.exists({
       where: {
         id: Not(current.id),
-        resourceId: composite.resourceId,
-        actionId: composite.actionId,
+        resource_key: composite.resource_key,
+        actionName: composite.actionName,
         fieldsHash: composite.fieldsHash,
         conditionHash: composite.conditionHash,
         effect: composite.effect,
@@ -331,7 +331,7 @@ export class PermissionRepository {
     });
     if (conflict) {
       throw new BadRequestError(
-        `Another Permission already exists with the same composite key (resourceId="${composite.resourceId}", actionId="${composite.actionId}", fieldsHash="${composite.fieldsHash}", conditionHash="${composite.conditionHash}", effect="${composite.effect}")`
+        `Another Permission already exists with the same composite key (resource_key="${composite.resource_key}", actionName="${composite.actionName}", fieldsHash="${composite.fieldsHash}", conditionHash="${composite.conditionHash}", effect="${composite.effect}")`
       );
     }
 

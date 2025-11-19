@@ -17,12 +17,24 @@ import {
 } from '@frankjhub/shared-schema';
 
 import { requirePermission } from '../common/middlewares/requirePermission';
-import { buildPermissionName } from '../codecs/permissionCodec';
 import { validateRequest } from '../common/middlewares/validateRequest';
 import { SYSTEM_RESOURCES } from '../common/constants/system-resources';
 import { SYSTEM_ACTIONS } from '../common/constants/system-actions';
+import { buildResourceKey, buildSingleActionPermissionName } from '@frankjhub/shared-perm';
 
 const router = Router();
+
+const resource_key_collection = buildResourceKey({
+  namespace: SYSTEM_RESOURCES.MAIN.namespace,
+  entity: 'invitation',
+  qualifier: '*',
+});
+
+const resource_key_item = buildResourceKey({
+  namespace: SYSTEM_RESOURCES.MAIN.namespace,
+  entity: 'invitation',
+  qualifier: ':id',
+});
 
 /**
  * 发起邀请
@@ -30,7 +42,7 @@ const router = Router();
 router.post(
   '/invitation/issue',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.CREATE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.CREATE.name)
   ),
   validateRequest({ body: issueInvitationRequestSchema }),
   issueInvitationController
@@ -51,7 +63,7 @@ router.post(
 router.patch(
   '/invitation/revoke',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.UPDATE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.UPDATE.name)
   ),
   validateRequest({ body: idParamsSchema }),
   revokeInvitationController
@@ -63,20 +75,18 @@ router.patch(
 router.get(
   '/invitation/list',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.READ.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.READ.name)
   ),
   validateRequest({ query: invitationListRequestSchema }),
   getInvitationListController
 );
 
-router.post(
-  '/invitation/list/search',
-  requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.READ.name])
-  ),
-  validateRequest({ body: invitationListRequestSchema }),
-  getInvitationListController
-);
+// router.post(
+//   '/invitation/list/search',
+//   requirePermission(buildSingleActionPermissionName(resource_key_item, SYSTEM_ACTIONS.READ.name)),
+//   validateRequest({ body: invitationListRequestSchema }),
+//   getInvitationListController
+// );
 
 /**
  * 硬删除邀请
@@ -84,7 +94,7 @@ router.post(
 router.delete(
   '/invitation/hard-delete',
   requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.DELETE.name])
+    buildSingleActionPermissionName(resource_key_collection, SYSTEM_ACTIONS.HARD_DELETE.name)
   ),
   validateRequest({ query: idParamsSchema }),
   hardDeleteInvitationController
@@ -93,9 +103,7 @@ router.delete(
 // 发邀请email
 router.post(
   '/invitation/:id/resend',
-  requirePermission(
-    buildPermissionName(SYSTEM_RESOURCES.INVITATION.name, [SYSTEM_ACTIONS.UPDATE.name])
-  ),
+  requirePermission(buildSingleActionPermissionName(resource_key_item, SYSTEM_ACTIONS.UPDATE.name)),
   validateRequest({ params: idParamsSchema }),
   sendInvitationEmailController
 );
