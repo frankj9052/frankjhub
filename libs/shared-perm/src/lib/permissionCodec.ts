@@ -144,8 +144,10 @@ export const parseResourceKey = (resourceKey: string): ResourceKeyParts => {
     return { namespace: '*', entity: '*' };
   }
 
-  // 允许：ns.entity 或 ns.entity.* 或 ns.entity.:id
-  const m = key.match(/^([a-z][a-zA-Z0-9]*)\.([a-z][a-zA-Z0-9]*)(?:\.(\*|:id))?$/);
+  // 允许：ns.entity / ns.* / ns.entity.* / ns.entity.:id / ns.*.*
+  const m = key.match(
+    /^([a-z][a-zA-Z0-9]*)\.([a-z][a-zA-Z0-9]*|\*)(?:\.(\*|:id))?$/ // 👈 entity 允许为 *
+  );
   if (!m) throw new Error(`Invalid resourceKey format: "${resourceKey}"`);
 
   const [, namespace, entity, q] = m;

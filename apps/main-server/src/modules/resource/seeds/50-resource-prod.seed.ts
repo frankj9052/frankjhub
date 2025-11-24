@@ -11,12 +11,17 @@ import {
 
 export default class ResourceProdSeed extends BaseSeeder {
   private resourcesToInsert: Resource[] = [];
+  private resourceKeySet = new Set<string>(); // 本轮 seeder 内存去重
 
   override async shouldRun(dataSource: DataSource): Promise<boolean> {
     this.logger.info('🔍 Checking for system resources...');
 
     const resourceRepo = dataSource.getRepository(Resource);
     const serviceRepo = dataSource.getRepository(Service);
+
+    // 防御性：确保每次 run 前都是干净的
+    this.resourcesToInsert = [];
+    this.resourceKeySet = new Set<string>();
 
     // 处理SYSTEM_RESOURCES
     for (const key of Object.keys(SYSTEM_RESOURCES)) {
@@ -46,6 +51,15 @@ export default class ResourceProdSeed extends BaseSeeder {
         this.logger.info(`✅ Resource "${resource_key}" already exists. Skipping.`);
         continue;
       }
+
+      // 再查本次 seeder 是否已经准备插入过
+      if (this.resourceKeySet.has(resource_key)) {
+        this.logger.info(
+          `✅ Resource "${resource_key}" already queued in seeder. Skipping duplicate.`
+        );
+        continue;
+      }
+      this.resourceKeySet.add(resource_key);
 
       const resource = resourceRepo.create({
         ...config,
@@ -88,6 +102,15 @@ export default class ResourceProdSeed extends BaseSeeder {
           this.logger.info(`✅ Resource "${resource_key}" already exists. Skipping.`);
           continue;
         }
+
+        // 查本地队列
+        if (this.resourceKeySet.has(resource_key)) {
+          this.logger.info(
+            `✅ Resource "${resource_key}" already queued in seeder. Skipping duplicate.`
+          );
+          continue;
+        }
+        this.resourceKeySet.add(resource_key);
 
         const resource = resourceRepo.create({
           namespace: config.resource.namespace,

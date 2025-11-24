@@ -26,6 +26,16 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
       // 从数据库中查完整用户上下文（使用 authService 内部逻辑）
       const fullUser = await authService.getUserPayloadById(sessionUser.id);
 
+      // 用户查不到，视为 session 失效
+      if (!fullUser) {
+        logger.warn(`Session user not found: ${sessionUser.id}`);
+        req.session.destroy(() => {
+          /** noop */
+        });
+        res.clearCookie('sid');
+        return next();
+      }
+
       // 检查 sessionVersion 是否匹配（防止用旧权限）
       if (fullUser.sessionVersion !== sessionUser.sessionVersion) {
         logger.warn(`Session version mismatch for user ${sessionUser.id}`);
@@ -36,8 +46,10 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
         res.clearCookie('sid');
         return next();
       }
-    }
 
+      req.currentUser = fullUser;
+      return next();
+    }
     /** =========================
      *  2️⃣ 若没有 session，则尝试 JWT
      * ========================= */
@@ -56,7 +68,7 @@ export const currentUser = async (req: Request, res: Response, next: NextFunctio
         req.currentUser = {
           id: payload.id,
           userName: payload.userName,
-          email: payload.userName,
+          email: payload.email,
           emailVerified: payload.emailVerified,
           profileCompleted: payload.profileCompleted,
           isActive: payload.isActive,

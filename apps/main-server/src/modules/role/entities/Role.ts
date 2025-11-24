@@ -43,18 +43,18 @@ export class Role extends BaseEntity {
   @Column({ type: 'enum', enum: RoleSource, default: RoleSource.TYPE })
   roleSource?: RoleSource;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'organization_type_id' })
   organizationTypeId?: string | null;
 
   @ManyToOne(() => OrganizationType, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'organizationTypeId' })
+  @JoinColumn({ name: 'organization_type_id' })
   organizationType?: OrganizationType | null;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'uuid', nullable: true, name: 'organization_id' })
   organizationId?: string | null;
 
   @ManyToOne(() => Organization, { nullable: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'organizationId' })
+  @JoinColumn({ name: 'organization_id' })
   organization?: Organization | null;
 
   @OneToMany(() => RolePermission, rp => rp.role, { nullable: true, onDelete: 'CASCADE' })

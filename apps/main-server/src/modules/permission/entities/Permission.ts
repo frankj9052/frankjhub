@@ -64,10 +64,10 @@ export class Permission extends BaseEntity {
    * - 资源删除时联动删除权限
    */
   @ManyToOne(() => Resource, { nullable: false, onDelete: 'CASCADE', eager: true })
-  @JoinColumn({ name: 'resourceId' })
+  @JoinColumn({ name: 'resource_id' })
   resource!: Resource;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'resource_id' })
   resourceId!: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -75,10 +75,10 @@ export class Permission extends BaseEntity {
 
   /** 动作（统一指向全局 Action 字典；建议 onDelete: RESTRICT 防止误删动作） */
   @ManyToOne(() => Action, { nullable: false, onDelete: 'RESTRICT', eager: true })
-  @JoinColumn({ name: 'actionId' })
+  @JoinColumn({ name: 'action_id' })
   action!: Action;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'action_id' })
   actionId!: string;
 
   /** 冗余缓存动作名（与 Action.name 一致，便于拼 name/少 join） */

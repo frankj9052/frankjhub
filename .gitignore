@@ -126,9 +126,6 @@ firebase-debug.log
 
 # ---------------------------------------------
 # 🐳 Docker / PM2 支持
-Dockerfile
-docker-compose.yml
-docker-compose.*.yml
 *.pid
 .pm2/
 

@@ -20,17 +20,17 @@ export class RouteScope extends BaseEntity {
   id!: string;
 
   @ManyToOne(() => ServiceRoute, { nullable: false, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'routeId' })
+  @JoinColumn({ name: 'route_id' })
   route!: ServiceRoute;
 
-  @Column('uuid')
+  @Column({ type: 'uuid', name: 'route_id' })
   routeId!: string;
 
   @ManyToOne(() => Scope, { nullable: false, onDelete: 'RESTRICT', eager: true })
-  @JoinColumn({ name: 'scopeId' })
+  @JoinColumn({ name: 'scope_id' })
   scope!: Scope;
 
-  @Column('uuid')
+  @Column({ type: 'uuid', name: 'scope_id' })
   scopeId!: string;
 
   // 冗余，便于快照/日志

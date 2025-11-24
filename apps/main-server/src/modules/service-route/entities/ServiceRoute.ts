@@ -28,10 +28,10 @@ export class ServiceRoute extends BaseEntity {
 
   /** 归属服务（以 serviceId 为自然键的 Service） */
   @ManyToOne(() => Service, { nullable: false, onDelete: 'CASCADE', eager: true })
-  @JoinColumn({ name: 'serviceId', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'serviceId', referencedColumnName: 'serviceId' })
   service!: Service;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'varchar' })
   serviceId!: string;
 
   /** 路由路径（网关对外暴露，如 /booking、/users/:id） */

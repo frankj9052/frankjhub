@@ -1,0 +1,16 @@
+services:
+  main-db-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: main-psql:18
+    container_name: main-psql-dev
+    environment:
+      POSTGRES_USER: frank
+      POSTGRES_PASSWORD: Jurong@2025
+      POSTGRES_DB: main_db_dev
+    ports:
+      - "5555:5432"
+    volumes:
+      - /srv/postgres/main-dev:/var/lib/postgresql
+    restart: unless-stopped

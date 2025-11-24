@@ -1,6 +1,7 @@
 import { ActionCreateRequest } from '@frankjhub/shared-schema';
 
 export const SYSTEM_ACTION_KEY_LIST = [
+  'ANY',
   'ALL',
   'CREATE',
   'READ',
@@ -13,8 +14,13 @@ export const SYSTEM_ACTION_KEY_LIST = [
 export type SystemActionKey = (typeof SYSTEM_ACTION_KEY_LIST)[number];
 
 export const SYSTEM_ACTIONS: Record<SystemActionKey, ActionCreateRequest> = {
+  ANY: {
+    name: 'any',
+    displayName: 'Any',
+    description: 'Any actions',
+  },
   ALL: {
-    name: '*',
+    name: 'all',
     displayName: 'All',
     description: 'All actions',
   },

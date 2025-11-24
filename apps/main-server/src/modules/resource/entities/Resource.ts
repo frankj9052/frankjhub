@@ -103,10 +103,18 @@ export class Resource extends BaseEntity {
     length: 300,
     generatedType: 'STORED',
     asExpression: `
-      CASE 
-        WHEN "qualifier" IS NULL OR "qualifier" = '' 
-          THEN "namespace" || '.' || "entity"
-        ELSE "namespace" || '.' || "entity" || '.' || "qualifier"
+      CASE
+        -- 1) 全部为 * 时，简写为 '*'
+        WHEN btrim("namespace") = '*' AND btrim("entity") = '*'
+             AND ("qualifier" IS NULL OR btrim("qualifier") = '' OR btrim("qualifier") = '*')
+          THEN '*'
+
+        -- 2) qualifier 为 "*" 或空，则省略 qualifier
+        WHEN "qualifier" IS NULL OR btrim("qualifier") = '' OR btrim("qualifier") = '*'
+          THEN btrim("namespace") || '.' || btrim("entity")
+
+        -- 3) 其余情况，完整拼接
+        ELSE btrim("namespace") || '.' || btrim("entity") || '.' || btrim("qualifier")
       END
     `,
   })

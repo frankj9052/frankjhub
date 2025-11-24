@@ -20,16 +20,25 @@ export default class ScopeProdSeed extends BaseSeeder {
     const resourceRepo = dataSource.getRepository(Resource);
     const actionRepo = dataSource.getRepository(Action);
 
+    // 本轮内存去重
+    const seenKeys = new Set<string>();
+
     // 处理SYSTEM_SERVICE_ROUTE里的scope
-    for (const key of Object.keys(SYSTEM_SERVICE_ROUTES)) {
-      const config = SYSTEM_SERVICE_ROUTES[key as SystemServiceRouteKey];
+    for (const routeKey of Object.keys(SYSTEM_SERVICE_ROUTES)) {
+      const config = SYSTEM_SERVICE_ROUTES[routeKey as SystemServiceRouteKey];
+
+      const scopes = config.scopes;
 
       // 检测scope是否存在
-      const scopes = config.scopes;
-      for (const key of scopes) {
+      for (const scopeKey of scopes) {
+        // 先看内存里是否有重复的key
+        if (seenKeys.has(scopeKey)) {
+          continue;
+        }
+
         const exists = await scopeRepo.exists({
           where: {
-            key,
+            key: scopeKey,
           },
           withDeleted: true,
         });
@@ -37,7 +46,7 @@ export default class ScopeProdSeed extends BaseSeeder {
           continue;
         }
 
-        const parsedScopeKey = parseScopeKey(key);
+        const parsedScopeKey = parseScopeKey(scopeKey);
 
         // 检测resource是否存在
         const resource = await resourceRepo.findOne({
@@ -74,10 +83,11 @@ export default class ScopeProdSeed extends BaseSeeder {
           action,
           resource_key: buildResourceKey(parsedScopeKey.resource),
           actionName: parsedScopeKey.action,
-          key,
+          key: scopeKey,
         });
 
         this.scopeToInsert.push(scope);
+        seenKeys.add(scopeKey);
       }
     }
     return this.scopeToInsert.length > 0;

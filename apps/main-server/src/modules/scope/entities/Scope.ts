@@ -25,10 +25,10 @@ export class Scope extends BaseEntity {
 
   /** 资源 */
   @ManyToOne(() => Resource, { nullable: false, onDelete: 'CASCADE', eager: true })
-  @JoinColumn({ name: 'resourceId' })
+  @JoinColumn({ name: 'resource_id' })
   resource!: Resource;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'resource_id' })
   resourceId!: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -36,15 +36,15 @@ export class Scope extends BaseEntity {
 
   /** 动作字典 */
   @ManyToOne(() => Action, { nullable: false, onDelete: 'RESTRICT', eager: true })
-  @JoinColumn({ name: 'actionId' })
+  @JoinColumn({ name: 'action_id' })
   action!: Action;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'action_id' })
   actionId!: string;
 
   /** 冗余缓存：动作名称（如 'read'），便于快速拼 key */
   @Check('ck_scope_action_name_nonempty', `"action_name" <> ''`)
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'varchar', length: 64, name: 'action_name' })
   actionName!: string;
 
   /** 规范化 scope 字符串：<serviceId>.<entity>:<action> */

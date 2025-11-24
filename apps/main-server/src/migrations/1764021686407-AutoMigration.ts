@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AutoMigration1762542244675 implements MigrationInterface {
-  name = 'AutoMigration1762542244675';
+export class AutoMigration1764021686407 implements MigrationInterface {
+  name = 'AutoMigration1764021686407';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -26,20 +26,17 @@ export class AutoMigration1762542244675 implements MigrationInterface {
       `CREATE UNIQUE INDEX "ux_action_name_not_deleted" ON "action" ("name") WHERE "deleted_at" IS NULL`
     );
     await queryRunner.query(
-      `CREATE TABLE "scope" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "resource_id" uuid NOT NULL, "action_id" uuid NOT NULL, "action_name" character varying(64) NOT NULL, "key" character varying(300) NOT NULL, "resourceId" uuid NOT NULL, "actionId" uuid NOT NULL, CONSTRAINT "ux_scope_resource_action" UNIQUE ("resourceId", "actionId"), CONSTRAINT "ux_scope_key" UNIQUE ("key"), CONSTRAINT "ck_scope_action_name_nonempty" CHECK ("action_name" <> ''), CONSTRAINT "ck_scope_key_nonempty" CHECK ("key" <> ''), CONSTRAINT "PK_d3425631cbb370861a58c3e88c7" PRIMARY KEY ("id"))`
+      `CREATE TABLE "scope" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "resource_id" uuid NOT NULL, "resource_key" character varying(100) NOT NULL, "action_id" uuid NOT NULL, "action_name" character varying(64) NOT NULL, "key" character varying(300) NOT NULL, CONSTRAINT "ux_scope_resource_action" UNIQUE ("resource_id", "action_id"), CONSTRAINT "ux_scope_key" UNIQUE ("key"), CONSTRAINT "ck_scope_action_name_nonempty" CHECK ("action_name" <> ''), CONSTRAINT "ck_scope_key_nonempty" CHECK ("key" <> ''), CONSTRAINT "PK_d3425631cbb370861a58c3e88c7" PRIMARY KEY ("id"))`
     );
-    await queryRunner.query(`CREATE INDEX "ix_scope_resource" ON "scope" ("resourceId") `);
+    await queryRunner.query(`CREATE INDEX "ix_scope_resource" ON "scope" ("resource_id") `);
     await queryRunner.query(
-      `CREATE TABLE "route_scope" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "route_id" uuid NOT NULL, "scope_id" uuid NOT NULL, "scope_key" character varying(300) NOT NULL, "routeId" uuid NOT NULL, "scopeId" uuid NOT NULL, CONSTRAINT "ux_route_scope" UNIQUE ("routeId", "scopeId"), CONSTRAINT "PK_ad10e0db3b3f1a035a48011a28d" PRIMARY KEY ("id"))`
+      `CREATE TABLE "route_scope" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "route_id" uuid NOT NULL, "scope_id" uuid NOT NULL, "scope_key" character varying(300) NOT NULL, CONSTRAINT "ux_route_scope" UNIQUE ("route_id", "scope_id"), CONSTRAINT "PK_ad10e0db3b3f1a035a48011a28d" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE INDEX "IDX_1476f766d88b816dd930673a99" ON "route_scope" ("scope_key") `
     );
     await queryRunner.query(
-      `CREATE TYPE "public"."service_route_auth_mode_enum" AS ENUM('any', 'all')`
-    );
-    await queryRunner.query(
-      `CREATE TABLE "service_route" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "service_id" uuid NOT NULL, "path" text NOT NULL, "route_rule_type" text NOT NULL DEFAULT 'exact', "methods" text array NOT NULL, "rewrite" text, "rate_limit" jsonb, "is_active" boolean NOT NULL DEFAULT true, "auth_mode" "public"."service_route_auth_mode_enum" NOT NULL DEFAULT 'any', "serviceId" uuid NOT NULL, CONSTRAINT "ux_route_service_path_rule_rewrite_not_deleted" UNIQUE ("serviceId", "path", "route_rule_type", "rewrite"), CONSTRAINT "ck_route_methods_nonempty" CHECK (cardinality("methods") > 0), CONSTRAINT "PK_c21c4528129cd60f6a39e213850" PRIMARY KEY ("id"))`
+      `CREATE TABLE "service_route" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "service_id" character varying NOT NULL, "path" text NOT NULL, "route_rule_type" text NOT NULL DEFAULT 'exact', "methods" text array NOT NULL, "rewrite" text, "rate_limit" jsonb, "is_active" boolean NOT NULL DEFAULT true, "auth_mode" "public"."service_route_auth_mode_enum" NOT NULL DEFAULT 'any', "serviceId" character varying(100) NOT NULL, CONSTRAINT "ux_route_service_path_rule_rewrite_not_deleted" UNIQUE ("serviceId", "path", "route_rule_type", "rewrite"), CONSTRAINT "ck_route_methods_nonempty" CHECK (cardinality("methods") > 0), CONSTRAINT "PK_c21c4528129cd60f6a39e213850" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(`CREATE INDEX "ix_route_service" ON "service_route" ("serviceId") `);
     await queryRunner.query(
@@ -51,19 +48,27 @@ export class AutoMigration1762542244675 implements MigrationInterface {
     await queryRunner.query(
       `INSERT INTO "typeorm_metadata"("database", "schema", "table", "type", "name", "value") VALUES ($1, $2, $3, $4, $5, $6)`,
       [
-        'maindb',
+        'main_db_dev',
         'public',
         'resource',
         'GENERATED_COLUMN',
         'resource_key',
-        '\n      CASE \n        WHEN "qualifier" IS NULL OR "qualifier" = \'\' \n          THEN "namespace" || \'.\' || "entity"\n        ELSE "namespace" || \'.\' || "entity" || \'.\' || "qualifier"\n      END\n    ',
+        '\n      CASE\n        -- 1) 全部为 * 时，简写为 \'*\'\n        WHEN btrim("namespace") = \'*\' AND btrim("entity") = \'*\'\n             AND ("qualifier" IS NULL OR btrim("qualifier") = \'\' OR btrim("qualifier") = \'*\')\n          THEN \'*\'\n\n        -- 2) qualifier 为 "*" 或空，则省略 qualifier\n        WHEN "qualifier" IS NULL OR btrim("qualifier") = \'\' OR btrim("qualifier") = \'*\'\n          THEN btrim("namespace") || \'.\' || btrim("entity")\n\n        -- 3) 其余情况，完整拼接\n        ELSE btrim("namespace") || \'.\' || btrim("entity") || \'.\' || btrim("qualifier")\n      END\n    ',
       ]
     );
     await queryRunner.query(`CREATE TABLE "resource" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "namespace" character varying(100) NOT NULL, "entity" character varying(100) NOT NULL, "qualifier" character varying(64), "fields_mode" "public"."resource_fields_mode_enum" NOT NULL DEFAULT 'all', "fields" text array NOT NULL DEFAULT '{}', "is_active" boolean NOT NULL DEFAULT true, "metadata" jsonb NOT NULL DEFAULT '{}', "resource_key" character varying(300) GENERATED ALWAYS AS (
-      CASE 
-        WHEN "qualifier" IS NULL OR "qualifier" = '' 
-          THEN "namespace" || '.' || "entity"
-        ELSE "namespace" || '.' || "entity" || '.' || "qualifier"
+      CASE
+        -- 1) 全部为 * 时，简写为 '*'
+        WHEN btrim("namespace") = '*' AND btrim("entity") = '*'
+             AND ("qualifier" IS NULL OR btrim("qualifier") = '' OR btrim("qualifier") = '*')
+          THEN '*'
+
+        -- 2) qualifier 为 "*" 或空，则省略 qualifier
+        WHEN "qualifier" IS NULL OR btrim("qualifier") = '' OR btrim("qualifier") = '*'
+          THEN btrim("namespace") || '.' || btrim("entity")
+
+        -- 3) 其余情况，完整拼接
+        ELSE btrim("namespace") || '.' || btrim("entity") || '.' || btrim("qualifier")
       END
     ) STORED NOT NULL, "version" integer NOT NULL, CONSTRAINT "ck_resource_qualifier_whitelist" CHECK ("qualifier" IS NULL OR "qualifier" IN ('*', ':id')), CONSTRAINT "ck_resource_fields_consistency" CHECK ((CASE 
      WHEN "fields_mode" = 'all' THEN coalesce(cardinality("fields"),0) = 0
@@ -79,25 +84,28 @@ export class AutoMigration1762542244675 implements MigrationInterface {
       `CREATE UNIQUE INDEX "ux_resource_ns_entity_qualifier_not_deleted" ON "resource" ("namespace", "entity", "qualifier") WHERE "deleted_at" IS NULL`
     );
     await queryRunner.query(
-      `CREATE TABLE "permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "fields" text array NOT NULL DEFAULT '{}', "fields_hash" character varying(256) NOT NULL DEFAULT '', "condition" jsonb, "condition_hash" character varying(1024) NOT NULL DEFAULT '', "resource_id" uuid NOT NULL, "action_id" uuid NOT NULL, "action_name" character varying(64) NOT NULL, "effect" "public"."permission_effect_enum" NOT NULL DEFAULT 'allow', "is_active" boolean NOT NULL DEFAULT true, "version" integer NOT NULL, "resourceId" uuid NOT NULL, "actionId" uuid NOT NULL, CONSTRAINT "ux_perm_resource_action_fields_cond_eff" UNIQUE ("resource_id", "action_id", "fields_hash", "condition_hash", "effect"), CONSTRAINT "PK_3b8b97af9d9d8807e41e6f48362" PRIMARY KEY ("id"))`
+      `CREATE TABLE "permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "fields" text array NOT NULL DEFAULT '{}', "fields_hash" character varying(256) NOT NULL DEFAULT '', "condition" jsonb, "condition_hash" character varying(1024) NOT NULL DEFAULT '', "resource_id" uuid NOT NULL, "resource_key" character varying(100) NOT NULL, "action_id" uuid NOT NULL, "action_name" character varying(64) NOT NULL, "effect" "public"."permission_effect_enum" NOT NULL DEFAULT 'allow', "is_active" boolean NOT NULL DEFAULT true, "version" integer NOT NULL, CONSTRAINT "ux_perm_resource_action_fields_cond_eff" UNIQUE ("resource_id", "action_id", "fields_hash", "condition_hash", "effect"), CONSTRAINT "PK_3b8b97af9d9d8807e41e6f48362" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_240853a0c3353c25fb12434ad3" ON "permission" ("name") `
     );
     await queryRunner.query(
-      `CREATE TABLE "role_permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "is_active" boolean NOT NULL DEFAULT true, "permission_id" uuid NOT NULL, "role_id" uuid NOT NULL, "permissionId" uuid NOT NULL, "roleId" uuid NOT NULL, CONSTRAINT "PK_96c8f1fd25538d3692024115b47" PRIMARY KEY ("id"))`
+      `CREATE TABLE "role_permission" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "is_active" boolean NOT NULL DEFAULT true, "permission_id" uuid NOT NULL, "role_id" uuid NOT NULL, CONSTRAINT "PK_96c8f1fd25538d3692024115b47" PRIMARY KEY ("id"))`
+    );
+    await queryRunner.query(
+      `CREATE UNIQUE INDEX "ux_role_permission_pair" ON "role_permission" ("role_id", "permission_id") `
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_401d840f6b1957fa74ac631c61" ON "role_permission" ("name") `
     );
     await queryRunner.query(
-      `CREATE TABLE "role" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "code" character varying(255) NOT NULL, "name" character varying(50) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "is_active" boolean NOT NULL DEFAULT true, "role_source" "public"."role_role_source_enum" NOT NULL DEFAULT 'type', "organization_type_id" uuid, "organization_id" uuid, "organizationTypeId" uuid, "organizationId" uuid, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`
+      `CREATE TABLE "role" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "code" character varying(255) NOT NULL, "name" character varying(50) NOT NULL, "description" character varying(255) NOT NULL DEFAULT '', "is_active" boolean NOT NULL DEFAULT true, "role_source" "public"."role_role_source_enum" NOT NULL DEFAULT 'type', "organization_type_id" uuid, "organization_id" uuid, CONSTRAINT "PK_b36bcfe02fc8de3c57a8b2391c2" PRIMARY KEY ("id"))`
     );
     await queryRunner.query(
       `CREATE UNIQUE INDEX "IDX_ee999bb389d7ac0fd967172c41" ON "role" ("code") `
     );
     await queryRunner.query(
-      `CREATE UNIQUE INDEX "IDX_3551ef7cbf25d2e49b1665bc55" ON "role" ("name", "role_source", "organizationTypeId", "organizationId") `
+      `CREATE UNIQUE INDEX "IDX_2ebd451f0c8d8330374db3b259" ON "role" ("name", "role_source", "organization_type_id", "organization_id") `
     );
     await queryRunner.query(
       `CREATE TABLE "user_organization_role" ("created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "deleted_at" TIMESTAMP WITH TIME ZONE, "created_by" character varying(255), "updated_by" character varying(255), "deleted_by" character varying(255), "id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying(512) NOT NULL, "is_active" boolean NOT NULL DEFAULT true, "userId" uuid NOT NULL, "organizationId" uuid NOT NULL, "roleId" uuid NOT NULL, CONSTRAINT "uq_uor_user_org_role" UNIQUE ("userId", "organizationId", "roleId"), CONSTRAINT "PK_af7e0d9e6a5a3001b829ced9500" PRIMARY KEY ("id"))`
@@ -165,40 +173,40 @@ export class AutoMigration1762542244675 implements MigrationInterface {
       `ALTER TABLE "organization" ADD CONSTRAINT "FK_32a98b1f3966745ebfd18f7955d" FOREIGN KEY ("org_type_id") REFERENCES "organization_type"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "scope" ADD CONSTRAINT "FK_d3544fbac9bdd99054bffb17640" FOREIGN KEY ("resourceId") REFERENCES "resource"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "scope" ADD CONSTRAINT "FK_5feb8b8e9bbf4673e1948e0494c" FOREIGN KEY ("resource_id") REFERENCES "resource"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "scope" ADD CONSTRAINT "FK_02c1be68a79d6ebcf0bc2ec03e8" FOREIGN KEY ("actionId") REFERENCES "action"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
+      `ALTER TABLE "scope" ADD CONSTRAINT "FK_7fcc3b915f3e2a69112bf5143b0" FOREIGN KEY ("action_id") REFERENCES "action"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "route_scope" ADD CONSTRAINT "FK_d9a9a1b04b195f39391f91c50f6" FOREIGN KEY ("routeId") REFERENCES "service_route"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "route_scope" ADD CONSTRAINT "FK_10e4ffd307397c8fe8c79c588c0" FOREIGN KEY ("route_id") REFERENCES "service_route"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "route_scope" ADD CONSTRAINT "FK_968de9e763db3b2448624af411a" FOREIGN KEY ("scopeId") REFERENCES "scope"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
+      `ALTER TABLE "route_scope" ADD CONSTRAINT "FK_59f5224aa180d2d02eaf033dc4b" FOREIGN KEY ("scope_id") REFERENCES "scope"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "service_route" ADD CONSTRAINT "FK_16034cff92303732c6749312bf5" FOREIGN KEY ("serviceId") REFERENCES "service"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "service_route" ADD CONSTRAINT "FK_16034cff92303732c6749312bf5" FOREIGN KEY ("serviceId") REFERENCES "service"("service_id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE "resource" ADD CONSTRAINT "FK_4bbbb68f9b40ccd42647707a523" FOREIGN KEY ("namespace") REFERENCES "service"("service_id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "permission" ADD CONSTRAINT "FK_287fe7669c4035bba465728974c" FOREIGN KEY ("resourceId") REFERENCES "resource"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "permission" ADD CONSTRAINT "FK_8cb319db6c644b6e59b98bdfd98" FOREIGN KEY ("resource_id") REFERENCES "resource"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "permission" ADD CONSTRAINT "FK_54b459f3ffe8a2420c1bb0aea5a" FOREIGN KEY ("actionId") REFERENCES "action"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
+      `ALTER TABLE "permission" ADD CONSTRAINT "FK_558a8b5ec76ab386a4c2e903f39" FOREIGN KEY ("action_id") REFERENCES "action"("id") ON DELETE RESTRICT ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "role_permission" ADD CONSTRAINT "FK_72e80be86cab0e93e67ed1a7a9a" FOREIGN KEY ("permissionId") REFERENCES "permission"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
+      `ALTER TABLE "role_permission" ADD CONSTRAINT "FK_e3a3ba47b7ca00fd23be4ebd6cf" FOREIGN KEY ("permission_id") REFERENCES "permission"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "role_permission" ADD CONSTRAINT "FK_e3130a39c1e4a740d044e685730" FOREIGN KEY ("roleId") REFERENCES "role"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`
+      `ALTER TABLE "role_permission" ADD CONSTRAINT "FK_3d0a7155eafd75ddba5a7013368" FOREIGN KEY ("role_id") REFERENCES "role"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "role" ADD CONSTRAINT "FK_25ff5fc261ad2318bb4a427dab3" FOREIGN KEY ("organizationTypeId") REFERENCES "organization_type"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "role" ADD CONSTRAINT "FK_2b9fced565a81f22f18d4a6fd14" FOREIGN KEY ("organization_type_id") REFERENCES "organization_type"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
-      `ALTER TABLE "role" ADD CONSTRAINT "FK_2bcd50772082305f3bcee6b6da4" FOREIGN KEY ("organizationId") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
+      `ALTER TABLE "role" ADD CONSTRAINT "FK_2c1fc97f79b82800ef15372b98c" FOREIGN KEY ("organization_id") REFERENCES "organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
     );
     await queryRunner.query(
       `ALTER TABLE "user_organization_role" ADD CONSTRAINT "FK_b7f91d67c393f0811a5849650ea" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION`
@@ -251,19 +259,19 @@ export class AutoMigration1762542244675 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "user_organization_role" DROP CONSTRAINT "FK_b7f91d67c393f0811a5849650ea"`
     );
-    await queryRunner.query(`ALTER TABLE "role" DROP CONSTRAINT "FK_2bcd50772082305f3bcee6b6da4"`);
-    await queryRunner.query(`ALTER TABLE "role" DROP CONSTRAINT "FK_25ff5fc261ad2318bb4a427dab3"`);
+    await queryRunner.query(`ALTER TABLE "role" DROP CONSTRAINT "FK_2c1fc97f79b82800ef15372b98c"`);
+    await queryRunner.query(`ALTER TABLE "role" DROP CONSTRAINT "FK_2b9fced565a81f22f18d4a6fd14"`);
     await queryRunner.query(
-      `ALTER TABLE "role_permission" DROP CONSTRAINT "FK_e3130a39c1e4a740d044e685730"`
+      `ALTER TABLE "role_permission" DROP CONSTRAINT "FK_3d0a7155eafd75ddba5a7013368"`
     );
     await queryRunner.query(
-      `ALTER TABLE "role_permission" DROP CONSTRAINT "FK_72e80be86cab0e93e67ed1a7a9a"`
+      `ALTER TABLE "role_permission" DROP CONSTRAINT "FK_e3a3ba47b7ca00fd23be4ebd6cf"`
     );
     await queryRunner.query(
-      `ALTER TABLE "permission" DROP CONSTRAINT "FK_54b459f3ffe8a2420c1bb0aea5a"`
+      `ALTER TABLE "permission" DROP CONSTRAINT "FK_558a8b5ec76ab386a4c2e903f39"`
     );
     await queryRunner.query(
-      `ALTER TABLE "permission" DROP CONSTRAINT "FK_287fe7669c4035bba465728974c"`
+      `ALTER TABLE "permission" DROP CONSTRAINT "FK_8cb319db6c644b6e59b98bdfd98"`
     );
     await queryRunner.query(
       `ALTER TABLE "resource" DROP CONSTRAINT "FK_4bbbb68f9b40ccd42647707a523"`
@@ -272,13 +280,13 @@ export class AutoMigration1762542244675 implements MigrationInterface {
       `ALTER TABLE "service_route" DROP CONSTRAINT "FK_16034cff92303732c6749312bf5"`
     );
     await queryRunner.query(
-      `ALTER TABLE "route_scope" DROP CONSTRAINT "FK_968de9e763db3b2448624af411a"`
+      `ALTER TABLE "route_scope" DROP CONSTRAINT "FK_59f5224aa180d2d02eaf033dc4b"`
     );
     await queryRunner.query(
-      `ALTER TABLE "route_scope" DROP CONSTRAINT "FK_d9a9a1b04b195f39391f91c50f6"`
+      `ALTER TABLE "route_scope" DROP CONSTRAINT "FK_10e4ffd307397c8fe8c79c588c0"`
     );
-    await queryRunner.query(`ALTER TABLE "scope" DROP CONSTRAINT "FK_02c1be68a79d6ebcf0bc2ec03e8"`);
-    await queryRunner.query(`ALTER TABLE "scope" DROP CONSTRAINT "FK_d3544fbac9bdd99054bffb17640"`);
+    await queryRunner.query(`ALTER TABLE "scope" DROP CONSTRAINT "FK_7fcc3b915f3e2a69112bf5143b0"`);
+    await queryRunner.query(`ALTER TABLE "scope" DROP CONSTRAINT "FK_5feb8b8e9bbf4673e1948e0494c"`);
     await queryRunner.query(
       `ALTER TABLE "organization" DROP CONSTRAINT "FK_32a98b1f3966745ebfd18f7955d"`
     );
@@ -310,10 +318,11 @@ export class AutoMigration1762542244675 implements MigrationInterface {
     await queryRunner.query(`DROP INDEX "public"."ix_uor_org"`);
     await queryRunner.query(`DROP INDEX "public"."ix_uor_role"`);
     await queryRunner.query(`DROP TABLE "user_organization_role"`);
-    await queryRunner.query(`DROP INDEX "public"."IDX_3551ef7cbf25d2e49b1665bc55"`);
+    await queryRunner.query(`DROP INDEX "public"."IDX_2ebd451f0c8d8330374db3b259"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_ee999bb389d7ac0fd967172c41"`);
     await queryRunner.query(`DROP TABLE "role"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_401d840f6b1957fa74ac631c61"`);
+    await queryRunner.query(`DROP INDEX "public"."ux_role_permission_pair"`);
     await queryRunner.query(`DROP TABLE "role_permission"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_240853a0c3353c25fb12434ad3"`);
     await queryRunner.query(`DROP TABLE "permission"`);
@@ -324,13 +333,12 @@ export class AutoMigration1762542244675 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE "resource"`);
     await queryRunner.query(
       `DELETE FROM "typeorm_metadata" WHERE "type" = $1 AND "name" = $2 AND "database" = $3 AND "schema" = $4 AND "table" = $5`,
-      ['GENERATED_COLUMN', 'resource_key', 'maindb', 'public', 'resource']
+      ['GENERATED_COLUMN', 'resource_key', 'main_db_dev', 'public', 'resource']
     );
     await queryRunner.query(`DROP INDEX "public"."ux_service_service_id_not_deleted"`);
     await queryRunner.query(`DROP TABLE "service"`);
     await queryRunner.query(`DROP INDEX "public"."ix_route_service"`);
     await queryRunner.query(`DROP TABLE "service_route"`);
-    await queryRunner.query(`DROP TYPE "public"."service_route_auth_mode_enum"`);
     await queryRunner.query(`DROP INDEX "public"."IDX_1476f766d88b816dd930673a99"`);
     await queryRunner.query(`DROP TABLE "route_scope"`);
     await queryRunner.query(`DROP INDEX "public"."ix_scope_resource"`);

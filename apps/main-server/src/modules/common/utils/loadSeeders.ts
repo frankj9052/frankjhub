@@ -4,6 +4,13 @@ import { env } from '../../../config/env';
 import { createLoggerWithContext } from '../libs/logger';
 import { BaseSeeder } from '../libs/BaseSeeder';
 
+// 排序用
+function getOrder(file: string): number {
+  const name = path.basename(file);
+  const match = name.match(/^(\d+)/); // 匹配开通的一串数字
+  return match ? parseInt(match[1], 10) : Number.POSITIVE_INFINITY;
+}
+
 const logger = createLoggerWithContext('SeederLoader');
 export async function loadSeeders(): Promise<Array<new () => BaseSeeder>> {
   const isProd = env.NODE_ENV === 'production';
@@ -14,9 +21,12 @@ export async function loadSeeders(): Promise<Array<new () => BaseSeeder>> {
     cwd,
     patterns: seedPatterns,
   });
-  const seedFiles = (await fg(seedPatterns, { cwd, absolute: true })).sort((a, b) =>
-    path.basename(a).localeCompare(path.basename(b))
-  );
+  const seedFiles = (await fg(seedPatterns, { cwd, absolute: true })).sort((a, b) => {
+    const orderA = getOrder(a);
+    const orderB = getOrder(b);
+    if (orderA !== orderB) return orderA - orderB;
+    return path.basename(a).localeCompare(path.basename(b));
+  });
   logger.info(`📦 Found ${seedFiles.length} seed file(s).`);
   const seeders: Array<new () => BaseSeeder> = [];
 

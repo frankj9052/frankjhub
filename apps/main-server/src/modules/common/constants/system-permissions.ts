@@ -9,9 +9,9 @@ export type SystemPermissionKey = (typeof SYSTEM_PERMISSION_KEY_LIST)[number];
 export const SYSTEM_PERMISSIONS: Record<SystemPermissionKey, PermissionCreateRequest> = {
   ALL: {
     resource_key: buildResourceKey({
-      namespace: SYSTEM_RESOURCES.ALL.namespace,
-      entity: SYSTEM_RESOURCES.ALL.entity,
-      qualifier: SYSTEM_RESOURCES.ALL.qualifier ?? undefined,
+      namespace: SYSTEM_RESOURCES.SYSTEM.namespace,
+      entity: SYSTEM_RESOURCES.SYSTEM.entity,
+      qualifier: SYSTEM_RESOURCES.SYSTEM.qualifier ?? undefined,
     }),
     actionName: SYSTEM_ACTIONS.ALL.name,
     description: 'Grant all permissions',
