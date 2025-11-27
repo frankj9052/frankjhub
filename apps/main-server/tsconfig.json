@@ -4,27 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared-perm"
-    },
-    {
-      "path": "../../libs/shared-errors"
-    },
-    {
-      "path": "../../libs/shared-typeorm-utils"
-    },
-    {
-      "path": "../../libs/shared-schema"
-    },
-    {
-      "path": "../../libs/shared-error-utils"
-    },
-    {
-      "path": "../../libs/shared-auth"
-    },
-    {
-      "path": "../../libs/shared-utils"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {

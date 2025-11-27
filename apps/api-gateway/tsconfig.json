@@ -4,36 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/shared-session"
-    },
-    {
-      "path": "../../libs/shared-error-handler"
-    },
-    {
-      "path": "../../libs/shared-cors"
-    },
-    {
-      "path": "../../libs/shared-redis"
-    },
-    {
-      "path": "../../libs/shared-rate-limiter"
-    },
-    {
-      "path": "../../libs/shared-logger"
-    },
-    {
-      "path": "../../libs/shared-constants"
-    },
-    {
-      "path": "../../libs/shared-errors"
-    },
-    {
-      "path": "../../libs/shared-schema"
-    },
-    {
-      "path": "../../libs/shared-config"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {

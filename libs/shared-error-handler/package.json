@@ -7,7 +7,7 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
+      "@frankjhub/source": "./src/index.ts",
       "types": "./dist/index.esm.d.ts",
       "import": "./dist/index.esm.js",
       "default": "./dist/index.esm.js"
@@ -18,9 +18,9 @@
     "express-session": "1.18.1",
     "@sentry/node": "9.24.0",
     "express": "4.21.2",
-    "@frankjhub/shared-schema": "0.0.4",
-    "@frankjhub/shared-utils": "0.0.9",
-    "@frankjhub/shared-errors": "0.0.2"
+    "@frankjhub/shared-schema": "0.0.6",
+    "@frankjhub/shared-errors": "0.0.2",
+    "@frankjhub/shared-error-utils": "0.0.1"
   },
   "nx": {
     "projectType": "library",

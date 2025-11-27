@@ -1,13 +1,13 @@
 {
   "name": "@frankjhub/shared-schema",
-  "version": "0.0.4",
+  "version": "0.0.6",
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.esm.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
+      "@frankjhub/source": "./src/index.ts",
       "require": "./dist/index.cjs.js",
       "types": "./dist/index.esm.d.ts",
       "import": "./dist/index.esm.js",
@@ -17,7 +17,7 @@
   "dependencies": {
     "zod": "^3.25.42",
     "@asteasolutions/zod-to-openapi": "7.3.2",
-    "@frankjhub/shared-utils": "0.0.9"
+    "@frankjhub/shared-utils": "0.0.11"
   },
   "nx": {
     "projectType": "library",

@@ -7,14 +7,14 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
+      "@frankjhub/source": "./src/index.ts",
       "types": "./dist/index.esm.d.ts",
       "import": "./dist/index.esm.js",
       "default": "./dist/index.esm.js"
     }
   },
   "dependencies": {
-    "@frankjhub/shared-schema": "0.0.4"
+    "@frankjhub/shared-schema": "0.0.6"
   },
   "nx": {
     "projectType": "library",

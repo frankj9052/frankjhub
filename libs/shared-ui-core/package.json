@@ -7,16 +7,16 @@
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
+      "@frankjhub/source": "./src/index.ts",
       "types": "./dist/index.esm.d.ts",
       "import": "./dist/index.esm.js",
       "default": "./dist/index.esm.js"
     }
   },
-    "nx": {
+  "nx": {
     "projectType": "library",
     "sourceRoot": "libs/shared-ui-core",
-        "targets": {
+    "targets": {
       "deploy": {
         "dependsOn": [
           "build"

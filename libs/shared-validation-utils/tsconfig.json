@@ -4,15 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../shared-error-utils"
-    },
-    {
-      "path": "../shared-errors"
-    },
-    {
-      "path": "../shared-schema"
-    },
-    {
       "path": "./tsconfig.lib.json"
     }
   ]

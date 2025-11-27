@@ -1,22 +1,22 @@
 {
   "name": "@frankjhub/shared-utils",
-  "version": "0.0.9",
+  "version": "0.0.11",
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
   "types": "./dist/index.esm.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "development": "./src/index.ts",
+      "@frankjhub/source": "./src/index.ts",
       "types": "./dist/index.esm.d.ts",
       "import": "./dist/index.esm.js",
       "default": "./dist/index.esm.js"
     }
   },
   "dependencies": {
-    "@internationalized/date": "^3.5.6",
-    "react": "19.0.0",
-    "date-fns": "4.1.0"
+    "@internationalized/date": "3.8.1",
+    "date-fns": "4.1.0",
+    "react": "19.0.0"
   },
   "nx": {
     "projectType": "library",

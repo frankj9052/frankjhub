@@ -53,6 +53,9 @@
       "path": "../../libs/shared-table-utils"
     },
     {
+      "path": "../../libs/shared-error-utils"
+    },
+    {
       "path": "../../libs/shared-ui-client"
     },
     {

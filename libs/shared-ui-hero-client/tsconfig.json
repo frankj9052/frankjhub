@@ -3,24 +3,6 @@
   "include": [],
   "references": [
     {
-      "path": "../shared-schema"
-    },
-    {
-      "path": "../shared-utils"
-    },
-    {
-      "path": "../shared-ui-core"
-    },
-    {
-      "path": "../shared-ui-client"
-    },
-    {
-      "path": "../shared-ui-hero-ssr"
-    },
-    {
-      "path": "../shared-hooks"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

@@ -1,6 +1,5 @@
 // axios 实例及拦截器
-
-import { parseError } from '@frankjhub/shared-utils';
+import { parseError } from '@frankjhub/shared-error-utils';
 import axios from 'axios';
 
 const axiosInstance = axios.create({

@@ -3,9 +3,6 @@
   "include": [],
   "references": [
     {
-      "path": "../shared-ui-core"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
