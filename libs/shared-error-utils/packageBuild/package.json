@@ -1,21 +1,22 @@
 {
   "name": "@frankjhub/shared-error-utils",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
-  "types": "./index.esm.d.ts",
+  "types": "./index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./index.esm.d.ts",
+      "types": "./index.d.ts",
       "import": "./index.esm.js",
+      "require": "./index.cjs.js",
       "default": "./index.esm.js"
     }
   },
   "dependencies": {
     "react-hook-form": "7.57.0",
     "zod": "3.25.42",
-    "axios": "1.9.0",
+    "axios": "1.13.2",
     "@frankjhub/shared-schema": "0.0.6"
   }
 }

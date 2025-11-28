@@ -12,12 +12,6 @@
   "include": ["src/**/*.ts"],
   "references": [
     {
-      "path": "../shared-error-utils/tsconfig.lib.json"
-    },
-    {
-      "path": "../shared-errors/tsconfig.lib.json"
-    },
-    {
       "path": "../shared-schema/tsconfig.lib.json"
     }
   ]

@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
-  "types": "./index.esm.d.ts",
+  "types": "./index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./index.esm.d.ts",
+      "types": "./index.d.ts",
       "import": "./index.esm.js",
+      "require": "./index.cjs.js",
       "default": "./index.esm.js"
     }
   },

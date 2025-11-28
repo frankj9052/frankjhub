@@ -85,7 +85,7 @@
     "@vitest/ui": "^3.0.0",
     "argon2": "0.43.0",
     "autoprefixer": "10.4.13",
-    "axios": "1.9.0",
+    "axios": "1.13.2",
     "bullmq": "5.58.7",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",

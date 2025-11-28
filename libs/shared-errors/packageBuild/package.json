@@ -1,17 +1,20 @@
 {
   "name": "@frankjhub/shared-errors",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "./index.esm.js",
   "module": "./index.esm.js",
-  "types": "./index.esm.d.ts",
+  "types": "./index.d.ts",
   "exports": {
     "./package.json": "./package.json",
     ".": {
-      "types": "./index.esm.d.ts",
+      "types": "./index.d.ts",
       "import": "./index.esm.js",
+      "require": "./index.cjs.js",
       "default": "./index.esm.js"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+    "http-status-codes": "2.3.0"
+  }
 }
