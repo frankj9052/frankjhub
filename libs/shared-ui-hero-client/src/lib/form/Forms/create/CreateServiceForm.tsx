@@ -2,8 +2,9 @@ import {
   PermissionOptionList,
   ServiceCreateRequest,
   serviceCreateRequestSchema,
+  ServiceRouteCreateRequest,
 } from '@frankjhub/shared-schema';
-import { BaseSyntheticEvent } from 'react';
+import { BaseSyntheticEvent, useState } from 'react';
 import { Controller, useForm, UseFormSetError } from 'react-hook-form';
 import { FrankForm } from '../../Base';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,8 +20,7 @@ const defaultValues: ServiceCreateRequest = {
   baseUrl: '',
   serviceSecret: '',
   audPrefix: 'api://',
-  routes: [],
-  requiredScopes: [],
+  baselineRequiredScopes: [],
   description: '',
   healthCheckPath: '',
   ownerTeam: '',
@@ -45,6 +45,7 @@ export const CreateServiceForm = ({
     control,
     handleSubmit,
     setError,
+    watch,
     formState: { errors, isDirty, isSubmitting },
   } = useForm<ServiceCreateRequest>({
     resolver: zodResolver(serviceCreateRequestSchema),
@@ -52,6 +53,11 @@ export const CreateServiceForm = ({
     reValidateMode: 'onBlur',
     defaultValues,
   });
+
+  const serviceId = watch('serviceId');
+
+  // 单独管理 routes 状态（因为 ServiceCreateRequest 中不包含 routes）
+  const [routes, setRoutes] = useState<ServiceRouteCreateRequest[]>([]);
 
   return (
     <FrankForm
@@ -183,12 +189,12 @@ export const CreateServiceForm = ({
       <div className="w-full">
         <div>
           <Controller
-            name="requiredScopes"
+            name="baselineRequiredScopes"
             control={control}
             render={({ field, fieldState }) => (
               <AddPermission
                 permissionOptionList={permissionOptionList}
-                value={field.value}
+                value={field.value ?? []}
                 onChange={field.onChange}
                 isDisabled={isSubmitting}
                 errorMessage={fieldState.error?.message}
@@ -200,29 +206,12 @@ export const CreateServiceForm = ({
       {/* routes */}
       <div className="w-full bg-gray-100 p-4 rounded-lg">
         <div>
-          <Controller
-            name="routes"
-            control={control}
-            render={({ field, fieldState }) => {
-              const value = field.value
-                ? field.value.map(item => ({
-                    path: item.path,
-                    methods: item.methods,
-                    requiredScopes: item.requiredScopes ?? [],
-                    rewrite: item.rewrite,
-                    rateLimit: item.rateLimit,
-                  }))
-                : [];
-              return (
-                <AddRoute
-                  routes={value}
-                  onChange={field.onChange}
-                  permissionOptionList={permissionOptionList}
-                  errorMessage={fieldState.error?.message}
-                  isDisabled={isSubmitting}
-                />
-              );
-            }}
+          <AddRoute
+            serviceId={serviceId || ''}
+            routes={routes}
+            onChange={setRoutes}
+            errorMessage={undefined}
+            isDisabled={isSubmitting}
           />
         </div>
       </div>

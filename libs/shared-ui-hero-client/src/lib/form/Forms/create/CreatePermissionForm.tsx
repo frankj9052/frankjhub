@@ -15,11 +15,13 @@ import { FrankButton } from '@frankjhub/shared-ui-hero-ssr';
 import { FrankAutocompleteGeneral } from '../../FormFields';
 
 const defaultValues: PermissionCreateRequest = {
-  resourceId: '',
-  actionIds: [],
+  resource_key: '',
+  actionName: '',
   description: undefined,
   fields: undefined,
   condition: undefined,
+  effect: undefined,
+  isActive: undefined,
 };
 
 export interface CreatePermissionFormProps {
@@ -76,7 +78,7 @@ export const CreatePermissionForm = ({
       <div className="w-full">
         <div>
           <Controller
-            name="resourceId"
+            name="resource_key"
             control={control}
             render={({ field, fieldState }) => (
               <FrankAutocompleteGeneral
@@ -90,8 +92,8 @@ export const CreatePermissionForm = ({
                 errorMessage={fieldState.error?.message}
                 defaultItems={
                   resourceOptionList?.map(item => ({
-                    label: item.name,
-                    key: item.id,
+                    label: item.resource_key,
+                    key: item.resource_key,
                   })) ?? []
                 }
                 size="sm"
@@ -103,21 +105,17 @@ export const CreatePermissionForm = ({
       <div className="w-full">
         <div>
           <Controller
-            name="actionIds"
+            name="actionName"
             control={control}
             render={({ field, fieldState }) => (
               <FrankSelect
-                label="Select Actions (*)"
-                ariaLabel="select actions"
-                selectionMode="multiple"
-                selectedKeys={field.value ?? []}
+                label="Select Action (*)"
+                ariaLabel="select action"
+                selectionMode="single"
+                selectedKeys={field.value ? [field.value] : []}
                 onSelectionChange={sharedSelection => {
-                  const selected: string[] =
-                    sharedSelection === 'all'
-                      ? actionOptionList?.map(item => item.id) ?? []
-                      : Array.from(sharedSelection).map(key => String(key));
-
-                  field.onChange(selected);
+                  const selected = Array.from(sharedSelection)[0];
+                  field.onChange(String(selected));
                 }}
                 onBlur={field.onBlur}
                 isInvalid={!!fieldState.error}
@@ -125,7 +123,7 @@ export const CreatePermissionForm = ({
                 items={
                   actionOptionList?.map(item => ({
                     label: item.name,
-                    key: item.id,
+                    key: item.name,
                   })) ?? []
                 }
                 size="sm"
@@ -145,9 +143,10 @@ export const CreatePermissionForm = ({
               <FrankInput
                 label="Fields (Use commas to separate)"
                 variant="bordered"
-                value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                value={Array.isArray(field.value) ? field.value.join(', ') : field.value ?? ''}
                 onValueChange={value => {
-                  const fields = value.split(',').map(item => item.trim());
+                  const fields =
+                    value.trim() === '' ? undefined : value.split(',').map(item => item.trim());
                   field.onChange(fields);
                 }}
                 onBlur={field.onBlur}

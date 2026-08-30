@@ -13,7 +13,7 @@ import {
   FrankSelect,
   FrankTextArea,
 } from '@frankjhub/shared-ui-hero-client';
-import { handleFormServerErrors } from '@frankjhub/shared-utils';
+import { handleFormServerErrors } from '@frankjhub/shared-error-utils';
 import { Button, Form, Input } from '@heroui/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useRef, useState } from 'react';
@@ -47,9 +47,9 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
     if (result.status === 'success') {
       toast.success(result.message);
       reset({
-        resourceId: '',
-        actionIds: [],
-        fields: [],
+        resource_key: '',
+        actionName: '',
+        fields: undefined,
         condition: undefined,
         description: '',
       });
@@ -99,7 +99,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
         <div className="flex flex-col w-full">
           <div className="h-[70px] w-full">
             <Controller
-              name="resourceId"
+              name="resource_key"
               control={control}
               render={({ field, fieldState }) => (
                 <FrankCustomizedAutocomplete
@@ -113,8 +113,8 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
                   errorMessage={fieldState.error?.message}
                   defaultItems={
                     resourceOptionList?.data?.map(item => ({
-                      label: item.name,
-                      key: item.id,
+                      label: item.resource_key,
+                      key: item.resource_key,
                     })) ?? []
                   }
                   defaultFilter={true}
@@ -125,21 +125,17 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
           </div>
           <div className="h-[70px] w-full">
             <Controller
-              name="actionIds"
+              name="actionName"
               control={control}
               render={({ field, fieldState }) => (
                 <FrankSelect
-                  label="Select Actions (*)"
-                  ariaLabel="select actions"
-                  selectionMode="multiple"
-                  selectedKeys={field.value ?? []}
+                  label="Select Action (*)"
+                  ariaLabel="select action"
+                  selectionMode="single"
+                  selectedKeys={field.value ? [field.value] : []}
                   onSelectionChange={sharedSelection => {
-                    const selected: string[] =
-                      sharedSelection === 'all'
-                        ? actionOptionList?.data?.map(item => item.id) ?? []
-                        : Array.from(sharedSelection).map(key => String(key));
-
-                    field.onChange(selected);
+                    const selected = Array.from(sharedSelection)[0];
+                    field.onChange(String(selected));
                   }}
                   onBlur={field.onBlur}
                   isInvalid={!!fieldState.error}
@@ -147,7 +143,7 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
                   items={
                     actionOptionList?.data?.map(item => ({
                       label: item.name,
-                      key: item.id,
+                      key: item.name,
                     })) ?? []
                   }
                   size="sm"
@@ -165,10 +161,11 @@ export const CreatePermissionForm = ({ onClose }: Props) => {
                 <Input
                   label="Fields (Use commas to separate)"
                   variant="bordered"
-                  value={Array.isArray(field.value) ? field.value.join(', ') : ''}
+                  value={Array.isArray(field.value) ? field.value.join(', ') : field.value ?? ''}
                   onChange={event => {
                     const value = event.currentTarget.value;
-                    const fields = value.split(',').map(item => item.trim());
+                    const fields =
+                      value.trim() === '' ? undefined : value.split(',').map(item => item.trim());
                     field.onChange(fields);
                   }}
                   onBlur={field.onBlur}

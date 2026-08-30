@@ -69,7 +69,7 @@ export function FrankAccordion({
         width: width ? `${width}px` : '100%',
       }}
     >
-      <Accordion
+      {/* <Accordion
         selectionMode={selectionMode}
         variant={variant}
         defaultExpandedKeys={defaultExpandedKeys}
@@ -109,6 +109,11 @@ export function FrankAccordion({
               </AccordionItem>
             );
           })}
+      </Accordion> */}
+      <Accordion className="w-full max-w-md">
+        <AccordionItem key="1" aria-label="Accordion 1" title="Accordion 1">
+          hello
+        </AccordionItem>
       </Accordion>
     </div>
   );

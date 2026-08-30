@@ -2,9 +2,10 @@ import {
   PermissionOptionList,
   ServiceUpdateRequest,
   serviceUpdateRequestSchema,
+  ServiceRouteCreateRequest,
 } from '@frankjhub/shared-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { BaseSyntheticEvent, useEffect } from 'react';
+import { BaseSyntheticEvent, useEffect, useState } from 'react';
 import { Controller, useForm, UseFormSetError } from 'react-hook-form';
 import { FrankForm } from '../../Base/FrankForm';
 import { FrankInput } from '../../FormFields/Input/FrankInput';
@@ -16,13 +17,24 @@ import { FrankTextArea } from '../../FormFields/Textarea/FrankTextarea';
 import { ActiveChip, DeletedChip } from '../../../dataDisplay';
 import { ActiveSwitch } from '../../FormFields';
 
+export interface ServiceEditInitialValue extends ServiceUpdateRequest {
+  /** serviceId 是只读的，从初始值中读取 */
+  serviceId?: string;
+  /** id 用于删除和恢复操作 */
+  id?: string;
+  /** deletedAt 用于显示删除状态 */
+  deletedAt?: string | null;
+  /** routes 是单独管理的，不是 ServiceUpdateRequest 的一部分 */
+  routes?: ServiceRouteCreateRequest[];
+}
+
 export interface ServiceEditFormProps {
   onSubmit: (
     values: ServiceUpdateRequest,
     setError: UseFormSetError<ServiceUpdateRequest>,
     event: BaseSyntheticEvent<object, any, any> | undefined
   ) => void;
-  initialValue?: ServiceUpdateRequest | undefined;
+  initialValue?: ServiceEditInitialValue | undefined;
   isLoading?: IsLoading;
   permissionOptionList?: PermissionOptionList;
   handleHardDelete?: (id: string) => void;
@@ -49,6 +61,19 @@ export const ServiceEditForm = ({
     reValidateMode: 'onBlur',
   });
 
+  // 从 initialValue 中提取 serviceId（因为 ServiceUpdateRequest 中不包含此字段）
+  const serviceId = (initialValue as any)?.serviceId || '';
+
+  // 单独管理 routes 状态（因为 ServiceUpdateRequest 中不包含 routes）
+  const [routes, setRoutes] = useState<ServiceRouteCreateRequest[]>(initialValue?.routes || []);
+
+  // 当 initialValue 变化时更新 routes
+  useEffect(() => {
+    if (initialValue?.routes) {
+      setRoutes(initialValue.routes);
+    }
+  }, [initialValue?.routes]);
+
   // 重置表格
   const handleReset = () => {
     if (initialValue) {
@@ -71,21 +96,12 @@ export const ServiceEditForm = ({
       {/* serviceId & serviceName */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
         <div>
-          <Controller
-            name="serviceId"
-            control={control}
-            render={({ field, fieldState }) => (
-              <FrankInput
-                label="ServiceId"
-                variant="bordered"
-                value={field.value ?? ''}
-                onValueChange={field.onChange}
-                onBlur={field.onBlur}
-                isInvalid={!!fieldState.error}
-                errorMessage={fieldState.error?.message}
-                size="sm"
-              />
-            )}
+          <FrankInput
+            label="ServiceId"
+            variant="bordered"
+            value={serviceId}
+            isDisabled={true}
+            size="sm"
           />
         </div>
         <div>
@@ -242,12 +258,12 @@ export const ServiceEditForm = ({
         <h1 className="font-semibold">Edit Basic Permission</h1>
         <div>
           <Controller
-            name="requiredScopes"
+            name="baselineRequiredScopes"
             control={control}
             render={({ field, fieldState }) => (
               <AddPermission
                 permissionOptionList={permissionOptionList ?? []}
-                value={field.value}
+                value={field.value ?? []}
                 onChange={field.onChange}
                 isDisabled={isSubmitting}
                 errorMessage={fieldState.error?.message}
@@ -260,29 +276,12 @@ export const ServiceEditForm = ({
       {/* routes */}
       <div className="w-full bg-gray-50 p-4 rounded-lg">
         <div>
-          <Controller
-            name="routes"
-            control={control}
-            render={({ field, fieldState }) => {
-              const value = field.value
-                ? field.value.map(item => ({
-                    path: item.path,
-                    methods: item.methods,
-                    requiredScopes: item.requiredScopes ?? [],
-                    rewrite: item.rewrite,
-                    rateLimit: item.rateLimit,
-                  }))
-                : [];
-              return (
-                <AddRoute
-                  routes={value}
-                  onChange={field.onChange}
-                  permissionOptionList={permissionOptionList}
-                  errorMessage={fieldState.error?.message}
-                  isDisabled={isSubmitting}
-                />
-              );
-            }}
+          <AddRoute
+            serviceId={serviceId || ''}
+            routes={routes}
+            onChange={setRoutes}
+            errorMessage={undefined}
+            isDisabled={isSubmitting}
           />
         </div>
       </div>
@@ -337,7 +336,7 @@ export const ServiceEditForm = ({
             isDisabled={isSubmitting}
             isLoading={isLoading}
             onPress={() => {
-              if (handleHardDelete && initialValue) {
+              if (handleHardDelete && initialValue?.id) {
                 handleHardDelete(initialValue.id);
               }
             }}
@@ -353,7 +352,7 @@ export const ServiceEditForm = ({
             isDisabled={isSubmitting || !initialValue?.deletedAt}
             isLoading={isLoading}
             onPress={() => {
-              if (handleRecovery && initialValue) {
+              if (handleRecovery && initialValue?.id) {
                 handleRecovery(initialValue.id);
               }
             }}

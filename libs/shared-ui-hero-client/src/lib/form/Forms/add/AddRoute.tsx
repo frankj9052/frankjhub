@@ -1,33 +1,35 @@
 import {
   HTTP_METHOD,
   HttpMethod,
-  PermissionOptionList,
-  ServiceRoute,
-  serviceRouteSchema,
+  ServiceRouteCreateRequest,
+  serviceRouteCreateRequestSchema,
+  ROUTE_RULE_TYPE,
+  AUTH_MODE,
 } from '@frankjhub/shared-schema';
 import { FrankButton, GeneralTableColumn } from '@frankjhub/shared-ui-hero-ssr';
 import { useMemo, useState } from 'react';
 import { FrankInput, FrankSelect, SelectItemType } from '../../FormFields';
-import { AddPermission } from './AddPermission';
 import { FrankGeneralTable } from '../../../table';
-import { generateColumnsFromKeys } from '@frankjhub/shared-utils';
+import { generateColumnsFromKeys } from '@frankjhub/shared-table-utils';
 
-const initialRoute: ServiceRoute = {
+const createInitialRoute = (serviceId: string): ServiceRouteCreateRequest => ({
+  serviceId,
   path: '',
   methods: [],
-  requiredScopes: [],
+  routeRuleType: ROUTE_RULE_TYPE.EXACT,
   rewrite: '',
   rateLimit: undefined,
-};
+  isActive: true,
+  authMode: AUTH_MODE.ANY,
+});
 
 export interface AddRouteProps {
+  /** 必需：服务 ID */
+  serviceId: string;
   /** 受控：当前 routes 列表 */
-  routes?: ServiceRoute[];
+  routes?: ServiceRouteCreateRequest[];
   /** 受控：变更回调（整个数组） */
-  onChange: (next: ServiceRoute[]) => void;
-
-  /** 可选：权限选项列表 */
-  permissionOptionList?: PermissionOptionList;
+  onChange: (next: ServiceRouteCreateRequest[]) => void;
 
   /** 可选：由上层校验传入的错误消息（例如 zod 要求至少 1 条 route） */
   errorMessage?: string;
@@ -37,14 +39,16 @@ export interface AddRouteProps {
 }
 
 export const AddRoute = ({
+  serviceId,
   routes = [],
   onChange,
-  permissionOptionList = [],
   errorMessage,
   isDisabled,
 }: AddRouteProps) => {
   const [showForm, setShowForm] = useState(false);
-  const [route, setRoute] = useState<ServiceRoute>(initialRoute);
+  const [route, setRoute] = useState<ServiceRouteCreateRequest>(() =>
+    createInitialRoute(serviceId)
+  );
   const [localError, setLocalError] = useState<string | null>(null);
   const methodItems: SelectItemType[] = useMemo(
     () =>
@@ -54,12 +58,14 @@ export const AddRoute = ({
       })),
     []
   );
-  const columnKeys: (keyof ServiceRoute)[] = [
+  const columnKeys: (keyof ServiceRouteCreateRequest)[] = [
     'path',
     'methods',
-    'requiredScopes',
+    'routeRuleType',
     'rewrite',
     'rateLimit',
+    'isActive',
+    'authMode',
   ];
   const routeRecords: GeneralTableColumn[] = generateColumnsFromKeys(columnKeys, {
     extraColumns: [
@@ -77,7 +83,7 @@ export const AddRoute = ({
   };
 
   const handleCreate = () => {
-    const result = serviceRouteSchema.safeParse(route);
+    const result = serviceRouteCreateRequestSchema.safeParse(route);
     const exist = routes.find(
       r => r.path === route.path && r.methods.toString() === route.methods.toString()
     );
@@ -95,7 +101,7 @@ export const AddRoute = ({
     setLocalError(null);
     onChange([...routes, route]);
     setShowForm(false);
-    setRoute(initialRoute);
+    setRoute(createInitialRoute(serviceId));
   };
 
   return (
@@ -117,10 +123,7 @@ export const AddRoute = ({
             const cellValue = item[columnKey as keyof typeof item];
             switch (columnKey) {
               case 'methods':
-              case 'requiredScopes':
-                if (typeof cellValue === 'string') {
-                  return <span>cellValue</span>;
-                } else if (Array.isArray(cellValue)) {
+                if (Array.isArray(cellValue)) {
                   return <span>[{cellValue.join(', ')}]</span>;
                 }
                 return;
@@ -213,7 +216,7 @@ export const AddRoute = ({
                 label="rewrite"
                 size="sm"
                 variant="bordered"
-                value={route.rewrite}
+                value={route.rewrite ?? ''}
                 isDisabled={isDisabled}
                 onValueChange={value => {
                   setRoute(prev => ({
@@ -224,13 +227,66 @@ export const AddRoute = ({
               />
             </div>
           </div>
-          {/* require scopes */}
-          <AddPermission
-            permissionOptionList={permissionOptionList}
-            value={route.requiredScopes}
-            onChange={next => setRoute(prev => ({ ...prev, requiredScopes: next }))}
-            isDisabled={isDisabled}
-          />
+          {/* routeRuleType & authMode */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <div>
+              <FrankSelect
+                label="Rule Type"
+                size="sm"
+                variant="bordered"
+                items={[
+                  { key: ROUTE_RULE_TYPE.EXACT, label: 'Exact' },
+                  { key: ROUTE_RULE_TYPE.PREFIX, label: 'Prefix' },
+                ]}
+                isDisabled={isDisabled}
+                selectedKeys={route.routeRuleType ? [route.routeRuleType] : []}
+                onSelectionChange={selected => {
+                  const value = Array.from(selected)[0];
+                  setRoute(prev => ({
+                    ...prev,
+                    routeRuleType: value as any,
+                  }));
+                }}
+              />
+            </div>
+            <div>
+              <FrankSelect
+                label="Auth Mode"
+                size="sm"
+                variant="bordered"
+                items={[
+                  { key: AUTH_MODE.ANY, label: 'Any' },
+                  { key: AUTH_MODE.ALL, label: 'All' },
+                ]}
+                isDisabled={isDisabled}
+                selectedKeys={route.authMode ? [route.authMode] : []}
+                onSelectionChange={selected => {
+                  const value = Array.from(selected)[0];
+                  setRoute(prev => ({
+                    ...prev,
+                    authMode: value as any,
+                  }));
+                }}
+              />
+            </div>
+          </div>
+          {/* isActive */}
+          <div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={route.isActive ?? true}
+                disabled={isDisabled}
+                onChange={e => {
+                  setRoute(prev => ({
+                    ...prev,
+                    isActive: e.target.checked,
+                  }));
+                }}
+              />
+              <span>Active</span>
+            </label>
+          </div>
           {/* Rate Limit */}
           <div className="border-gray-200 border rounded-lg p-2 flex flex-col gap-2">
             <h3 className="text-gray-400 pl-1 text-sm">Rate Limit (Optional):</h3>
@@ -287,7 +343,7 @@ export const AddRoute = ({
               className="text-secondary"
               onPress={() => {
                 setShowForm(false);
-                setRoute(initialRoute);
+                setRoute(createInitialRoute(serviceId));
                 setLocalError(null);
               }}
               size="sm"
