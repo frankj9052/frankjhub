@@ -156,9 +156,6 @@
       },
       "migration:run:prod": {
         "executor": "nx:run-commands",
-        "dependsOn": [
-          "build"
-        ],
         "options": {
           "command": "ts-node",
           "args": [
