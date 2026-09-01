@@ -16,7 +16,7 @@
   "dependencies": {
     "@frankjhub/shared-schema": "0.0.6",
     "@frankjhub/shared-jose": "0.0.1",
-    "@frankjhub/shared-errors": "0.0.2"
+    "@frankjhub/shared-errors": "0.0.3"
   },
   "nx": {
     "projectType": "library",
