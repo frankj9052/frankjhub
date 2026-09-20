@@ -20,7 +20,7 @@ export class MjmlRenderer implements ITemplateRenderer {
     const compiled = Handlebars.compile(raw);
     const mjml = compiled(templateVars);
 
-    const { html, errors } = mjml2html(mjml, { validationLevel: 'soft' });
+    const { html, errors } = await mjml2html(mjml, { validationLevel: 'soft' });
     if (errors?.length) {
       // 记录但不中断
       logger.error('Error occur in mjml2html');
