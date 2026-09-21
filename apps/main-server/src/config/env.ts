@@ -8,6 +8,7 @@ const baseSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().default('4000'),
   HOST: z.string().default('localhost'),
+  BIND_HOST: z.string().default('127.0.0.1'),
   CORS_ORIGIN: z.string().optional(),
   JWT_SECRET: z.string(),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),

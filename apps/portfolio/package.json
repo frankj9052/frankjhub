@@ -20,7 +20,7 @@
         "executor": "nx:run-commands",
         "defaultConfiguration": "production",
         "options": {
-          "command": "next start apps/portfolio"
+          "command": "next start apps/portfolio -H 127.0.0.1"
         }
       }
     }

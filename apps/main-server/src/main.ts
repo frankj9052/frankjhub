@@ -51,7 +51,7 @@ async function startServer() {
     const app = await createApp();
 
     // 4. 启动 HTTP 服务器
-    server = app.listen(Number(env.PORT), () => {
+    server = app.listen(Number(env.PORT), env.BIND_HOST, () => {
       serverLogger.info(`🚀 Server running at http://${env.HOST}:${env.PORT}`);
       serverLogger.info(`📚 Swagger docs available at http://${env.HOST}:${env.PORT}/api-docs`);
       // 在 server 启动成功后再启动快照定时器
